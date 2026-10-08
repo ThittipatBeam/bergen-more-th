@@ -23,6 +23,12 @@ retrieve_top_k: 50
 rerank_top_k: 50
 generation_top_k: 5
 
+# Thai-aware metrics (M_th, F1_th, Precision_th, Recall_th).
+# null = auto: enabled when the dataset's language is Thai
+# (dataset.<split>.query.init_args.lang == 'th').
+# Override per run with thai_metrics=true / thai_metrics=false.
+thai_metrics: null
+
 
 #
 pyserini_num_threads: 20

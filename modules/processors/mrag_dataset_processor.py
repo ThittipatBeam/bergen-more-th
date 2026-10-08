@@ -13,7 +13,10 @@ class MKQA(Processor):
         self.lang = lang
         
     def process(self):
-        mkqa = datasets.load_dataset('mkqa', trust_remote_code=True)
+        # 'mkqa' is a legacy repo that redirects to apple/mkqa; the redirect breaks
+        # on newer huggingface_hub inside datasets 3.x (HfUriError), so load the
+        # canonical repo directly. Same data, just the namespaced name.
+        mkqa = datasets.load_dataset('apple/mkqa', trust_remote_code=True)
         kilt_nq = datasets.load_dataset("kilt_tasks", "nq")
 
         mkqa_ids = {s['example_id']:i for i, s in enumerate(mkqa[self.split])}

@@ -28,6 +28,7 @@ from modules.generate_query import GenerateQueries
 from modules.process_context import ProcessContext
 from modules.dataset_processor import ProcessDatasets
 from modules.metrics import RAGMetrics
+from models.generators.generator import load_existing_responses
 
 
 class RAG:
@@ -454,7 +455,14 @@ class RAG:
                  dataset_split, 
                  ):
         generation_start = time.time()
-        query_ids, questions, instructions, predictions, references, ranking_labels  = self.generator.eval(gen_dataset)
+        # resume support: questions already answered in a previous (crashed or
+        # interrupted) run are replayed from eval_*_out.json, not regenerated
+        out_file = f"{self.experiment_folder}/eval_{dataset_split}_out.json"
+        existing = load_existing_responses(out_file)
+        if existing:
+            gen_dataset = gen_dataset.map(
+                lambda x: {'existing_response': existing.get(x['q_id'])})
+        query_ids, questions, instructions, predictions, references, ranking_labels  = self.generator.eval(gen_dataset, resume_file=out_file)
         generation_time = time.time() - generation_start
         write_generated(
             self.experiment_folder,
@@ -491,6 +499,27 @@ class RAG:
 
         return questions, instructions, predictions, references
 
+    def _resolve_thai_metrics(self, dataset_split):
+        """Whether to also compute Thai-aware metrics for this split.
+
+        An explicit config override wins ('thai_metrics=True/False'); otherwise
+        it is decided by the dataset's language, read from the same config path
+        evaluate.py's lid_eval uses (dataset.<split>.query.init_args.lang).
+        Anything unreadable falls back to False, i.e. today's behavior.
+        """
+        override = None
+        try:
+            override = self.config.get('thai_metrics')
+        except Exception:
+            pass
+        if override is not None:
+            return bool(override)
+        try:
+            lang = self.config['dataset'][dataset_split]['query']['init_args'].get('lang')
+        except Exception:
+            return False
+        return lang == 'th'
+
     def eval_metrics(self, dataset_split, questions, predictions, references):
         if predictions is None and references is None and questions is None:
             return
@@ -499,15 +528,16 @@ class RAG:
             generated = json.load(fd)
         generated = pd.DataFrame(generated)
         metrics_out = self.metrics[dataset_split].compute(
-        predictions=predictions, 
-        references=references, 
-        questions=questions
+        predictions=predictions,
+        references=references,
+        questions=questions,
+        thai=self._resolve_thai_metrics(dataset_split),
         )
         for m in metrics_out:
             generated[m] = metrics_out[m]
         avg_metrics = {v: np.mean(metrics_out[v]) for v in metrics_out}
-        write_dict(self.experiment_folder, f"eval_{dataset_split}_metrics.json", avg_metrics)        
-        generated.to_json(out_file, orient='records')
+        write_dict(self.experiment_folder, f"eval_{dataset_split}_metrics.json", avg_metrics)
+        generated.to_json(out_file, orient='records', force_ascii=False)
         
 
     def train(self):

@@ -1,0 +1,10 @@
+init_args:
+  _target_: models.rerankers.api_reranker.APIReranker
+  model_name: "jina-reranker-v2-base-multilingual"   # Jina AI, multilingual
+  provider: jina
+  max_retries: 6
+  batch_pause: 0.0
+  max_doc_chars: null
+  dry_run: false
+  require_confirmation: true
+batch_size: 100

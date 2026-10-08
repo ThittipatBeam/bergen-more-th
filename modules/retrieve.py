@@ -10,9 +10,10 @@ Example: bm25, splade, oracle_provenance. See models/retrievers/ for specific re
 # Retrieve
 from tqdm import tqdm
 import sys
+from functools import partial
 from torch.utils.data import DataLoader
 import torch
-import os 
+import os
 import glob
 from hydra.utils import instantiate
 from utils import load_embeddings
@@ -71,9 +72,10 @@ class Retrieve:
             
             return bm25_out
         else:
-            
+
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
             query_embeds = load_embeddings(query_embeds_path)
-            query_embeds = query_embeds.to_dense().to('cuda')
+            query_embeds = query_embeds.to_dense().to(device)
             #query_embeds = query_embeds.to('cuda')
             self.model.model = self.model.model.to('cpu')
 
@@ -114,10 +116,12 @@ class Retrieve:
         # make index folder if save_path is provided
         os.makedirs(save_path, exist_ok=True)
         dataloader = DataLoader(
-            dataset, 
-            batch_size=self.batch_size, 
-            # collate_fn=lambda batch: self.model.collate_fn(batch, query_or_doc) if query_or_doc != None else self.model.collate_fn(batch),
-            collate_fn=lambda batch: self.model.collate_fn(batch, query_or_doc),
+            dataset,
+            batch_size=self.batch_size,
+            # a lambda here breaks under spawn start-method (bergen.py sets spawn):
+            # worker processes pickle the collate function and lambdas are not
+            # picklable. functools.partial over the bound method is.
+            collate_fn=partial(self.model.collate_fn, query_or_doc=query_or_doc),
             num_workers=4
             )
         embs_list = list()
@@ -149,8 +153,9 @@ class Retrieve:
         top_k_scores_list, top_k_indices_list, top_k_embed_list= [], [], []
 
         num_emb = 0
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
         for emb_chunk in doc_embeds:
-            emb_chunk = emb_chunk.to('cuda')
+            emb_chunk = emb_chunk.to(device)
             scores_q = self.model.similarity_fn(emb_q, emb_chunk)
             # if detach_and_cpu:
             #     scores_q = scores_q.detach().cpu().float()

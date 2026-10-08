@@ -11,3 +11,6 @@ tests/run/
 outputs/
 results/
 wandb/
+.env
+.DS_Store
+.archify/

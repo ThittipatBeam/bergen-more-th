@@ -6,6 +6,10 @@ import hydra
 from multiprocess import set_start_method
 import os
 import json
+
+from models.env import load_env_file
+load_env_file()   # pick up API keys from .env in the repo root, if present
+
 if 'CONFIG' in  os.environ:
     CONFIG = os.environ["CONFIG"]
 else:

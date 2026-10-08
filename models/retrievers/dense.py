@@ -7,6 +7,9 @@ CC BY-NC-SA 4.0 license
 from transformers import AutoModel, AutoTokenizer
 import torch
 from models.retrievers.retriever import Retriever
+# helpers also live in models/retrievers/similarities.py (dependency-free);
+# re-exported here so existing configs referencing models.retrievers.dense.* keep working
+from models.retrievers.similarities import MeanPooler, ClsPooler, DotProduct, CosineSim
 
 class Dense(Retriever):
     #low_cpu_mem_usage=True,
@@ -60,30 +63,3 @@ class Dense(Retriever):
 
     def similarity_fn(self, query_embds, doc_embds):
         return self.similarity.sim(query_embds, doc_embds)
-
-class MeanPooler:
-
-    @staticmethod
-    def pool(outputs, mask):
-        outputs = outputs.masked_fill(~mask[..., None].bool(), 0.)
-        return outputs.sum(dim=1) / mask.sum(dim=1)[..., None]
-
-class ClsPooler:
-
-    @staticmethod
-    def pool(outputs, *args):
-        return outputs[:,0]
-    
-class DotProduct:
-
-    @staticmethod
-    def sim(query_embds, doc_embds):
-        return torch.mm(query_embds, doc_embds.t())
-
-class CosineSim:
-
-    @staticmethod
-    def sim(query_embds, doc_embds):
-        query_embds = query_embds / (torch.norm(query_embds, dim=-1, keepdim=True) + 1e-9)
-        doc_embds = doc_embds / (torch.norm(doc_embds, dim=-1, keepdim=True) + 1e-9)
-        return torch.mm(query_embds, doc_embds.t())

@@ -1,3 +1,12 @@
+## Quick install (recommended for API-only / CPU / Apple-Silicon setups)
+
+```bash
+./install.sh          # core deps + torch for your platform (conda env activated)
+./install.sh --all    # ... plus all API provider clients (openai, cohere, voyageai, google-genai)
+```
+
+On linux+NVIDIA you can get the CUDA torch instead afterwards via `pip install torch --index-url https://download.pytorch.org/whl/cu121`.
+
 ## Requirements
 
 For CUDA>=12

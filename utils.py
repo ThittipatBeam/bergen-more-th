@@ -235,8 +235,9 @@ def write_generated(out_folder, out_filename, query_ids, questions, instructions
     write_dict(out_folder, out_filename, jsonl_list)
 
 def write_dict(out_folder, out_filename, dict_to_write):
-    with open(f'{out_folder}/{out_filename}', 'w') as fp:
-        json.dump(dict_to_write, fp, indent=2)
+    with open(f'{out_folder}/{out_filename}', 'w', encoding='utf-8') as fp:
+        # ensure_ascii=False keeps Thai (and any non-Latin) text readable
+        json.dump(dict_to_write, fp, indent=2, ensure_ascii=False)
 
 def load_trec(fname):
     # read file

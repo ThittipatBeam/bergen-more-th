@@ -1,0 +1,13 @@
+init_args:
+  _target_: models.retrievers.dense_api.DenseAPI
+  model_name: "gemini-embedding-001"   # Google Gemini, multilingual
+  provider: google
+  similarity:
+    _target_: models.retrievers.similarities.CosineSim
+  dimensions: 768
+  max_retries: 6
+  batch_pause: 0.0
+  dry_run: false
+  require_confirmation: true
+batch_size: 100   # Gemini embed_content batch limit
+batch_size_sim: 2048

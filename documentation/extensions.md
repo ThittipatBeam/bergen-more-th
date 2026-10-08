@@ -84,6 +84,16 @@ To use the model add the argument `reranker='new_reranker'`:
 python3 main.py reranker='new_reranker'
 ```
 
+### API-based retriever/reranker
+
+Ready-made implementations for hosted APIs are available out of the box:
+`models/retrievers/dense_api.py` (`DenseAPI`, embedding APIs: OpenAI-compatible,
+Cohere, Voyage, Gemini) and `models/rerankers/api_reranker.py` (`APIReranker`,
+reranking APIs: Cohere, Voyage, Jina, OpenAI-compatible `/rerank` endpoints),
+together with built-in cost guardrails (dry-run mode and a confirmation prompt
+before spending). See [documentation/apis.md](apis.md) for the
+provider table, env vars and example commands.
+
 ### Add Generator
 The Generator inherits from the abstract `Generator` class and thus needs to follow this structure:
 

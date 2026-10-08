@@ -1,0 +1,16 @@
+init_args:
+  _target_: models.retrievers.dense_api.DenseAPI
+  # any embedding model id your OpenAI-compatible endpoint serves (LiteLLM, vLLM, TEI);
+  # override per run: retriever.init_args.model_name=BAAI/bge-m3
+  model_name: "bge-m3"
+  provider: openai_compatible
+  similarity:
+    _target_: models.retrievers.similarities.CosineSim
+  # base_url comes from OPENAI_BASE_URL / EMBED_BASE_URL (.env or export) - no need to set here
+  dimensions: null       # do not pass `dimensions`: endpoints serving non-OpenAI models reject it
+  max_retries: 6
+  batch_pause: 0.0
+  dry_run: false
+  require_confirmation: true
+batch_size: 256
+batch_size_sim: 2048

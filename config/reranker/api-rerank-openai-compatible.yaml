@@ -1,0 +1,11 @@
+init_args:
+  _target_: models.rerankers.api_reranker.APIReranker
+  model_name: "bge-reranker-v2-m3"   # the model id as served by your endpoint
+  provider: openai_compatible
+  base_url: ${oc.env:RERANK_BASE_URL,null}   # or set OPENAI_BASE_URL
+  max_retries: 6
+  batch_pause: 0.0
+  max_doc_chars: null
+  dry_run: false
+  require_confirmation: true
+batch_size: 100

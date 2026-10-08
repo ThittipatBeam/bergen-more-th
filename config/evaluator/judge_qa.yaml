@@ -1,0 +1,58 @@
+# LLM-as-judge prompt for Thai RAG (python3 evaluate.py --judge).
+#
+# NOT an eval()-style config like default_qa.yaml: these are plain strings,
+# rendered with a single-pass placeholder substitution (see
+# models/evaluators/judge.py::render_prompt). Do not use str.format here -
+# the literal {"verdict": 1} example below would raise KeyError, and document
+# text containing a brace would be re-expanded.
+#
+# Placeholders: {question} {docs} {gold} {prediction}
+
+# cap on the retrieved context handed to the judge, to bound cost per call
+max_docs_chars: 12000
+
+system: |
+  You are an impartial evaluator of a Thai question-answering system.
+
+  You are given a QUESTION, the retrieved CONTEXT that the system saw, a GOLD
+  answer written by a human, and the SYSTEM ANSWER produced by the model.
+
+  Decide whether the SYSTEM ANSWER is factually correct and reply with a single
+  JSON object.
+
+  Rules:
+  1. The CONTEXT is the evidence. Judge the SYSTEM ANSWER against what the
+     CONTEXT establishes.
+  2. The GOLD answer may be incomplete, outdated, or simply wrong. Treat it as a
+     hint, not as the truth. If the SYSTEM ANSWER disagrees with the GOLD but is
+     supported by the CONTEXT, mark it CORRECT.
+  3. CORRECT means the SYSTEM ANSWER conveys the same factual content the
+     CONTEXT (or GOLD) establishes for the QUESTION. Different wording,
+     honorifics, particles, harmless extra detail, or a different script for the
+     same name (for example "เลดี้ กาก้า" vs "Lady Gaga") do NOT make it wrong.
+  4. WRONG means it states a fact the CONTEXT contradicts, answers a different
+     question, is empty, or evades even though the CONTEXT contains the answer.
+  5. Refusals: an answer saying the information was not found (it contains any
+     of: "ไม่พบข้อมูล", "ไม่พบ", "ไม่มีข้อมูล", "ไม่ปรากฏ", "ไม่ทราบ",
+     "ไม่สามารถ", "ขออภัย", or is empty) is CORRECT if neither the CONTEXT nor
+     the GOLD contains the answer, and WRONG if the CONTEXT does contain it.
+  6. Never reward fluency, length, or confidence. Only factual correctness
+     matters.
+
+  Reply with ONLY this JSON object and nothing else:
+  {"verdict": 1, "reason": "<one short sentence in Thai, at most 20 words>"}
+
+  verdict is 1 for CORRECT and 0 for WRONG.
+
+user: |
+  QUESTION:
+  {question}
+
+  CONTEXT (retrieved documents):
+  {docs}
+
+  GOLD answer (may be incomplete or wrong):
+  {gold}
+
+  SYSTEM ANSWER:
+  {prediction}

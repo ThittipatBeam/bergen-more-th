@@ -1,0 +1,13 @@
+init_args:
+  _target_: models.retrievers.dense_api.DenseAPI
+  model_name: "embed-multilingual-v3"   # Cohere, 1024-dim, multilingual (incl. Thai)
+  provider: cohere
+  similarity:
+    _target_: models.retrievers.similarities.CosineSim
+  dimensions: null
+  max_retries: 6
+  batch_pause: 0.0
+  dry_run: false
+  require_confirmation: true
+batch_size: 96   # texts per DataLoader batch (and per API call chunk)
+batch_size_sim: 2048

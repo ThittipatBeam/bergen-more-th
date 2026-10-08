@@ -3,6 +3,9 @@ BERGEN
 Copyright (c) 2024-present NAVER Corp.
 CC BY-NC-SA 4.0 license
 '''
+import json
+import os
+import shutil
 import torch
 import gc
 from abc import ABC, abstractmethod
@@ -12,6 +15,20 @@ from tqdm import tqdm
 from jinja2.exceptions import TemplateError
 from functools import partial
 import random
+
+
+def load_existing_responses(filename):
+    """Read q_id -> response pairs from a previous (partial or complete)
+    eval_*_out.json so generation can resume instead of starting over.
+    Returns {} when the file is missing or unreadable."""
+    if not filename or not os.path.exists(filename):
+        return {}
+    try:
+        records = json.load(open(filename))
+        return {r['q_id']: r['response'] for r in records if 'q_id' in r and 'response' in r}
+    except Exception as e:
+        tqdm.write(f'WARNING: could not read existing responses from {filename} ({e}); starting generation from scratch')
+        return {}
 
 
 class Generator(ABC):
@@ -32,36 +49,61 @@ class Generator(ABC):
     @abstractmethod
     def generate(self, inp):
         pass
-    
+
     @abstractmethod
     def collate_fn(self, inp):
         pass
 
-    def eval(self, dataset):
+    def eval(self, dataset, resume_file=None, num_workers=4):
+        # resume: skip questions already answered in a previous (crashed or
+        # interrupted) run of this same experiment folder
+        existing = load_existing_responses(resume_file)
+        if existing:
+            done = sum(1 for q_id in dataset['q_id'] if existing.get(q_id) is not None)
+            tqdm.write(f'Resuming generation: {done} of {len(dataset)} answers already in {resume_file}, only the remaining ones will be generated')
+
         with torch.no_grad():
             if self.tokenizer:
                 tokenized_and_sorted_dataset = Tokenized_Sorted_Dataset(dataset, self, training=False)
-                dataloader = DataLoader(tokenized_and_sorted_dataset, batch_size=self.batch_size, collate_fn=partial(self.collate_fn, eval=True), num_workers=4)
+                dataloader = DataLoader(tokenized_and_sorted_dataset, batch_size=self.batch_size, collate_fn=partial(self.collate_fn, eval=True), num_workers=num_workers)
             else:
-                dataloader = DataLoader(dataset, batch_size=self.batch_size, collate_fn=partial(self.collate_fn, eval=True), num_workers=4)
-            
+                dataloader = DataLoader(dataset, batch_size=self.batch_size, collate_fn=partial(self.collate_fn, eval=True), num_workers=num_workers)
+
             responses, instructions, query_ids, queries, labels, ranking_labels = list(), list(), list(), list(), list(), list()
             for data_dict in tqdm(dataloader, desc='Generating'):
-                id_ = data_dict['q_id']
-                instruction = data_dict['instruction']
-                query_ids += id_
-                label = data_dict['label']
-                labels += label
+                query_ids += data_dict['q_id']
+                labels += data_dict['label']
                 queries += data_dict['query']
                 ranking_labels += data_dict['ranking_label']
-                instructions += instruction
-                generated_response = self.generate(data_dict['model_input'])
-                responses += generated_response
-                
+                instructions += data_dict['instruction']
+                answers = iter(self.generate([m for m in data_dict['model_input'] if m is not None]))
+                # done questions replay their previous answer (no API call);
+                # the rest consume the new answers in order
+                responses += [existing[q_id] if existing.get(q_id) is not None else next(answers)
+                              for q_id in data_dict['q_id']]
+                # checkpoint after every batch so a crash loses at most one batch
+                self._write_checkpoint(resume_file, query_ids, queries, instructions, responses, labels, ranking_labels)
+
                 torch.cuda.empty_cache()
                 gc.collect()
-                
+
             return query_ids, queries, instructions, responses, labels, ranking_labels
+
+    @staticmethod
+    def _write_checkpoint(resume_file, query_ids, queries, instructions, responses, labels, ranking_labels):
+        """Atomically rewrite eval_*_out.json with everything generated so far
+        (same record format as utils.write_generated)."""
+        if resume_file is None:
+            return
+        records = [{'q_id': q, 'response': r, 'instruction': i, 'label': l,
+                    'question': qu, 'ranking_label': rl}
+                   for q, qu, r, i, l, rl in zip(query_ids, queries, responses, instructions, labels, ranking_labels)]
+        tmp_file = resume_file + '_'
+        with open(tmp_file, 'w', encoding='utf-8') as f:
+            # ensure_ascii=False keeps Thai (and any non-Latin) text readable
+            # instead of เ-style escapes
+            json.dump(records, f, indent=2, ensure_ascii=False)
+        shutil.move(tmp_file, resume_file)
 
     def get_response(self):
         """

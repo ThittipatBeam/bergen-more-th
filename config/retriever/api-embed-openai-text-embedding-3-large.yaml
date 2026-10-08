@@ -1,0 +1,14 @@
+init_args:
+  _target_: models.retrievers.dense_api.DenseAPI
+  model_name: "text-embedding-3-large"   # any OpenAI-compatible /v1/embeddings endpoint
+  provider: openai_compatible
+  similarity:
+    _target_: models.retrievers.similarities.CosineSim
+  dimensions: 3072
+  # base_url: https://my-endpoint/v1   # or export OPENAI_BASE_URL
+  max_retries: 6
+  batch_pause: 0.0
+  dry_run: false
+  require_confirmation: true
+batch_size: 256
+batch_size_sim: 2048

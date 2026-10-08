@@ -1,6 +1,6 @@
 evaluate
-tensorflow_hub
-datasets
+datasets>=3.0,<4.0  # mkqa/kilt/xor are script-based; datasets 4.0 removed script support
+huggingface_hub<0.25  # 0.25+ mishandles the legacy->namespaced repo redirect with script datasets
 pytest
 hydra-core
 multiprocess
@@ -13,17 +13,23 @@ regex
 rouge
 scikit_learn
 scipy
-tensorflow==2.8.0
-protobuf==3.20.*
+protobuf
 sentencepiece
 tqdm
 transformers
 trl
-bitsandbytes
 tabulate
-pytest
 langid
-fasttext
-fasttext-langdetect
+fasttext-wheel
 langdetect
 langcodes
+pythainlp
+python-dotenv
+# torch is installed separately by install.sh (CPU vs CUDA wheel depends on your platform).
+# Uncomment for a quick install on CPU-only machines:
+# torch --index-url https://download.pytorch.org/whl/cpu
+# API provider clients (optional - install only what you use, see documentation/apis.md):
+# openai cohere voyageai google-genai
+# removed vs upstream: tensorflow==2.8.0 + tensorflow_hub (only used by the optional
+# multidomain dataset processors and uninstallable on modern Pythons / macOS arm64),
+# bitsandbytes (CUDA-only, needed only for int4 local-model training)

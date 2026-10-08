@@ -1,0 +1,13 @@
+init_args:
+  _target_: models.generators.llm_openai.OpenAI
+  # any chat model id your OpenAI-compatible endpoint serves (LiteLLM, vLLM, Together, local proxy);
+  # override per run: generator.init_args.model_name=DEEPSEEK-V4.1F
+  # base_url comes from LLM_BASE_URL / OPENAI_BASE_URL (.env or export) - no need to set here
+  model_name: "my-chat-model"
+  max_new_tokens: 512
+  max_length: 32000
+  batch_size: 16
+  # parallel API requests in generation (threads; the endpoint sees ~8 in flight).
+  # set back to 1 for sequential behavior, raise if your endpoint/gateway allows it;
+  # env LLM_CONCURRENCY overrides this value without editing the file
+  concurrency: 8

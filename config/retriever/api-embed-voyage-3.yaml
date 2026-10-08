@@ -1,0 +1,13 @@
+init_args:
+  _target_: models.retrievers.dense_api.DenseAPI
+  model_name: "voyage-3"   # Voyage AI, 1024-dim, multilingual
+  provider: voyage
+  similarity:
+    _target_: models.retrievers.similarities.CosineSim
+  dimensions: null
+  max_retries: 6
+  batch_pause: 0.0
+  dry_run: false
+  require_confirmation: true
+batch_size: 128
+batch_size_sim: 2048

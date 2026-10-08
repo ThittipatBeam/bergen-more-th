@@ -5,8 +5,9 @@ For neural metrics such as LLMEval, see eval.py or models/evaluators/ for specif
 '''
 
 from scipy.stats import pearsonr, spearmanr
+import os
 import string
-import regex 
+import regex
 import numpy as np
 from rouge import Rouge
 from collections import Counter
@@ -44,6 +45,30 @@ def normalize(s: str) -> str:
         return text.lower()
 
     return white_space_fix(remove_articles(remove_punc(lower(s))))
+
+# pythainlp engine used for Thai word segmentation; 'newmm' is the pure-python
+# default (no model download, no extra dependency). 'longest' is the other
+# engine available without extras - override to compare segmentation choices.
+THAI_ENGINE = os.environ.get('THAI_TOKENIZE_ENGINE', 'newmm')
+
+def normalize_th(s: str) -> str:
+    """Like normalize(), but also removes whitespace.
+
+    Thai is written without spaces and gets spaced inconsistently: retrieved
+    documents are word-segmented ('สปริงเบรก. ใน อดีต ...') while model answers
+    often are not. normalize() only collapses whitespace runs, so a verbatim
+    correct answer containing the gold string can still score M=0 - stripping
+    whitespace makes containment/comparison space-insensitive.
+    """
+    return regex.sub(r'\s+', '', normalize(s))
+
+def thai_tokens(s: str) -> List[str]:
+    """Thai word segmentation, used as a tokenfun in place of str.split().
+
+    import is lazy so non-Thai runs never pay pythainlp's import cost.
+    """
+    from pythainlp.tokenize import word_tokenize
+    return word_tokenize(s, keep_whitespace=False, engine=THAI_ENGINE)
 
 def f1_single(prediction: str, ground_truth: str, tokenfun=lambda x: x.split()):
     prediction_tokens = tokenfun(normalize(prediction))
@@ -116,31 +141,45 @@ def exact_match_score(predictions: list[str], references: list[list[str]]):
     match_samples = [max([em_single(prediction, gt) for gt in ground_truths]) for ground_truths, prediction in zip(references, predictions)] 
     return match_samples
 
-def match_single(prediction: str, ground_truth: str):
-    return float(normalize(ground_truth) in normalize(prediction))
+def match_single(prediction: str, ground_truth: str, normalize_fun=normalize):
+    return float(normalize_fun(ground_truth) in normalize_fun(prediction))
 
 
-def match_score(predictions, references):
+def match_score(predictions, references, normalize_fun=normalize):
     assert isinstance(references[0], list), f"during metrics computation: Labels are type {type(references[0])}, but are expected to be a list of strings (even if only one label). Metrics computation may run but produce false results."
-    match_samples = [max([match_single(prediction, gt) for gt in ground_truths]) for ground_truths, prediction in zip(references, predictions)]
+    match_samples = [max([match_single(prediction, gt, normalize_fun) for gt in ground_truths]) for ground_truths, prediction in zip(references, predictions)]
     return match_samples
 
 
 
 class RAGMetrics:
     @staticmethod
-    def compute(predictions, references, questions=None):
+    def compute(predictions, references, questions=None, thai=False):
+        """thai=True additionally returns Thai-aware metrics (M_th, F1_th,
+        Precision_th, Recall_th) alongside the standard ones - the standard
+        keys are always computed unchanged so existing runs stay comparable."""
         rouge = rouge_score(predictions, references)
         f1_scores = f1_score(predictions, references)
         recall_char3gram = f1_score(predictions, references, ngrams)["recall"]
-        return {    "M": match_score(predictions, references),
+        metrics = { "M": match_score(predictions, references),
                     "EM": exact_match_score(predictions, references),
                     "F1": f1_scores["f1"],
-                    "Precision": f1_scores["precision"], 
+                    "Precision": f1_scores["precision"],
                     "Recall": f1_scores["recall"],
                     "Recall_char3gram": recall_char3gram,
                     "Rouge-1": rouge["rouge1"],
                     "Rouge-2": rouge["rouge2"],
                     "Rouge-L": rouge["rougel"],
                 }
+        if thai:
+            # whitespace-insensitive containment, plus word-level F1 over
+            # pythainlp tokens instead of str.split() (which sees Thai text
+            # with no spaces as a single token)
+            thai_f1 = f1_score(predictions, references, thai_tokens)
+            metrics.update({   "M_th": match_score(predictions, references, normalize_th),
+                               "F1_th": thai_f1["f1"],
+                               "Precision_th": thai_f1["precision"],
+                               "Recall_th": thai_f1["recall"],
+                           })
+        return metrics
 

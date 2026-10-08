@@ -113,13 +113,16 @@ def main(args):
     df= pd.DataFrame(ltuple)
     col=list(df.columns)
     llmeval_col = [c for c in col if 'llmeval' in c.lower()]
+    # Thai-aware metrics are only present for runs that computed them; keep them
+    # out of the table entirely when absent rather than erroring on selection
+    thai_col = [c for c in ('M_th', 'F1_th', 'Precision_th', 'Recall_th') if c in col]
 
     if args.format =='simple':
-        sel_col = ['exp_folder', 'query_dataset', 'Generator', 'Retriever', 'Reranker', "M", "EM", "Recall"] + llmeval_col
+        sel_col = ['exp_folder', 'query_dataset', 'Generator', 'Retriever', 'Reranker', "M", "EM", "Recall"] + thai_col + llmeval_col
     elif args.format =='tiny':
-        sel_col =['exp_folder', 'query_dataset', 'Generator', 'Retriever', 'Reranker', "M"] + llmeval_col
+        sel_col =['exp_folder', 'query_dataset', 'Generator', 'Retriever', 'Reranker', "M"] + thai_col + llmeval_col
     elif args.format =='full':
-        sel_col = ['exp_folder', 'Retriever', 'P_1', 'Reranker', 'Generator',  'gen_time', 'query_dataset', "M", "EM", "F1", "Precision", "Recall", "Recall_char3gram", "Rouge-L"] + llmeval_col
+        sel_col = ['exp_folder', 'Retriever', 'P_1', 'Reranker', 'Generator',  'gen_time', 'query_dataset', "M", "EM", "F1", "Precision", "Recall", "Recall_char3gram", "Rouge-L"] + thai_col + llmeval_col
     else:
         raise ValueError('Invalid output format')
     df=df[sel_col]
