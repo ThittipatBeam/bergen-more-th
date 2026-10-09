@@ -1,9 +1,7 @@
+# data / indexes / experiment outputs
 experiments/
 datasets/
 indexes/
-datasets/
-__pycache__
-*.swp
 tests/dataset/
 tests/index/
 tests/exp/
@@ -11,6 +9,33 @@ tests/run/
 outputs/
 results/
 wandb/
+logs/
+
+# secrets
 .env
+
+# OS junk
 .DS_Store
+
+# editor / swp / notebook junk
+*.swp
+.ipynb_checkpoints/
+
+# python
+__pycache__/
+*.pyc
+
+# agent / tooling local state (skills, plans, plugins)
 .archify/
+.opencode/
+.impeccable/
+.agents/
+.claude/
+plugins/
+skills-lock.json
+RESTRUCTURE_PLAN.md
+
+# legacy server leftovers
+server/bergen_api.db
+server/logs/
+

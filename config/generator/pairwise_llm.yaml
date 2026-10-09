@@ -1,0 +1,11 @@
+# Generator config used for pairwise comparisons (evaluate.py --llm pairwise_llm <name>
+# --opponent_folder ...). The LLM-as-judge call goes through the same
+# OpenAI-compatible endpoint as generation. The model id comes from the
+# LLM_PAIRWISE_MODEL env var (falling back to the benchmark's chat model).
+init_args:
+  _target_: models.generators.llm_openai.OpenAI
+  model_name: ${oc.env:LLM_PAIRWISE_MODEL,DEEPSEEK-V4.1F}
+  max_new_tokens: 128
+  max_length: 32000
+  batch_size: 16
+  concurrency: 8

@@ -29,6 +29,8 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from tqdm import tqdm
+
 import omegaconf
 import openai
 
@@ -357,30 +359,46 @@ class LLMJudge:
 
         lock = threading.Lock()
         n_failed = 0
+        n_known_new = 0    # parseable verdicts from THIS run -> running correct-%
+        n_correct_new = 0
         handle = open(checkpoint_path, 'a', encoding='utf-8') if checkpoint_path else None
         try:
             with ThreadPoolExecutor(max_workers=max(1, self.concurrency)) as pool:
                 futures = [pool.submit(self.judge_one, r) for r in todo]
-                for i, future in enumerate(as_completed(futures), 1):
-                    q_id, score, reason, raw, cost, ok = future.result()
-                    self.total_cost += cost
-                    if not ok:
-                        n_failed += 1
-                        continue
-                    scores[q_id] = score
-                    reasons[q_id] = reason
-                    if handle is not None:
-                        line = json.dumps({
-                            'q_id': q_id, 'ok': True, 'score': score, 'reason': reason,
-                            'raw': raw, 'model': self.model_name,
-                            'prompt_hash': self.prompt_hash, 'ts': time.time(),
-                        }, ensure_ascii=False)
-                        with lock:
-                            handle.write(line + '\n')
-                            handle.flush()
-                    if i % 50 == 0 or i == len(todo):
-                        print(f'judge: {i}/{len(todo)} done, '
-                              f'cost so far ${self.total_cost:.4f}', file=sys.stderr)
+                # unit='q' -> it/s renders as q/s; dynamic_ncols keeps the bar clean,
+                # and the running correct-% updates in place instead of a print
+                # every 50 that the old every-50 loop emitted.
+                with tqdm(total=len(todo), desc=f'judging:{self.model_name}',
+                          unit='q', dynamic_ncols=True) as bar:
+                    for future in as_completed(futures):
+                        q_id, score, reason, raw, cost, ok = future.result()
+                        self.total_cost += cost
+                        if not ok:
+                            n_failed += 1
+                        else:
+                            scores[q_id] = score
+                            reasons[q_id] = reason
+                            if score != UNKNOWN_SCORE:
+                                n_known_new += 1
+                                n_correct_new += score
+                            if handle is not None:
+                                line = json.dumps({
+                                    'q_id': q_id, 'ok': True, 'score': score, 'reason': reason,
+                                    'raw': raw, 'model': self.model_name,
+                                    'prompt_hash': self.prompt_hash, 'ts': time.time(),
+                                }, ensure_ascii=False)
+                                with lock:
+                                    handle.write(line + '\n')
+                                    handle.flush()
+                        postfix = {}
+                        if n_known_new:
+                            postfix['correct'] = f'{n_correct_new / n_known_new * 100:.1f}%'
+                        if self.total_cost:
+                            postfix['cost'] = f'${self.total_cost:.4f}'
+                        if n_failed:
+                            postfix['failed'] = n_failed
+                        bar.set_postfix(postfix, refresh=False)
+                        bar.update(1)
         finally:
             if handle is not None:
                 handle.close()
