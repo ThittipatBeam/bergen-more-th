@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thai RAG Leaderboard · MKQA Thai RAG Benchmark</title>
+<meta name="description" content="Thai RAG Leaderboard. Judge-first scoring on MKQA (lang=th): which Thai RAG system reads best, measured against retrieved Thai context. Fully bilingual Thai + English.">
+<link rel="stylesheet" href="fonts.css">
+<style>
+/* ============ ระดับเสียง — tone-level sheet ============ */
+:root{
+  --paper:#F7F3EA;
+  --paper-2:#EFE8D8;
+  --ink:#1B1710;
+  --ink-soft:#4A4335;
+  --ink-faint:#6A6248;
+  --lead:#B83618;          /* vermilion — leader band + judge only */
+  --lead-deep:#93290F;
+  --hair:rgba(27,23,16,.16);
+  --hair-strong:rgba(27,23,16,.4);
+  --scored:#FDFBF4;        /* band fill */
+  --slot:#ECE5D3;
+  --radius:3px;
+  --mono:"IBMPlexMono","IBM Plex Mono",ui-monospace,monospace;
+  --th:"IBMPlexSansThai","IBM Plex Sans Thai";
+  --th-loop:"IBMPlexSansThaiLooped","IBM Plex Sans Thai Looped","IBMPlexSansThai";
+  --sans:"IBMPlexSans","IBM Plex Sans";
+  --font:var(--th),var(--sans),system-ui,sans-serif;
+  --font-disp:var(--th-loop),var(--th),var(--sans),sans-serif;
+  --sheet-max:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+::selection{background:var(--lead);color:var(--paper)}
+:focus-visible{outline:2px solid var(--lead);outline-offset:3px;border-radius:2px}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+}
+/* faint top-tier stave — the sheet's own material, not decoration */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    repeating-linear-gradient(to bottom,
+      transparent 0 calc(5.5rem - 1px),
+      rgba(27,23,16,.035) calc(5.5rem - 1px) 5.5rem);
+  opacity:.6;
+}
+main{position:relative;z-index:1}
+
+/* ---------- scrollbar ---------- */
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--paper-2)}
+::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:6px;border:2px solid var(--paper-2)}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-soft)}
+html{scrollbar-width:thin;scrollbar-color:var(--ink-faint) var(--paper-2)}
+
+.wrap{max-width:var(--sheet-max);margin:0 auto;padding:0 clamp(1rem,4vw,3rem)}
+
+/* ============ MASTHEAD ============ */
+.mast{
+  border-bottom:1.5px solid var(--ink);
+  padding-top:1.1rem;
+  background:var(--paper);
+  position:relative;z-index:2;
+}
+.mast-row{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;padding-bottom:1.1rem}
+.wordmark{display:flex;align-items:baseline;gap:.9rem;flex-wrap:wrap}
+.wordmark .th-logo{
+  font-family:var(--font-disp);font-weight:700;
+  font-size:clamp(1.9rem,4.2vw,2.7rem);line-height:1;
+  letter-spacing:-.02em;color:var(--ink);
+}
+.wordmark .en-sub{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--lead);font-weight:500;
+}
+/* language toggle */
+.lang{
+  display:flex;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden;
+}
+.lang button{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;font-weight:500;
+  padding:.5rem 1rem;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.lang button:not([aria-pressed="true"]):hover{background:var(--paper-2)}
+/* site nav */
+.nav{display:flex;gap:1.4rem;flex-wrap:wrap;padding:.7rem 0 1.1rem;border-top:1px solid var(--hair)}
+.nav a{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);text-decoration:none;padding-bottom:2px;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+}
+.nav a:hover{color:var(--ink);border-bottom-color:var(--lead)}
+.nav a:focus-visible{border-bottom-color:var(--lead)}
+
+/* ============ INTRO ============ */
+.intro{padding:clamp(2rem,5vw,3.6rem) 0 clamp(1.4rem,3vw,2.2rem)}
+.intro .th-head{
+  font-family:var(--font-disp);font-weight:600;
+  font-size:clamp(1.9rem,4.6vw,3.3rem);line-height:1.12;letter-spacing:-.02em;
+  max-width:20ch;color:var(--ink);
+}
+.intro .lede{
+  margin-top:1.1rem;max-width:62ch;font-size:clamp(1rem,1.4vw,1.13rem);
+  color:var(--ink-soft);
+}
+.intro .lede strong{color:var(--ink);font-weight:600}
+.intro .meta{
+  margin-top:1.3rem;display:flex;gap:2.2rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;color:var(--ink-faint);
+}
+.intro .meta b{display:block;color:var(--ink);font-weight:500;font-size:.82rem;margin-top:.2rem;letter-spacing:.02em}
+
+/* ============ SHEET / LEADERBOARD ============ */
+.sheet-sec{padding:clamp(1.2rem,3vw,2.2rem) 0 clamp(2rem,4vw,3rem)}
+.sheet-headline{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.4rem}
+.sheet-note{font-family:var(--mono);font-size:.78rem;color:var(--ink-faint);letter-spacing:.02em;margin:0}
+.judgenote{
+  margin-top:1rem;font-size:.8rem;line-height:1.5;color:var(--ink-soft);
+  border-left:2px solid var(--lead);padding-left:.8rem;max-width:70ch;
+}
+.judgenote b{color:var(--lead-deep)}
+.judgenote code{font-family:var(--mono);font-size:.85em;background:var(--paper-2);padding:.05em .3em;border-radius:2px}
+/* ==== guide callout ==== */
+.callout{
+  border:1.5px solid var(--ink);border-radius:var(--radius);background:var(--scored);
+  padding:clamp(1.4rem,3.5vw,2.4rem);display:flex;align-items:center;justify-content:space-between;
+  gap:1.6rem;flex-wrap:wrap;transition:box-shadow .25s,transform .25s;
+}
+.callout:hover{transform:translateY(-3px);box-shadow:0 18px 36px -20px rgba(27,23,16,.35)}
+.callout-txt h2{font-family:var(--font-disp);font-weight:600;font-size:clamp(1.3rem,2.5vw,1.7rem);margin-bottom:.5rem}
+.callout-txt p{color:var(--ink-soft);max-width:52ch;font-size:.98rem}
+.callout-btn{
+  font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;
+  border:1.5px solid var(--ink);border-radius:var(--radius);padding:.8rem 1.3rem;text-decoration:none;
+  color:var(--ink);display:inline-flex;align-items:center;gap:.6rem;white-space:nowrap;
+  transition:background .2s,color .2s,gap .2s;
+}
+.callout-btn .arr{transition:transform .2s}
+.callout-btn:hover{background:var(--ink);color:var(--paper);gap:.9rem}
+.callout-btn:hover .arr{transform:translateX(3px)}
+/* table wrapper scrolls on narrow screens instead of pushing the page */
+.tablescroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tablescroll .score-table{min-width:760px}
+.rank{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);letter-spacing:.08em;width:2.6rem}
+
+/* ---- LMArena-style score table ---- */
+.score-table{
+  width:100%;border-collapse:collapse;
+  font-variant-numeric:tabular-nums;
+  margin-top:.4rem;background:var(--scored);
+  border:1.5px solid var(--ink);border-radius:var(--radius);
+  overflow:hidden;
+}
+.score-table caption{
+  text-align:left;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);
+  letter-spacing:.03em;padding-bottom:.6rem;caption-side:top;
+}
+.score-table thead th{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:500;text-align:left;
+  padding:.7rem .9rem;border-bottom:1.5px solid var(--ink);
+  background:var(--paper-2);white-space:nowrap;vertical-align:bottom;
+}
+.score-table thead th.num, .score-table td.num{text-align:right}
+.score-table thead th button{
+  all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;
+  font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;
+  color:inherit;transition:color .14s;
+}
+.score-table thead th button:hover{color:var(--ink)}
+.score-table thead th button .arw{font-size:.68rem;opacity:.45;transition:opacity .14s}
+.score-table thead th button[aria-sort] .arw, .score-table thead th button.sorted .arw{opacity:1;color:var(--lead)}
+.score-table tbody td{
+  padding:.85rem .9rem;border-bottom:1px solid var(--hair);
+  color:var(--ink);vertical-align:middle;font-size:.95rem;
+}
+.score-table tbody tr:last-child td{border-bottom:none}
+.score-table tbody tr{transition:background .12s}
+.score-table tbody tr:hover{background:var(--paper-2)}
+.score-table tbody tr.leader td{background:linear-gradient(to right,rgba(184,54,24,.05),var(--scored) 30%)}
+.score-table tbody tr.slot td{color:var(--ink-faint)}
+/* rank */
+.td-rank{font-family:var(--mono);font-size:.78rem;color:var(--ink-faint);width:2.8rem}
+tr.leader .td-rank{color:var(--lead);font-weight:600}
+/* model cell: flag + icon + name */
+.lead-flag{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--paper);background:var(--lead);padding:.2rem .45rem;border-radius:2px;
+  display:inline-flex;align-items:center;gap:.4rem;font-weight:500;flex:none;
+}
+.lead-flag svg{width:.7em;height:.7em}
+.modicon{width:1.7rem;height:1.7rem;flex:none;border-radius:4px;overflow:hidden;
+  border:1px solid var(--hair);background:var(--paper);display:grid;place-items:center}
+.modicon img,.modicon svg{width:1.15rem;height:1.15rem;display:block}
+.modicon.empty{border-style:dashed;background:transparent}
+.modname{font-family:var(--font-disp);font-weight:700;font-size:1.1rem;color:var(--ink);flex:0 0 auto;white-space:nowrap}
+tr.slot .modname{color:var(--ink-faint);font-weight:500}
+/* model cell: icon + name on one line; flag tucked right, compact */
+.td-model .modwrap{display:flex;align-items:center;gap:.55rem;min-width:0;flex-wrap:nowrap}
+.td-model .modwrap .lead-flag{margin-left:auto;flex:none;padding:.15rem .4rem;font-size:.6rem}
+.td-model .modwrap .lead-flag svg{display:none}
+.score-table col.c-model{width:inherit}
+/* numeric cell: number + thin inline bar */
+.td-num{font-family:var(--mono);font-size:1rem;color:var(--ink)}
+tr.leader .td-num{font-weight:600}
+.td-dash{color:var(--ink-faint)}
+/* score bar track under the number for glance comparison */
+.bar{margin-top:.4rem;height:3px;background:var(--slot);border-radius:2px;overflow:hidden;min-width:4.5rem}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:2px}
+tr.leader .bar i{background:var(--lead)}
+.slotnote{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);letter-spacing:.01em}
+/* pipeline columns: embedding + reranker ids, quieter mono than the scores */
+.score-table td.td-pipe{text-align:left}
+.pipe-model{font-family:var(--mono);font-size:.78rem;color:var(--ink-soft);letter-spacing:.01em;white-space:nowrap}
+tr.leader .pipe-model{color:var(--ink-soft)}
+.pipe-model.dash{color:var(--ink-faint)}
+/* pipeline cells: brand icon + id */
+.td-pipe .pipewrap{display:flex;align-items:center;gap:.45rem}
+.pipe-icon{width:1.15rem;height:1.15rem;flex:none;display:inline-grid;place-items:center;color:var(--ink-soft)}
+.pipe-icon img,.pipe-icon svg{width:100%;height:100%;display:block}
+.pipe-mono{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);letter-spacing:.02em}
+
+/* ==== fluid table: fill width, no horizontal scroll on desktop ==== */
+.tablescroll .score-table{width:100%;table-layout:auto;min-width:0}
+.score-table col.c-rank{width:2.8rem}
+.score-table col.c-headline{width:7rem}
+.score-table .pipe-model{white-space:normal;word-break:break-word;line-height:1.25;display:block}
+@media(max-width:900px){
+  .tablescroll .score-table{min-width:700px} /* genuine overflow -> scroll frame */
+}
+
+/* ==== motion: scroll reveal + hover ==== */
+@keyframes rv { to { opacity:1; transform:none } }
+.rv{opacity:0;transform:translateY(14px)}
+.rv.in{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none!important}
+  *{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+/* hover lives */
+.score-table tbody tr{transition:background .18s,transform .18s,box-shadow .18s}
+.score-table tbody tr:not(.slot):hover{transform:translateY(-1px)}
+.card-h,.ex,.code,.equation{transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s,border-color .22s}
+.card-h:hover,.ex:hover{transform:translateY(-3px);box-shadow:0 14px 28px -18px rgba(27,23,16,.35);border-color:var(--ink)}
+.sortb,.lang button,.nav a,.foot a{transition:all .18s}
+footer a{border-bottom-color:transparent;transition:border-color .18s,color .18s}
+footer a:hover{color:var(--lead);border-bottom-color:var(--lead)}
+/* brand icon pop */
+.modicon,.pipe-icon{transition:transform .2s cubic-bezier(.22,1,.36,1)}
+.score-table tbody tr:hover .modicon{transform:scale(1.12) rotate(-2deg)}
+/* judge number subtle emphasis on row hover */
+.score-table tbody tr:hover .judgecell > span:first-child{transform:translateY(-1px)}
+.judgecell{display:inline-block;line-height:1.05}
+.judgecell > span:first-child{font-size:1.35rem;font-weight:600;color:var(--lead)}
+/* model column: give it room */
+.score-table col.c-model{width:26%;min-width:13rem}
+.score-table td.td-model{padding-right:1rem}
+/* inline metric bars slim */
+.score-table td.td-num{min-width:5.5rem}
+.score-table td.td-num.headline{min-width:6.5rem;text-align:right}
+.td-num .bar{display:block}
+
+/* ============ SECTIONS ============ */
+.sect{padding:clamp(3.2rem,6.5vw,4.6rem) 0 clamp(2.2rem,5vw,3.4rem);border-top:1.5px solid var(--ink)}
+.sect .s-head{display:flex;align-items:baseline;gap:.8rem;flex-wrap:wrap;margin-bottom:1.5rem;padding-top:.8rem}
+.sect h2{font-family:var(--font-disp);font-weight:600;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.015em}
+.sect .th-h{margin-right:.5rem}
+.sect .en-h{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:2.2rem;margin-top:1.4rem}
+.col p{color:var(--ink-soft);margin-bottom:.9rem;font-size:.98rem}
+.col p strong{color:var(--ink);font-weight:600}
+.col h3{font-family:var(--font-disp);font-weight:600;font-size:1.05rem;margin-bottom:.7rem;letter-spacing:-.01em}
+.col h3 .th{margin-right:.4rem}
+/* example card */
+.ex{
+  background:var(--scored);border:1.5px solid var(--ink);border-radius:var(--radius);
+  padding:1.1rem 1.2rem;margin-top:1rem;
+}
+.ex .q{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.5rem}
+.ex blockquote{font-size:.95rem;font-style:normal;color:var(--ink);border-left:2px solid var(--lead);padding-left:.8rem;margin:.4rem 0;line-height:1.55}
+.ex .v{font-family:var(--mono);font-size:.78rem;color:var(--lead-deep);margin-top:.6rem;font-weight:500}
+.ex .v::before{content:"▸ ";opacity:.6}
+/* code */
+.code{
+  background:#211C14;color:#EDE6D2;border-radius:var(--radius);
+  font-family:var(--mono);font-size:.78rem;line-height:1.7;
+  padding:1.1rem 1.2rem;overflow-x:auto;margin-top:1rem;
+  -webkit-overflow-scrolling:touch;
+}
+.code .cm{color:#9A8F77}
+.code .cmd{color:#F0B429}
+.code b{color:#E86A4A;font-weight:600}
+.code::-webkit-scrollbar{height:8px}
+.code::-webkit-scrollbar-thumb{background:#4A4232}
+.equation{
+  font-family:var(--mono);font-size:.8rem;background:var(--paper-2);
+  border:1px solid var(--hair-strong);border-radius:var(--radius);
+  padding:.9rem 1.1rem;margin-top:1rem;color:var(--ink);overflow-x:auto;
+}
+.equation b{color:var(--lead)}
+
+/* ============ FOOTER ============ */
+footer{border-top:1.5px solid var(--ink);margin-top:2rem;background:var(--paper-2)}
+.foot{padding:2.4rem 0 2.6rem}
+.foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:2rem}
+.foot h4{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.8rem;font-weight:500}
+.foot p{font-size:.88rem;color:var(--ink-soft);line-height:1.65;margin-bottom:.6rem}
+.foot a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--lead);transition:color .15s}
+.foot a:hover{color:var(--lead)}
+.foot .wordmark-sm{font-family:var(--font-disp);font-weight:700;font-size:1.3rem;color:var(--ink);letter-spacing:-.01em;margin-bottom:.5rem}
+.foot-bottom{
+  border-top:1px solid var(--hair);padding:1.2rem 0;margin-top:2rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.03em;color:var(--ink-faint);
+}
+
+/* lang visibility */
+html[lang="th"] .en-only{display:none!important}
+html[lang="en"] .th-only{display:none!important}
+
+@media(max-width:879px){
+  .score-table thead th,.score-table tbody td{padding:.7rem .6rem}
+  .modname{font-size:.95rem}
+}
+@media(max-width:640px){
+  /* keep the table a table; shrink type and padding */
+  .score-table thead th{font-size:.66rem;padding:.6rem .4rem}
+  .score-table tbody td{padding:.7rem .4rem;font-size:.86rem}
+  .judgecell > span:first-child{font-size:1.15rem}
+  .lead-flag{padding:.15rem .3rem;font-size:.6rem}
+  .modicon{width:1.4rem;height:1.4rem}
+}
+</style>
+</head>
+<body>
+<main>
+
+<!-- ============ MASTHEAD ============ -->
+<header class="mast">
+  <div class="wrap">
+    <div class="mast-row">
+      <div class="wordmark">
+        <span class="th-logo"><span class="en-only">Thai RAG Leaderboard</span><span class="th-only">ตารางคะแนน Thai RAG</span></span>
+        <span class="en-sub">MKQA·th·dev·2,827</span>
+      </div>
+      <div class="lang" role="group" aria-label="Language / ภาษา">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="th" aria-pressed="false">ไทย</button>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#board"   ><span class="en-only">Leaderboard</span><span class="th-only">ตารางคะแนน</span></a>
+      <a href="guide.html#judge"   ><span class="en-only">The Judge</span><span class="th-only">ผู้ตัดสิน</span></a>
+      <a href="guide.html#metrics" ><span class="en-only">Metrics</span><span class="th-only">ตัวชี้วัด</span></a>
+      <a href="guide.html#repro"   ><span class="en-only">Reproduce</span><span class="th-only">ทำซ้ำ</span></a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ INTRO ============ -->
+<section class="intro rv">
+  <div class="wrap">
+    <h1 class="th-head">
+      <span class="en-only">Which Thai RAG system <em style="font-style:normal;color:var(--lead)">reads best</em>? The judge says so.</span>
+      <span class="th-only">ระบบ RAG ภาษาไทยตัวไหนอ่านดีที่สุด? ผู้ตัดสินเป็นคนบอก</span>
+    </h1>
+    <p class="lede">
+      <span class="en-only">Every system is ranked by its <strong>judge score</strong> — an LLM grading factual correctness against the retrieved Thai context. String metrics alone under-credit Thai answers: a different transliteration of the same entity, or a correct refusal like <strong>ไม่พบข้อมูล</strong>, looks like a failure to a string match. Here the judged truth leads the first column, and the strings support beside it.</span>
+      <span class="th-only">ทุกระบบถูกจัดอันดับด้วย<strong>คะแนนผู้ตัดสิน</strong> — LLM ที่ให้คะแนนความถูกต้องเทียบกับบริบทภาษาไทยที่ดึงมา ตัวชี้วัดแบบเทียบข้อความล้วนประเมินคำตอบภาษาไทยต่ำเกินไป การสะกดถ่ายเสียงต่างกันของชื่อเดียวกัน หรือการปฏิเสธที่ถูกต้องอย่าง <strong>ไม่พบข้อมูล</strong> อาจถูกมองว่าผิดเพียงเพราะไม่ตรงตัวอักษร ที่นี่คะแนนจากผู้ตัดสินนำคอลัมน์แรก และตัวชี้วัดข้อความเป็นเพียงเสริมข้างๆ</span>
+    </p>
+    <div class="meta">
+      <div><span class="en-only">Dataset</span><span class="th-only">ชุดข้อมูล</span><b>MKQA · lang=th · dev · 2,827</b></div>
+      <div><span class="en-only">Datastore</span><span class="th-only">คลังข้อมูล</span><b>wiki-100w-th</b></div>
+      <div><span class="en-only">Pipeline</span><span class="th-only">ไปป์ไลน์</span><b>BGE-M3 · top-100 · gen top-5</b></div>
+      <div><span class="en-only">Headline</span><span class="th-only">ตัวหลัก</span><b>Judge score</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEADERBOARD SHEET ============ -->
+<section class="sheet-sec rv" id="board">
+  <div class="wrap">
+    <div class="sheet-headline">
+      <h2><span class="en-only">Measured sheet</span><span class="th-only">แผ่นวัดผล</span><span class="en">· MKQA/th · dev · 2,827</span></h2>
+      <p class="sheet-note"><span class="en-only">Judge score leads. Click a column to sort.</span><span class="th-only">คะแนนผู้ตัดสินนำ คลิกคอลัมน์เพื่อเรียง</span></p>
+    </div>
+
+    <div id="tableWrap"><!-- score table injected --></div>
+
+    <p class="judgenote"><span class="en-only">The Judge score is final: every one of the 2,827 questions judged. It is an LLM grading factual correctness against the retrieved Thai context — see <a href="guide.html#judge" style="color:var(--lead);text-decoration:none;border-bottom:1px solid var(--lead)">how the judge works</a>.</span><span class="th-only">คะแนนผู้ตัดสินถือเป็นผลสุดท้าย: ตัดสินครบทั้ง 2,827 ข้อ เป็น LLM ให้คะแนนความถูกต้องเทียบกับบริบทภาษาไทยที่ดึงมา ดู<a href="guide.html#judge" style="color:var(--lead);text-decoration:none;border-bottom:1px solid var(--lead)">ผู้ตัดสินทำงานอย่างไร</a></span></p>
+  </div>
+</section>
+
+<!-- ============ GUIDE CALLOUT ============ -->
+<section class="sect rv" id="guidelink">
+  <div class="wrap">
+    <div class="callout">
+      <div class="callout-txt">
+        <h2><span class="en-only">How the scores are made</span><span class="th-only">คะแนนเหล่านี้มาอย่างไร</span></h2>
+        <p><span class="en-only">The judged truth behind the numbers: why an LLM grades each answer, why string metrics under-credit Thai, and the exact commands to reproduce it.</span>
+        <span class="th-only">ความจริงที่ตัดสินหลังตัวเลข: ทำไม LLM เป็นผู้ให้คะแนน ทำไมตัวชี้วัดข้อความประเมินภาษาไทยต่ำ และคำสั่งสำหรับทำซ้ำ</span></p>
+      </div>
+      <a class="callout-btn" href="guide.html"><span class="en-only">Read the guide</span><span class="th-only">อ่านคู่มือ</span> <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot">
+    <div class="foot-grid">
+      <div>
+        <div class="wordmark-sm"><span class="en-only">Thai RAG Leaderboard</span><span class="th-only">ตารางคะแนน Thai RAG</span></div>
+        <p><span class="en-only">A Thai-focused fork of <a href="https://github.com/naver/bergen" rel="noopener">BERGEN</a>, a benchmarking library for retrieval-augmented generation. Thai-aware metrics, an LLM-as-judge, and API-based pipelines.</span>
+        <span class="th-only">โครงการแยกของ <a href="https://github.com/naver/bergen" rel="noopener">BERGEN</a> ที่เน้นภาษาไทย — ไลบรารีสำหรับวัดประสิทธิภาพ retrieval-augmented generation ตัวชี้วัดที่เข้าใจภาษาไทย ผู้ตัดสินแบบ LLM และไปป์ไลน์ผ่าน API</span></p>
+      </div>
+      <div>
+        <h4><span class="en-only">Research</span><span class="th-only">งานวิจัย</span></h4>
+        <p>
+          <a href="https://arxiv.org/abs/2407.01102" rel="noopener">BERGEN (arXiv:2407.01102)</a><br>
+          <a href="https://arxiv.org/abs/2407.01463" rel="noopener">Multilingual RAG (arXiv:2407.01463)</a>
+        </p>
+        <p><span class="en-only">EMNLP ’24 slides and full documentation live in the repository.</span>
+        <span class="th-only">สไลด์ EMNLP ’24 และเอกสารฉบับเต็มอยู่ในที่เก็บโค้ด</span></p>
+      </div>
+      <div>
+        <h4><span class="en-only">License &amp; credit</span><span class="th-only">สัญญาอนุญาตและเครดิต</span></h4>
+        <p><span class="en-only">Released under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a>. Upstream BERGEN by NAVER and co-authors must remain credited.</span>
+        <span class="th-only">เผยแพร่ภายใต้ <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a> ต้องให้เครดิต BERGEN ต้นฉบับโดย NAVER และผู้แต่งร่วมเสมอ</span></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>MKQA · lang=th · dev · 2,827 · wiki-100w-th</span>
+      <span><span class="en-only">Measured, not claimed</span><span class="th-only">วัดจริง ไม่ใช่อ้าง</span></span>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  const wrap = document.getElementById('tableWrap');
+  const metrics = BENCH.metrics;
+  // field key per metric
+  const F = { judge:'judgePct', m_th:'m_th', f1_th:'f1_th', prec_th:'prec_th', rec_th:'rec_th' };
+  let sortId = 'judge', sortDir = -1; // judge desc by default
+  let lang = 'en';
+
+  const fmt = v => (typeof v === 'number') ? v.toFixed(1) : '—';
+  const fmtInt = v => v.toLocaleString(lang === 'th' ? 'th-TH' : 'en-US');
+  const pctW = v => Math.max(0, Math.min(100, v||0));
+
+  // max value per metric among measured rows (for inline bars)
+  function maxOf(f){
+    let m = 0;
+    BENCH.systems.forEach(s => { if(s.measured && typeof s[f]==='number') m = Math.max(m, s[f]); });
+    return m;
+  }
+
+  function cellNum(s, m){
+    const f = F[m.id];
+    if(!s.measured || typeof s[f] !== 'number'){
+      return `<span class="td-dash">—</span>`;
+    }
+    const v = s[f];
+    const num = `<span>${fmt(v)}</span>`;
+    if(!m.headline){
+      const w = pctW(v / maxOf(f) * 100);
+      return num + `<span class="bar"><i style="width:${w}%"></i></span>`;
+    }
+    // judge headline: single finished score, largest
+    return `<span class="judgecell">${num}</span>`;
+  }
+
+  function rowHTML(s, idx, isLeader){
+    const bgeIcon = `<span class="pipe-icon" title="BAAI"><img src="assets/icons/baai.svg" alt="" width="16" height="16" loading="lazy" decoding="async"></span>`;
+    const pipe = (s.measured && s.embedder && s.reranker)
+      ? `<td class="td-pipe"><div class="pipewrap">${bgeIcon}<span class="pipe-model">${s.embedder}</span></div></td>
+         <td class="td-pipe"><div class="pipewrap">${bgeIcon}<span class="pipe-model">${s.reranker}</span></div></td>`
+      : `<td class="td-pipe"><span class="pipe-model dash">—</span></td>
+         <td class="td-pipe"><span class="pipe-model dash">—</span></td>`;
+    if(!s.measured){
+      return `<tr class="slot">
+        <td class="td-rank"></td>
+        <td class="td-model"><div class="modwrap">
+          <span class="modicon empty" aria-hidden="true"></span>
+          <span class="modname"><span class="en-only">${s.displayName_en}</span><span class="th-only">${s.displayName_th}</span></span>
+        </div></td>
+        ${pipe}
+        ${metrics.map(()=>`<td class="num td-num"><span class="td-dash">—</span></td>`).join('')}
+      </tr>`;
+    }
+    const iconInner = `<img src="assets/icons/deepseek-color.svg" alt="" width="18" height="18" loading="lazy" decoding="async">`;
+    const flag = isLeader ? `<span class="lead-flag"><svg viewBox="0 0 10 12" fill="currentColor"><path d="M0 0h10v12L5 9 0 12z"/></svg><span class="en-only">Leader</span><span class="th-only">อันดับ 1</span></span>` : '';
+    return `<tr class="${isLeader?'leader':''}">
+      <td class="td-rank">${String(idx).padStart(2,'0')}</td>
+      <td class="td-model"><div class="modwrap">
+        <span class="modicon">${iconInner}</span>
+        <span class="modname">${s.name}</span>
+        ${flag}
+      </div></td>
+      ${pipe}
+      ${metrics.map(m=>`<td class="num td-num ${m.headline?'headline':''}">${cellNum(s,m)}</td>`).join('')}
+    </tr>`;
+  }
+
+  function render(){
+    const list = BENCH.systems.slice();
+    const measuredTop = list.filter(s=>s.measured)
+      .sort((a,b)=>((a[F[sortId]]||0)-(b[F[sortId]]||0))*sortDir);
+    const slots = list.filter(s=>!s.measured);
+    const ordered = measuredTop.concat(slots);
+
+    const head = `
+      <tr>
+        <th class="td-rank">#</th>
+        <th><span class="en-only">Model</span><span class="th-only">โมเดล</span></th>
+        <th class="td-pipe"><span class="en-only">Embedding</span><span class="th-only">เอมเบดดิง</span></th>
+        <th class="td-pipe"><span class="en-only">Reranker</span><span class="th-only">ตัวจัดอันดับ</span></th>
+        ${metrics.map(m=>`<th class="num"><button type="button" data-m="${m.id}" class="${m.id===sortId?'sorted':''}" aria-sort="${m.id===sortId?(sortDir<0?'descending':'ascending'):'none'}">
+          <span class="en-only">${m.enLabel}</span><span class="th-only">${m.thLabel}</span><span class="arw">${m.id===sortId?(sortDir<0?'↓':'↑'):'↕'}</span>
+        </button></th>`).join('')}
+      </tr>`;
+
+    wrap.innerHTML = `
+      <div class="tablescroll">
+      <table class="score-table">
+        <colgroup>
+          <col class="c-rank"><col class="c-model"><col class="c-pipe"><col class="c-pipe"><col class="c-headline"><col class="c-num"><col class="c-num"><col class="c-num"><col class="c-num">
+        </colgroup>
+        <thead>${head}</thead>
+        <tbody>
+          ${ordered.map((s,i)=>rowHTML(s, i+1, i===0 && s.measured)).join('')}
+        </tbody>
+      </table>
+      </div>`;
+
+    // header sort handlers
+    wrap.querySelectorAll('thead th button').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const id = b.dataset.m;
+        if(sortId === id){ sortDir *= -1; } else { sortId = id; sortDir = -1; }
+        render();
+      });
+    });
+  }
+
+  // language toggle + persistence
+  function setLang(l){
+    lang = l;
+    document.documentElement.lang = l;
+    try{ localStorage.setItem('thrag-lang', l); }catch(e){}
+    document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.lang===l)));
+  }
+  document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+  try{ lang = localStorage.getItem('thrag-lang') || ((navigator.language||'').startsWith('th')?'th':'en'); }catch(e){}
+  setLang(lang);
+
+  // scroll reveal
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce && 'IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+  } else {
+    document.querySelectorAll('.rv').forEach(el=>el.classList.add('in'));
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

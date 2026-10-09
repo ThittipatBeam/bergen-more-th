@@ -51,8 +51,11 @@ class DenseAPI(Retriever):
         self.require_confirmation = require_confirmation
         self.index_tokens_estimate = index_tokens_estimate
 
-        # docs embed with request_batch_size texts per API call, queries 1-by-1
-        self.request_batch_size = {'doc': 96, 'query': 1}
+        # docs embed with request_batch_size texts per API call, queries 1-by-1.
+        # EMBED_DOC_BATCH overrides the doc request batch for endpoints that cap it
+        # (e.g. a 422 "batch size 96 > maximum allowed batch size 32").
+        doc_batch = int(os.environ.get("EMBED_DOC_BATCH", "96"))
+        self.request_batch_size = {'doc': doc_batch, 'query': 1}
 
         # stub so that `self.model.model.to(...)` in modules/retrieve.py is a no-op
         self.model = torch.nn.Identity()

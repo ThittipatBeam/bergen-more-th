@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How it works · Thai RAG Leaderboard · Judge, metrics &amp; reproduction</title>
+<meta name="description" content="How the Thai RAG leaderboard scores systems: the LLM judge, the Thai string metrics, and the exact commands to reproduce.">
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --paper:#F7F3EA; --paper-2:#EFE8D8; --ink:#1B1710; --ink-soft:#4A4335; --ink-faint:#6A6248;
+  --lead:#B83618; --lead-deep:#93290F; --hair:rgba(27,23,16,.16); --hair-strong:rgba(27,23,16,.4);
+  --scored:#FDFBF4; --slot:#ECE5D3; --radius:3px;
+  --mono:"IBMPlexMono","IBM Plex Mono",ui-monospace,monospace;
+  --th:"IBMPlexSansThai","IBM Plex Sans Thai"; --th-loop:"IBMPlexSansThaiLooped","IBM Plex Sans Thai Looped","IBMPlexSansThai";
+  --sans:"IBMPlexSans","IBM Plex Sans"; --font:var(--th),var(--sans),system-ui,sans-serif;
+  --font-disp:var(--th-loop),var(--th),var(--sans),sans-serif; --sheet-max:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:6rem}
+::selection{background:var(--lead);color:var(--paper)}
+:focus-visible{outline:2px solid var(--lead);outline-offset:3px;border-radius:2px}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(to bottom,transparent 0 calc(5.5rem - 1px),rgba(27,23,16,.035) calc(5.5rem - 1px) 5.5rem);opacity:.6}
+main{position:relative;z-index:1}
+::-webkit-scrollbar{width:11px;height:11px}::-webkit-scrollbar-track{background:var(--paper-2)}
+::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:6px;border:2px solid var(--paper-2)}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-soft)}
+html{scrollbar-width:thin;scrollbar-color:var(--ink-faint) var(--paper-2)}
+.wrap{max-width:var(--sheet-max);margin:0 auto;padding:0 clamp(1rem,4vw,3rem)}
+code{font-family:var(--mono);font-size:.85em;background:var(--paper-2);padding:.1em .35em;border-radius:2px}
+
+/* masthead */
+.mast{border-bottom:1.5px solid var(--ink);padding-top:1.1rem;background:var(--paper);position:relative;z-index:2}
+.mast-row{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;padding-bottom:1.1rem}
+.wordmark{display:flex;align-items:baseline;gap:.9rem;flex-wrap:wrap}
+.wordmark .th-logo{font-family:var(--font-disp);font-weight:700;font-size:clamp(1.6rem,3.4vw,2.2rem);line-height:1;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.wordmark .th-logo:hover{color:var(--lead)}
+.wordmark .en-sub{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lead);font-weight:500}
+.lang{display:flex;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden}
+.lang button{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;font-weight:500;padding:.5rem 1rem;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.lang button:not([aria-pressed="true"]):hover{background:var(--paper-2)}
+.nav{display:flex;gap:1.4rem;flex-wrap:wrap;padding:.7rem 0 1.1rem;border-top:1px solid var(--hair)}
+.nav a{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);text-decoration:none;padding-bottom:2px;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.nav a:hover{color:var(--ink);border-bottom-color:var(--lead)}
+.nav a:focus-visible{border-bottom-color:var(--lead)}
+.nav a.active{color:var(--lead);border-bottom-color:var(--lead)}
+
+/* hero of the guide */
+.intro{padding:clamp(2rem,5vw,3.4rem) 0 clamp(1.2rem,3vw,2rem)}
+.intro .th-head{font-family:var(--font-disp);font-weight:600;font-size:clamp(1.9rem,4.4vw,3rem);line-height:1.12;letter-spacing:-.02em;max-width:22ch}
+.intro .lede{margin-top:1.1rem;max-width:64ch;font-size:clamp(1rem,1.4vw,1.13rem);color:var(--ink-soft)}
+.intro .lede strong{color:var(--ink)}
+.crumbs{margin-top:1.2rem;font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);letter-spacing:.02em}
+.crumbs a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--lead)}
+.crumbs a:hover{color:var(--lead)}
+
+/* guide sub-nav (sticky chips) */
+.gsub{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1.5px solid var(--ink);padding:.7rem 0;margin-bottom:0}
+.gsub-in{display:flex;gap:.5rem;flex-wrap:wrap}
+.gsub a{font-family:var(--mono);font-size:.72rem;text-decoration:none;color:var(--ink-soft);border:1px solid var(--hair-strong);border-radius:var(--radius);padding:.35rem .7rem;transition:all .16s}
+.gsub a:hover{border-color:var(--ink);color:var(--ink);transform:translateY(-1px)}
+.gsub a:focus-visible{border-color:var(--lead)}
+
+/* sections */
+.sect{padding:clamp(3rem,6.5vw,4.4rem) 0;border-top:1.5px solid var(--ink);scroll-margin-top:6rem}
+.sect:first-of-type{border-top:0}
+.sect h2{font-family:var(--font-disp);font-weight:600;font-size:clamp(1.6rem,3.2vw,2.2rem);letter-spacing:-.015em;margin-bottom:.4rem}
+.sect .deck{color:var(--ink-soft);max-width:62ch;font-size:1rem;margin-bottom:1.8rem}
+.sect .deck strong{color:var(--ink)}
+.prose p{color:var(--ink-soft);margin-bottom:1rem;max-width:68ch}
+.prose p strong{color:var(--ink)}
+
+/* side-by-side cards */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1.6rem;margin-top:1.4rem}
+.card-h{background:var(--scored);border:1.5px solid var(--ink);border-radius:var(--radius);padding:1.2rem 1.3rem;transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s,border-color .22s}
+.card-h:hover{transform:translateY(-3px);box-shadow:0 14px 28px -18px rgba(27,23,16,.35);border-color:var(--ink)}
+.card-h h3{font-size:1.05rem;margin-bottom:.7rem;font-family:var(--font-disp);font-weight:600}
+.card-h p{color:var(--ink-soft);font-size:.94rem;margin-bottom:.8rem}
+.card-h p:last-child{margin-bottom:0}
+
+/* worked example + interactive compare */
+.ex{background:var(--scored);border:1.5px solid var(--ink);border-radius:var(--radius);padding:1.2rem 1.3rem;margin-top:1rem;transition:transform .22s,box-shadow .22s,border-color .22s}
+.ex:hover{transform:translateY(-2px);box-shadow:0 14px 28px -18px rgba(27,23,16,.35)}
+.ex .q{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.4rem}
+.ex blockquote{font-size:.95rem;color:var(--ink);border-left:2px solid var(--lead);padding-left:.85rem;margin:.3rem 0 .6rem;line-height:1.55}
+.ex .v{font-family:var(--mono);font-size:.78rem;color:var(--lead-deep);font-weight:500}
+.ex .v::before{content:"▸ ";opacity:.6}
+
+/* interactive compare: same answer, two scorings */
+.compare{border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden;background:var(--scored);margin-top:1.4rem}
+.compare-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.9rem 1.2rem;border-bottom:1.5px solid var(--ink);background:var(--paper-2)}
+.compare-head .cap{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:var(--radius);overflow:hidden}
+.seg button{font-family:var(--mono);font-size:.72rem;padding:.45rem 1rem;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg button:not([aria-pressed="true"]):hover{background:var(--paper-2)}
+.compare-body{padding:1.2rem 1.3rem}
+.ans{font-size:1.02rem;color:var(--ink);border-left:2px solid var(--lead);padding-left:.9rem;margin-bottom:1rem;line-height:1.5}
+.verdict{display:flex;align-items:flex-start;gap:.9rem}
+.verdict .score-dot{font-family:var(--mono);font-weight:600;font-size:2rem;line-height:1;transition:color .2s;min-width:3.2rem}
+.verdict.good .score-dot{color:var(--lead)}
+.verdict.bad .score-dot{color:var(--ink-faint)}
+.verdict .vt{font-size:.92rem;color:var(--ink-soft);max-width:56ch}
+.verdict .vt b{color:var(--ink)}
+.compare-slide{overflow:hidden;max-height:400px;transition:max-height .4s cubic-bezier(.22,1,.36,1),opacity .3s,transform .3s}
+.compare-slide.hide{max-height:0;opacity:0;transform:translateY(6px);pointer-events:none}
+
+/* metric cheat-sheet list */
+.metriclist{list-style:none;margin-top:1.2rem}
+.metriclist li{display:grid;grid-template-columns:8.5rem 1fr;gap:1.1rem;padding:.8rem 0;border-top:1px solid var(--hair);align-items:baseline}
+.metriclist li:first-child{border-top:0}
+.metriclist .mk{font-family:var(--mono);font-size:.82rem;color:var(--lead);font-weight:600;letter-spacing:.02em}
+.metriclist .mk span{display:block;color:var(--ink-faint);font-size:.69rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.15rem}
+.metriclist .mv{color:var(--ink-soft);font-size:.94rem}
+
+/* pipeline diagram */
+.pipe{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:1.4rem 0;border:1.5px solid var(--ink);border-radius:var(--radius);background:var(--scored);overflow:hidden}
+.pstage{flex:1;min-width:150px;padding:1rem 1.1rem;border-right:1px solid var(--hair);position:relative;transition:background .2s}
+.pstage:last-child{border-right:0}
+.pstage:hover{background:var(--paper-2)}
+.pstage .pn{font-family:var(--mono);font-size:.66rem;color:var(--lead);letter-spacing:.1em;font-weight:600}
+.pstage .pt{font-family:var(--font-disp);font-weight:600;font-size:.95rem;margin:.25rem 0 .3rem}
+.pstage .pd{font-family:var(--mono);font-size:.7rem;color:var(--ink-soft)}
+.pstage .arr{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-weight:600}
+.pstage:last-child .arr{display:none}
+
+/* code block + copy */
+.codewrap{position:relative;margin-top:1rem}
+.code{background:#211C14;color:#EDE6D2;border-radius:var(--radius);font-family:var(--mono);font-size:.78rem;line-height:1.7;padding:1.1rem 1.2rem;overflow-x:auto;transition:transform .22s,box-shadow .22s}
+.codewrap:hover .code{transform:translateY(-2px);box-shadow:0 14px 28px -18px rgba(27,23,16,.45)}
+.code .cm{color:#9A8F77}.code .cmd{color:#F0B429}.code b{color:#E86A4A;font-weight:600}
+.code::-webkit-scrollbar{height:8px}.code::-webkit-scrollbar-thumb{background:#4A4232}
+.copybtn{position:absolute;top:.6rem;right:.6rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;color:#EDE6D2;background:rgba(27,23,16,.7);border:1px solid var(--hair-strong);border-radius:2px;padding:.3rem .6rem;cursor:pointer;transition:all .16s;opacity:0}
+.codewrap:hover .copybtn{opacity:1}
+.copybtn:hover{background:var(--lead);border-color:var(--lead)}
+.copybtn.done{background:var(--lead);border-color:var(--lead)}
+.equation{font-family:var(--mono);font-size:.82rem;background:var(--paper-2);border:1px solid var(--hair-strong);border-radius:var(--radius);padding:.9rem 1.1rem;margin-top:1rem;overflow-x:auto}
+.equation b{color:var(--lead)}
+
+/* back-to-board fade strip */
+.backboard{display:block;border:1.5px solid var(--ink);border-radius:var(--radius);background:var(--scored);padding:clamp(1.4rem,3vw,2rem);text-align:center;text-decoration:none;transition:all .25s}
+.backboard:hover{transform:translateY(-3px);box-shadow:0 18px 36px -20px rgba(27,23,16,.35)}
+.backboard .k{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--lead);font-weight:600}
+.backboard .t{font-family:var(--font-disp);font-weight:600;font-size:1.4rem;color:var(--ink);margin-top:.3rem}
+.backboard .arr{display:inline-block;transition:transform .25s;margin-left:.5rem;color:var(--lead)}
+.backboard:hover .arr{transform:translateX(4px)}
+
+/* footer */
+footer{border-top:1.5px solid var(--ink);margin-top:3rem;background:var(--paper-2)}
+.foot{padding:2.2rem 0}
+.foot p{font-size:.86rem;color:var(--ink-soft);max-width:60ch;line-height:1.6}
+.foot a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--lead);transition:color .18s}
+.foot a:hover{color:var(--lead)}
+.foot-bottom{border-top:1px solid var(--hair);padding-top:1.2rem;margin-top:1.6rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;color:var(--ink-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+
+/* reveal */
+@keyframes rv{to{opacity:1;transform:none}}
+.rv{opacity:0;transform:translateY(14px)}
+.rv.in{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none!important}*{animation-duration:.001s!important;transition-duration:.001s!important}}
+
+html[lang="th"] .en-only{display:none!important}
+html[lang="en"] .th-only{display:none!important}
+</style>
+</head>
+<body>
+<main>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="mast-row">
+      <div class="wordmark">
+        <a class="th-logo" href="index.html"><span class="en-only">How it works</span><span class="th-only">หลักการทำงาน</span></a>
+        <span class="en-sub">Thai RAG · Guide</span>
+      </div>
+      <div class="lang" role="group" aria-label="Language / ภาษา">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="th" aria-pressed="false">ไทย</button>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <a href="index.html#board"><span class="en-only">Leaderboard</span><span class="th-only">ตารางคะแนน</span></a>
+      <a href="#judge" class="active"><span class="en-only">The Judge</span><span class="th-only">ผู้ตัดสิน</span></a>
+      <a href="#metrics" class="active"><span class="en-only">Metrics</span><span class="th-only">ตัวชี้วัด</span></a>
+      <a href="#repro" class="active"><span class="en-only">Reproduce</span><span class="th-only">ทำซ้ำ</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="intro rv">
+  <div class="wrap">
+    <p class="crumbs"><a href="index.html"><span class="en-only">Leaderboard</span><span class="th-only">ตารางคะแนน</span></a> / <span class="en-only">How it works</span><span class="th-only">หลักการทำงาน</span></p>
+    <h1 class="th-head" style="margin-top:.7rem">
+      <span class="en-only">Why the judge leads, and how to reproduce it.</span>
+      <span class="th-only">ทำไมคะแนนผู้ตัดสินจึงนำ และทำซ้ำได้อย่างไร</span>
+    </h1>
+    <p class="lede">
+      <span class="en-only">Three short reads. First, <strong>how the judge scores</strong> — an LLM grading each answer against the documents the pipeline actually retrieved. Then <strong>why string metrics under-credit Thai</strong>. Then <strong>the exact commands</strong> to run the same pipeline yourself.</span>
+      <span class="th-only">สามเรื่องสั้นๆ เรื่องแรก <strong>ผู้ตัดสินให้คะแนนอย่างไร</strong> — LLM ให้คะแนนแต่ละคำตอบเทียบกับเอกสารที่ไปป์ไลน์ดึงมาจริง เรื่องที่สอง <strong>ทำไมตัวชี้วัดข้อความให้คะแนนภาษาไทยต่ำเกินไป</strong> เรื่องสุดท้าย <strong>คำสั่งสำหรับรันเอง</strong>ให้ได้ผลเหมือนกัน</span>
+    </p>
+  </div>
+</section>
+
+<div class="gsub"><div class="wrap gsub-in">
+  <a href="#judge"><span class="en-only">The Judge</span><span class="th-only">ผู้ตัดสิน</span></a>
+  <a href="#metrics"><span class="en-only">Metrics</span><span class="th-only">ตัวชี้วัด</span></a>
+  <a href="#repro"><span class="en-only">Reproduce</span><span class="th-only">ทำซ้ำ</span></a>
+  <a href="index.html#board" style="border-color:var(--lead);color:var(--lead)"><span class="en-only">← Back to the board</span><span class="th-only">← กลับไปตาราง</span></a>
+</div></div>
+
+<!-- ============ THE JUDGE ============ -->
+<section class="sect rv" id="judge">
+  <div class="wrap">
+    <h2><span class="en-only">The judge, in plain terms</span><span class="th-only">ผู้ตัดสิน อธิบายง่ายๆ</span></h2>
+    <p class="deck">
+      <span class="en-only">The headline score is <strong>not a string match</strong>. A Thai-aware LLM reads each model answer <strong>next to the documents the pipeline actually pulled</strong>, and asks one question: is this answer factually correct given that context?</span>
+      <span class="th-only">คะแนนหลัก<strong>ไม่ใช่</strong>การเทียบข้อความ LLM ที่เข้าใจภาษาไทยอ่านคำตอบของแต่ละโมเดล<strong>คู่กับเอกสารที่ระบบดึงมาจริง</strong> แล้วถามคำถามเดียว: คำตอบนี้ถูกต้องตามข้อเท็จจริงจากบริบทนั้นหรือไม่</span>
+    </p>
+    <div class="cols">
+      <div class="card-h">
+        <h3><span class="en-only">What it credits</span><span class="th-only">อะไรที่ได้คะแนน</span></h3>
+        <p><span class="en-only">A correct answer in <strong>different words</strong> still earns full credit. So does a different Thai <strong>transliteration</strong> of the same name — เลดี้ กาก้า and Lady Gaga are the same entity.</span>
+        <span class="th-only">คำตอบที่ถูกแม้ใช้<strong>ถ้อยคำต่างกัน</strong>ก็ยังได้คะแนนเต็ม เช่นเดียวกับการสะกด<strong>ถ่ายเสียงไทย</strong>ต่างกันของชื่อเดียวกัน — เลดี้ กาก้า กับ Lady Gaga คือบุคคลเดียวกัน</span></p>
+      </div>
+      <div class="card-h">
+        <h3><span class="en-only">What it also credits</span><span class="th-only">อะไรที่ได้คะแนนเพิ่ม</span></h3>
+        <p><span class="en-only">A <strong>correct refusal</strong>. If the retrieved context genuinely lacks the answer, replying <strong>ไม่พบข้อมูล</strong> is the right call. The judge rewards it; every string metric scores it zero.</span>
+        <span class="th-only"><strong>การปฏิเสธที่ถูกต้อง</strong> หากบริบทที่ดึงมาไม่มีคำตอบจริง การตอบ <strong>ไม่พบข้อมูล</strong> คือสิ่งที่ถูก ผู้ตัดสินให้คะแนน แต่ตัวชี้วัดข้อความทุกตัวให้ศูนย์</span></p>
+      </div>
+    </div>
+
+    <!-- interactive worked example -->
+    <div class="compare rv">
+      <div class="compare-head">
+        <span class="cap"><span class="en-only">Work it yourself — the same answer, two scorings</span><span class="th-only">ลองเอง — คำตอบเดียวกัน คะแนนสองแบบ</span></span>
+        <div class="seg" role="group" aria-label="Scoring method">
+          <button type="button" data-mode="judge" aria-pressed="true"><span class="en-only">Judge</span><span class="th-only">ผู้ตัดสิน</span></button>
+          <button type="button" data-mode="string" aria-pressed="false"><span class="en-only">String</span><span class="th-only">ข้อความ</span></button>
+        </div>
+      </div>
+      <div class="compare-body">
+        <div class="q" style="font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.4rem"><span class="en-only">Q. เพลง The Edge of Glory ร้องโดยใคร</span><span class="th-only">ถาม. เพลง The Edge of Glory ร้องโดยใคร</span></div>
+        <div class="ans"><span class="en-only"><strong>A.</strong> ร้องโดย เลดี้ กาก้า (Lady Gaga)</span><span class="th-only"><strong>ตอบ.</strong> ร้องโดย เลดี้ กาก้า (Lady Gaga)</span></div>
+
+        <div class="verdict good compare-slide" data-pane="judge">
+          <div class="score-dot">✓</div>
+          <div class="vt"><span class="en-only"><b>Judge: correct.</b> Same entity — เลดี้ กาก้า is the Thai transliteration of “Lady Gaga”. The judge cares about the fact, not the exact letters. <b>Score: 1.</b></span>
+          <span class="th-only"><b>ผู้ตัดสิน: ถูกต้อง</b> ชื่อเดียวกัน — เลดี้ กาก้า คือการถ่ายเสียงไทยของ “Lady Gaga” ผู้ตัดสินดูข้อเท็จจริง ไม่ใช่ตัวอักษรเป๊ะๆ <b>คะแนน: 1</b></span></div>
+        </div>
+        <div class="verdict bad compare-slide hide" data-pane="string">
+          <div class="score-dot">✗</div>
+          <div class="vt"><span class="en-only"><b>String match: fail.</b> The reference answer is in English. The Thai transliteration shares no matching tokens, so the overlap is zero — even though the answer is right. <b>Score: 0.</b></span>
+          <span class="th-only"><b>เทียบข้อความ: ผิด</b> คำตอบอ้างอิงเป็นภาษาอังกฤษ การถ่ายเสียงไทยไม่มีคำซ้ำกันเลย ความซ้ำเป็นศูนย์ ทั้งที่คำตอบถูก <b>คะแนน: 0</b></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="equation">LLMeval_judge_pct = <b>mean(judge_score) × 100</b> <span style="color:var(--ink-faint)">— <span class="en-only">the share of questions the answer got right, as a percentage</span><span class="th-only">สัดส่วนข้อที่ตอบถูก เป็นเปอร์เซ็นต์</span></span></div>
+  </div>
+</section>
+
+<!-- ============ METRICS ============ -->
+<section class="sect rv" id="metrics">
+  <div class="wrap">
+    <h2><span class="en-only">The metrics, side by side</span><span class="th-only">ตัวชี้วัด เทียบกัน</span></h2>
+    <p class="deck">
+      <span class="en-only">String metrics compare <strong>token overlap</strong> against a reference. Thai has no spaces, so the fork tokenizes with <strong>pythainlp</strong> first — these are the <code>_th</code> metrics. They measure the lexical surface, never the fact.</span>
+      <span class="th-only">ตัวชี้วัดข้อความเทียบ<strong>คำที่ซ้ำกัน</strong>กับคำตอบอ้างอิง ภาษาไทยไม่มีการเว้นวรรค จึงต้องตัดคำด้วย <strong>pythainlp</strong> ก่อน — นี่คือตัวชี้วัด <code>_th</code> วัดได้แค่ผิวของข้อความ ไม่ใช่ข้อเท็จจริง</span>
+    </p>
+    <ul class="metriclist">
+      <li><div class="mk">Judge<span>Headline</span></div><div class="mv"><span class="en-only">Did the model get the fact right against the retrieved context? The only metric that answers the real question.</span><span class="th-only">โมเดลตอบถูกเทียบกับบริบทที่ดึงมาหรือไม่ ตัวชี้วัดเดียวที่ตอบคำถามจริง</span></div></li>
+      <li><div class="mk">M_th<span>Thai Match</span></div><div class="mv"><span class="en-only">1 if any reference answer string appears anywhere in the response. Generous — a long answer that name-drops the right entity scores full.</span><span class="th-only">เป็น 1 ถ้าข้อความคำตอบอ้างอิงข้อใดปรากฏในคำตอบ ใจกว้าง คำตอบยาวที่พาดพิงชื่อถูกก็ได้เต็ม</span></div></li>
+      <li><div class="mk">F1_th<span>Harmonic</span></div><div class="mv"><span class="en-only">Balance of Precision_th and Recall_th over pythainlp tokens. The fairest single string number, still blind to correctness.</span><span class="th-only">ถ่วงดุล Precision_th กับ Recall_th บนคำที่ตัดด้วย pythainlp เลขข้อความตัวเดียวที่ยุติธรรมที่สุด แต่ยังมองไม่เห็นความถูกต้อง</span></div></li>
+      <li><div class="mk">Recall_th<span>Coverage</span></div><div class="mv"><span class="en-only">How much of the reference the answer covers.</span><span class="th-only">คำตอบครอบคลุมคำในอ้างอิงมากแค่ไหน</span></div></li>
+      <li><div class="mk">Precision_th<span>Economy</span></div><div class="mv"><span class="en-only">How much of the answer is actually on-reference. The gap metric below shows why it sits lowest.</span><span class="th-only">คำตอบมีส่วนที่ตรงอ้างอิงมากแค่ไหน ตัวชี้วัดช่องว่างด้านล่างอธิบายว่าทำไมตัวนี้ต่ำสุด</span></div></li>
+    </ul>
+    <div class="card-h rv" style="margin-top:1.6rem">
+      <h3><span class="en-only">Why the gap matters here</span><span class="th-only">ทำไมช่องว่างจึงสำคัญ</span></h3>
+      <p><span class="en-only">On the measured sheet, judge <strong>69.7</strong> against F1_th <strong>13.1</strong> — and Recall_th (32.1) runs far above Precision_th (10.0). That tells you systems pull the right entity but <strong>say too much</strong>, and the strings punish correct Thai phrasing. That gap is the whole reason this benchmark exists.</span>
+      <span class="th-only">บนแผ่นวัด ผู้ตัดสิน <strong>69.7</strong> เทียบ F1_th <strong>13.1</strong> และ Recall_th (32.1) สูงกว่า Precision_th (10.0) มาก แสดงว่าระบบดึงชื่อที่ถูกแต่<strong>พูดเกิน</strong> และตัวชี้วัดข้อความลงโทษการใช้ถ้อยคำไทยที่ถูก ช่องว่างนี้คือเหตุผลทั้งหมดที่เกณฑ์วัดนี้มีอยู่</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REPRODUCE ============ -->
+<section class="sect rv" id="repro">
+  <div class="wrap">
+    <h2><span class="en-only">Reproduce it yourself</span><span class="th-only">ทำซ้ำด้วยตัวเอง</span></h2>
+    <p class="deck">
+      <span class="en-only">One pipeline definition, three commands. It runs through OpenAI-compatible endpoints with cost guardrails, so no local GPU stack is needed.</span>
+      <span class="th-only">นิยามไปป์ไลน์เดียว สามคำสั่ง รันผ่านเอนด์พอยต์แบบ OpenAI-compatible พร้อมตัวจำกัดค่าใช้จ่าย ไม่ต้องมี GPU ในเครื่อง</span>
+    </p>
+
+    <!-- pipeline diagram -->
+    <div class="pipe" role="list" aria-label="Pipeline stages">
+      <div class="pstage" role="listitem"><div class="pn">1</div><div class="pt"><span class="en-only">Retrieve</span><span class="th-only">ดึง</span></div><div class="pd">BGE-M3 · top-100</div><span class="arr">→</span></div>
+      <div class="pstage" role="listitem"><div class="pn">2</div><div class="pt"><span class="en-only">Rerank</span><span class="th-only">จัดอันดับ</span></div><div class="pd">bge-reranker-v2-m3 · top-10</div><span class="arr">→</span></div>
+      <div class="pstage" role="listitem"><div class="pn">3</div><div class="pt"><span class="en-only">Generate</span><span class="th-only">สร้าง</span></div><div class="pd">Your LLM · top-5 docs</div><span class="arr">→</span></div>
+      <div class="pstage" role="listitem"><div class="pn">4</div><div class="pt"><span class="en-only">Judge</span><span class="th-only">ตัดสิน</span></div><div class="pd">LLM vs. context</div></div>
+    </div>
+
+    <p class="prose p"><span class="en-only">Set <code>EMBED_BASE_URL</code>, <code>RERANK_BASE_URL</code>, <code>LLM_BASE_URL</code> and their keys in <code>.env</code>. The model ids in the config are simply whatever your endpoint serves.</span>
+    <span class="th-only">ตั้งค่า <code>EMBED_BASE_URL</code>, <code>RERANK_BASE_URL</code>, <code>LLM_BASE_URL</code> และคีย์ใน <code>.env</code> ชื่อโมเดลในคอนฟิกคือชื่อที่เอนด์พอยต์ของคุณให้บริการเท่านั้น</span></p>
+
+    <div class="codewrap">
+      <button class="copybtn" type="button" data-copy><span class="en-only">Copy</span><span class="th-only">คัดลอก</span></button>
+      <div class="code">
+<span class="cm"># 1 · run the full Thai pipeline</span><br>
+<span class="cmd">python3 bergen.py</span> dataset=mkqa/mkqa_th.retrieve_th \<br>
+&nbsp;&nbsp;retriever=api-embed-openai-compatible \<br>
+&nbsp;&nbsp;reranker=api-rerank-openai-compatible \<br>
+&nbsp;&nbsp;generator=openai_compatible \<br>
+&nbsp;&nbsp;generator.init_args.model_name=<b>YOUR_MODEL</b><br><br>
+<span class="cm"># 2 · Thai string metrics auto-enable; judge reads on-disk data</span><br>
+<span class="cmd">python3 evaluate.py</span> --folder experiments/&lt;exp&gt; --split dev <b>--judge</b><br><br>
+<span class="cm"># 3 · print the table</span><br>
+<span class="cmd">python3 print_results.py</span> --folder experiments/ --format=tiny
+      </div>
+    </div>
+    <p class="prose p" style="margin-top:1rem"><span class="en-only">New runs land as new rows on the leaderboard — each row states its own embedding and reranker, because changing either makes it a different system.</span>
+    <span class="th-only">ผลการรันใหม่จะมาเป็นแถวใหม่บนตาราง — แต่ละแถวระบุเอมเบดดิงและตัวจัดอันดับของตัวเอง เพราะเปลี่ยนอย่างใดอย่างหนึ่งก็เป็นระบบคนละตัว</span></p>
+
+    <div style="margin-top:2.2rem">
+      <a class="backboard rv" href="index.html#board">
+        <div class="k"><span class="en-only">Done reading</span><span class="th-only">อ่านครบแล้ว</span></div>
+        <div class="t"><span class="en-only">Back to the leaderboard</span><span class="th-only">กลับสู่ตารางคะแนน</span><span class="arr">←</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <p><span class="en-only">A Thai-focused fork of <a href="https://github.com/naver/bergen" rel="noopener">BERGEN</a>, a benchmarking library for retrieval-augmented generation. Released under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a>. Upstream BERGEN by NAVER and co-authors must remain credited.</span>
+    <span class="th-only">โครงการแยกของ <a href="https://github.com/naver/bergen" rel="noopener">BERGEN</a> ที่เน้นภาษาไทย ไลบรารีสำหรับวัดประสิทธิภาพ retrieval-augmented generation เผยแพร่ภายใต้ <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">CC BY-NC-SA 4.0</a> ต้องให้เครดิต BERGEN ต้นฉบับโดย NAVER และผู้แต่งร่วมเสมอ</span></p>
+    <div class="foot-bottom">
+      <span>MKQA · lang=th · dev · 2,827 · wiki-100w-th</span>
+      <span><span class="en-only">Measured, not claimed</span><span class="th-only">วัดจริง ไม่ใช่อ้าง</span></span>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script>
+(function(){
+  // language
+  let lang='en';
+  function setLang(l){ lang=l; document.documentElement.lang=l; try{localStorage.setItem('thrag-lang',l)}catch(e){} document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===l))); }
+  document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+  try{ lang=localStorage.getItem('thrag-lang')||((navigator.language||'').startsWith('th')?'th':'en'); }catch(e){}
+  setLang(lang);
+
+  // reveal
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce && 'IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+  } else document.querySelectorAll('.rv').forEach(el=>el.classList.add('in'));
+
+  // compare toggle
+  const panes=document.querySelectorAll('.compare-slide');
+  document.querySelectorAll('.seg button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+      panes.forEach(p=>p.classList.toggle('hide', p.dataset.pane!==b.dataset.mode));
+    });
+  });
+
+  // copy buttons
+  document.querySelectorAll('[data-copy]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const code=btn.parentElement.querySelector('.code').innerText;
+      try{ await navigator.clipboard.writeText(code); }catch(e){}
+      const orig=btn.textContent;
+      btn.classList.add('done'); const span=btn.querySelector('span'); if(span) span.textContent='Copied ✓'; btn.firstChild && (btn.lastChild.textContent='คัดลอกแล้ว ✓');
+      setTimeout(()=>{ btn.classList.remove('done'); const en=btn.querySelector('.en-only'); if(en) en.textContent='Copy'; const th=btn.querySelector('.th-only'); if(th) th.textContent='คัดลอก'; btn.childNodes.forEach(n=>{ if(n.nodeType===3) n.textContent=''; }); },1400);
+    });
+  });
+})();
+</script>
+</body>
+</html>
