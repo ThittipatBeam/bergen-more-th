@@ -50,6 +50,10 @@ reranker, LLM-as-judge) resolves its base URL and key with the same precedence:
 2. its component-specific env var: `LLM_*`, `EMBED_*`, `RERANK_*`, `JUDGE_*`
 3. the shared `OPENAI_BASE_URL` / `OPENAI_API_KEY` fallback
 
+Model ids resolve the same way: `LLM_MODEL` / `EMBED_MODEL` / `RERANK_MODEL` /
+`JUDGE_MODEL` in `.env` override the `model_name` in the yaml configs, so the
+models under test can be swapped without editing any config file.
+
 Two common setups — see `example.env` for the matching template:
 
 - **One server for everything** (e.g. a LiteLLM gateway or a vLLM box

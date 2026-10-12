@@ -37,7 +37,8 @@ class APIReranker(Reranker):
         # file names, same as it does for local HuggingFace rerankers.
         assert provider in ('cohere', 'voyage', 'jina', 'openai_compatible'), \
             f'Unknown reranking provider: {provider}'
-        self.model_name = model_name
+        # env RERANK_MODEL overrides the yaml model_name (.env-driven testing)
+        self.model_name = os.environ.get('RERANK_MODEL') or model_name
         self.provider = provider
         self.base_url = base_url
         self.max_retries = max_retries

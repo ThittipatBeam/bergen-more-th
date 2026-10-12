@@ -26,6 +26,9 @@ class OpenAI(Generator):
                 concurrency=1,
                 max_retries=6,
                  ):
+        # env LLM_MODEL overrides the yaml model_name, so the model under test
+        # can be changed from .env without editing configs
+        model_name = os.environ.get('LLM_MODEL') or model_name
         Generator.__init__(self,
                            model_name=model_name,
                            batch_size=batch_size,

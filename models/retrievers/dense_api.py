@@ -40,7 +40,8 @@ class DenseAPI(Retriever):
         # the local HuggingFace retrievers.
         assert provider in ('openai_compatible', 'cohere', 'voyage', 'google'), \
             f'Unknown embedding provider: {provider}'
-        self.model_name = model_name
+        # env EMBED_MODEL overrides the yaml model_name (.env-driven testing)
+        self.model_name = os.environ.get('EMBED_MODEL') or model_name
         self.provider = provider
         self.similarity = similarity
         self.dimensions = dimensions
