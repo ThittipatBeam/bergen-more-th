@@ -411,8 +411,17 @@ class NarrativeQA(Processor):
 
 class Wiki_monolingual_100w(Processor):
 
-    def __init__(self, lang, *args, **kwargs):
-        dataset_name = 'wiki-100w-' + lang
+    def __init__(self, lang, num_words=None, *args, **kwargs):
+        # Chunk size in words. Default preserves the original 100-word corpus and
+        # its dataset name (wiki-100w-*) so existing configs/caches are untouched.
+        # WIKI_CHUNK_WORDS in .env/export provides a default when the config leaves
+        # num_words unset; an explicit config value always wins. Any size other
+        # than 100 changes the dataset name -> separate datasets/, indexes/, runs/
+        # artifacts, so chunk sizes can be compared side-by-side without clobbering.
+        if num_words is None:
+            num_words = int(os.environ.get('WIKI_CHUNK_WORDS', '100'))
+        self.num_words = num_words
+        dataset_name = f'wiki-{num_words}w-' + lang
         super().__init__(*args, **kwargs, dataset_name=dataset_name)
         self.lang = lang
 
@@ -420,42 +429,113 @@ class Wiki_monolingual_100w(Processor):
         hf_name = 'wikimedia/wikipedia'
         subset = "20231101." + self.lang
         dataset = datasets.load_dataset(hf_name, subset, num_proc=self.num_proc)[self.split]
+        return _chunk_articles_to_passages(
+            dataset,
+            get_id=lambda s: s['id'],
+            get_title=lambda s: s['title'],
+            get_text=lambda s: s['text'],
+            num_words=self.num_words,
+            tokenize=_make_word_tokenizer(self.lang),
+            num_proc=self.num_proc,
+        )
 
-        def map_100w(sample, num_words=100):
-            wiki_id = sample['id']
-            title = sample['title']
-            doc = sample["text"]
-            if self.lang not in ["zh", "ja", "th", "hu"]:
-                import spacy
-                nlp = spacy.load("xx_sent_ud_sm")
-                words = [token.text for token in nlp(doc)]
-            elif self.lang == "ja":
-                import fugashi
-                fugashi_tagger = fugashi.Tagger()
-                words = [token.surface for token in fugashi_tagger(doc)]
-            elif self.lang == "zh":
-                import jieba
-                words = list(jieba.cut(doc))
-            elif self.lang == "th":
-                from pythainlp.tokenize import word_tokenize as thai_tokenize
-                words = thai_tokenize(doc, keep_whitespace=False)
-            elif self.lang == "hu":
-                import stanza
-                hu_nlp = stanza.Pipeline('hu', processors='tokenize')
-                doc = hu_nlp(" ".join(doc.split()[:10000]))
-                words = [word.text for sent in doc.sentences for word in sent.words]
-            paragraphs = [title + '. ' + " ".join(words[i:i + num_words]) for i in range(0, len(words), num_words)]
-            wiki_ids = [wiki_id] * len(paragraphs)
-            return {'paragraphs': paragraphs, "wiki_ids": wiki_ids}
-        
-        kilt_dataset = dataset.map(map_100w, num_proc=self.num_proc)
-        paragraphs = [el for sublist in kilt_dataset['paragraphs'] for el in sublist]
-        wiki_ids = [el for sublist in kilt_dataset['wiki_ids'] for el in sublist]
-        dataset = datasets.Dataset.from_dict({'content': paragraphs, 'wikipedia_id': wiki_ids})
-        dataset = dataset.map(lambda example, idx: {'id': str(idx), **example}, with_indices=True)
 
-        del kilt_dataset
-        return dataset
+class ThaiWikiV4(Processor):
+    """Thai Wikipedia (and optionally sister Wikimedia projects) from
+    pythainlp/thai-wiki-dataset-v4, chunked into passages for retrieval.
+
+    Fields per output row: id (chunk row index as str), content (passage text
+    prefixed with article title), wikipedia_id (the Thai curid from the source
+    dataset — this is what new ground-truth qrels reference).
+    """
+
+    def __init__(self, num_words=None, sources=('thwiki',), *args, **kwargs):
+        if num_words is None:
+            num_words = int(os.environ.get('WIKI_CHUNK_WORDS', '100'))
+        self.num_words = num_words
+        self.sources = tuple(sources)
+        src_tag = 'allsrc' if len(self.sources) > 1 else self.sources[0]
+        dataset_name = f'thai-wiki-v4-{num_words}w-{src_tag}'
+        super().__init__(*args, **kwargs, dataset_name=dataset_name)
+
+    def process(self):
+        # Prefer local parquet shards under data/ (downloaded once, reproducible);
+        # fall back to the HF hub when they are absent.
+        import glob as _glob
+        local = sorted(_glob.glob('data/train-0000*-of-00002.parquet'))
+        if local:
+            dataset = datasets.load_dataset('parquet', data_files=local)['train']
+        else:
+            dataset = datasets.load_dataset('pythainlp/thai-wiki-dataset-v4')[self.split]
+        if self.sources:
+            keep = set(self.sources)
+            dataset = dataset.filter(lambda s: s['source'] in keep,
+                                     num_proc=self.num_proc)
+        return _chunk_articles_to_passages(
+            dataset,
+            get_id=lambda s: s['id'],
+            get_title=lambda s: s['title'],
+            get_text=lambda s: s['text'],
+            num_words=self.num_words,
+            tokenize=_make_word_tokenizer('th'),
+            num_proc=self.num_proc,
+        )
+
+
+def _make_word_tokenizer(lang):
+    """Return fn(text) -> list[str] of words for the given language.
+
+    Kept as a factory so both Wiki_monolingual_100w and ThaiWikiV4 share one
+    tokenizer implementation (each used to inline its own).
+    """
+    if lang not in ['zh', 'ja', 'th', 'hu']:
+        import spacy
+        nlp = spacy.load('xx_sent_ud_sm')
+        return lambda doc: [token.text for token in nlp(doc)]
+    if lang == 'ja':
+        import fugashi
+        tagger = fugashi.Tagger()
+        return lambda doc: [tok.surface for tok in tagger(doc)]
+    if lang == 'zh':
+        import jieba
+        return lambda doc: list(jieba.cut(doc))
+    if lang == 'th':
+        from pythainlp.tokenize import word_tokenize as thai_tokenize
+        return lambda doc: thai_tokenize(doc, keep_whitespace=False)
+    if lang == 'hu':
+        import stanza
+        nlp = stanza.Pipeline('hu', processors='tokenize')
+        return lambda doc: [w.text for sent in nlp(' '.join(doc.split()[:10000])).sentences for w in sent.words]
+    raise ValueError(f'Unsupported lang for word tokenizer: {lang}')
+
+
+def _chunk_articles_to_passages(dataset, get_id, get_title, get_text,
+                                num_words, tokenize, num_proc=1):
+    """Split each article in `dataset` into `num_words`-word passages.
+
+    `get_id`/`get_title`/`get_text` are column accessors so the same logic
+    serves both the raw wikimedia/wikipedia schema and the thai-wiki-dataset-v4
+    schema. Each passage carries the source article's id in `wikipedia_id`
+    (for wiki_monolingual_100w that's the English/KILT id, for ThaiWikiV4 the
+    Thai curid) so retrieval ground truth can be expressed per source corpus.
+    """
+    def chunk(sample):
+        wiki_id = get_id(sample)
+        title = get_title(sample)
+        doc = get_text(sample)
+        words = tokenize(doc)
+        paragraphs = [title + '. ' + ' '.join(words[i:i + num_words])
+                      for i in range(0, len(words), num_words)]
+        wiki_ids = [wiki_id] * len(paragraphs)
+        return {'paragraphs': paragraphs, 'wiki_ids': wiki_ids}
+
+    chunked = dataset.map(chunk, num_proc=num_proc)
+    paragraphs = [el for sublist in chunked['paragraphs'] for el in sublist]
+    wiki_ids = [el for sublist in chunked['wiki_ids'] for el in sublist]
+    dataset = datasets.Dataset.from_dict({'content': paragraphs, 'wikipedia_id': wiki_ids})
+    dataset = dataset.map(lambda example, idx: {'id': str(idx), **example}, with_indices=True)
+    del chunked
+    return dataset
 
 class ODQAWikiCorpora100WKarpukhin(Processor):
 
