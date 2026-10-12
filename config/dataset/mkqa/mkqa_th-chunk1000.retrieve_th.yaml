@@ -1,0 +1,25 @@
+# MKQA-TH over Thai Wikipedia chunked at 1000 words per passage
+# (vs. the 100-word default in mkqa_th.retrieve_th.yaml).
+# Run with:
+#   python3 bergen.py dataset='mkqa/mkqa_th-chunk1000.retrieve_th' ...
+# Chunk size is part of the dataset identity: this produces wiki-1000w-th
+# datasets/indexes/runs separate from the wiki-100w-th 100-word baseline,
+# so both experiments coexist and can be compared via print_results.py.
+train:
+    doc: null
+    query: null
+dev:
+    doc:
+      init_args:
+        _target_: modules.dataset_processor.Wiki_monolingual_100w
+        split: train
+        lang: th
+        num_words: 1000
+    query:
+      init_args:
+        _target_: modules.processors.mrag_dataset_processor.MKQA
+        split: train
+        lang: th
+test:
+    doc: null
+    query: null

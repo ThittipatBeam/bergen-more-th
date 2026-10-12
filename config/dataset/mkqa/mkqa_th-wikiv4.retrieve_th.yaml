@@ -1,0 +1,23 @@
+# MKQA-TH over Thai Wikipedia from pythainlp/thai-wiki-dataset-v4 (cleaned
+# paragraphs, source='thwiki' only), chunk size defaults to 1000 words (or
+# whatever WIKI_CHUNK_WORDS is set to). Run with e.g.:
+#   python3 bergen.py dataset='mkqa/mkqa_th-wikiv4.retrieve_th' ...
+# and later point evaluate.py at the resulting experiment folder.
+train:
+    doc: null
+    query: null
+dev:
+    doc:
+      init_args:
+        _target_: modules.dataset_processor.ThaiWikiV4
+        split: train
+        num_words: 1000      # Thai words per passage; env WIKI_CHUNK_WORDS ignored when set
+        sources: ['thwiki']  # pure Thai Wikipedia, not sister projects
+    query:
+      init_args:
+        _target_: modules.processors.mrag_dataset_processor.MKQA
+        split: train
+        lang: th
+test:
+    doc: null
+    query: null

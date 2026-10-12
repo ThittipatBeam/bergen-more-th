@@ -1,0 +1,23 @@
+# 100-word-passage variant of mkqa_th-wikiv4.retrieve_th, to sanity-check
+# how much passage length matters in the Thai corpus. Same queries, same
+# corpus (thai-wiki-dataset-v4 source='thwiki'), only chunk size differs.
+# Artifacts land under thai-wiki-v4-100w-thwiki, separate from the
+# thai-wiki-v4-1000w-thwiki run used by the main config.
+train:
+    doc: null
+    query: null
+dev:
+    doc:
+      init_args:
+        _target_: modules.dataset_processor.ThaiWikiV4
+        split: train
+        num_words: 100
+        sources: ['thwiki']
+    query:
+      init_args:
+        _target_: modules.processors.mrag_dataset_processor.MKQA
+        split: train
+        lang: th
+test:
+    doc: null
+    query: null
