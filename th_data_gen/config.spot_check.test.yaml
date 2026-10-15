@@ -1,0 +1,9 @@
+input:
+  file: th_data_gen/output/candidates/test_verified.jsonl
+
+output:
+  file: th_data_gen/output/final/test_spot_check.jsonl
+
+ui:
+  sample_size: 16
+  port: 8402
