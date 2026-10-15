@@ -45,7 +45,7 @@ The only Thai-aware RAG benchmark that scores generation with both Thai-tokenize
 ## Evidence on Hand
 
 - MKQA TH dev leaderboard table with DeepSeek-V4.1F baseline numbers (README.md).
-- Research papers (arXiv:2407.01102, arXiv:2407.01463) and EMNLP'24 slides (`documentation/BERGEN.pdf`).
+- Research papers (arXiv:2407.01102, arXiv:2407.01463) and EMNLP'24 slides (`documentation/legacy/BERGEN.pdf`).
 - Upstream baseline Match-metric tables for LLama-2-7B/70B, Mistral-8x7B, Solar-10.7B across ASQA/NQ/TriviaQA/POPQA/HotpotQA.
 - Experiment run outputs in `experiments/`, `outputs/`, `logs/`.
 - No fabricated testimonials, customers, or pricing exist; none may be invented.
