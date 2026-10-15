@@ -1,172 +1,154 @@
-<img src="documentation/images/BERGEN.png" width="500">
+<img src="documentation/images/BERGEN.png" width="400">
 
-# BERGEN: A Benchmarking Library for Retrieval-Augmented Generation
- 
-[![arXiv](https://img.shields.io/badge/arXiv-2407.01102-b31b1b.svg)](https://arxiv.org/abs/2407.01102)
-[![arXiv](https://img.shields.io/badge/arXiv-2407.01463-b31b1b.svg)](https://arxiv.org/abs/2407.01463)
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+# BERGEN-TH: Thai RAG Benchmark
 
-BERGEN (BEnchmarking Retrieval-augmented GENeration) is a library designed to benchmark RAG systems with a focus on question-answering (QA). It addresses the challenge of inconsistent benchmarking in comparing approaches and understanding the impact of each component in a RAG pipeline.
+Benchmarking **Retrieval-Augmented Generation** pipelines in **Thai** — retrieval over Thai Wikipedia, evaluated with Thai-aware metrics and an LLM-as-judge.
 
-> **This repository is a Thai-focused fork of [BERGEN](https://github.com/naver/bergen).** In addition to everything upstream provides, it adds Thai-aware evaluation metrics (`M_th`, `F1_th`, …), an LLM-as-judge that scores factual correctness against the retrieved context (robust to Thai transliteration and correct refusals), and fully API-based pipeline components. See [Thai RAG Benchmark](#thai-rag-benchmark) below.
+> Thai-focused fork of [BERGEN](https://github.com/naver/bergen). For upstream documentation, see [documentation/legacy/BERGEN_README.md](documentation/legacy/BERGEN_README.md).
 
-## Key Features
+## Why Thai-specific?
 
-- Easy reproducibility and integration of new datasets and models
-- Support for various retrievers (20+), rerankers(4) and large language models (20+)
-- Flexible configuration system using YAML files
-- Comprehensive evaluation metrics (*Match, EM, LLMEval*, ... )
-- Support for multilingual experiments
-- Thai-aware evaluation: `pythainlp`-tokenized metrics (`M_th`, `F1_th`, `Precision_th`, `Recall_th`) that auto-enable for Thai datasets — see the [evaluation guide](documentation/evaluations.md)
-- LLM-as-judge: post-hoc, resumable factual-correctness scoring judged against the retrieved context — robust to Thai transliteration differences and correct refusals, which string-match metrics cannot credit
-- Support for API-based components: full pipelines running on embedding, reranking and LLM APIs (OpenAI-compatible endpoints, Cohere, Voyage, Gemini, Jina) with built-in cost guardrails — see [documentation/apis.md](documentation/apis.md)
+String metrics (Match/EM, F1, Recall) miscount Thai answers:
+- Transliteration of entity names (e.g. `โรนัลโด` vs `Ronaldo`, `โซเยย์` vs `So-yul`)
+- pythainlp vs whitespace word segmentation disagreements
+- Correct refusals (e.g., `ไม่พบข้อมูล` = "information not found") get 0 instead of credit
 
-![](documentation/images/teaser_bergen.jpg) 
-
-For more information and experimental findings, please see:
-- The initial BERGEN paper: https://arxiv.org/abs/2407.01102 and our [EMNLP'24 slides](documentation/legacy/BERGEN.pdf)
-- The Multilingual RAG paper: https://arxiv.org/abs/2407.01463
+This fork adds:
+- **Thai-aware metrics** (`M_th`, `F1_th`, `Precision_th`, `Recall_th`) — tokenized with `pythainlp`
+- **LLM-as-judge** — factual correctness against the retrieved context, forgiving of spelling/transliteration variance
+- **Thai Wikipedia corpus** — PyThaiNLP `thai-wiki-dataset-v4`, `sources=[thwiki]`, chunked to 1000-word passages (179k)
+- **Two Thai QA datasets** — MKQA `mkqa_th` over Thai wiki + ThaiWikiV4QA (your new generated set)
 
 ## Quick Start
 
-A typical RAG setup follows this pipeline:
+Prereq: one OpenAI-compatible endpoint serving embedding + rerank + LLM. Populate `.env` (see `example.env`).
 
-`question` >> `retriever` >> `reranker` >> `LLM` >> `answer`
-
-You can configure each component using simple YAML files. Here's an example of running an experiment:
+Full Thai RAG benchmark (BGE-M3 retrieval + rerank via OpenAI-compatible endpoint, generation via compatible chat):
 
 ```bash
-python3 bergen.py retriever="bm25" reranker="minilm6" generator='tinyllama-chat' dataset='kilt_nq'
-```
-
-## Installation
-
-One-shot install (core deps + torch for your platform):
-
-```bash
-./install.sh                    # minimal
-./install.sh --all              # ... plus all API provider clients
-```
-
-For more details and options (CUDA torch, vllm, etc.) see the [installation guide](documentation/INSTALL.md).
-
-
-## Usage
-
-```
-# simple setup for benchmarking
-# run the retriever and cache results
-# do the generation with VLLM
-for dataset in kilt_nq kilt_hotpotqa kilt_triviaqa asqa popqa ; do
-   
-   python3 bergen.py  retriever=splade-v3 reranker=debertav3  dataset=$dataset
-    
-   python3 bergen.py  retriever=splade-v3 reranker=debertav3 dataset=$dataset  generator=vllm_SOLAR-107B
-done
-```
-
-
-To fully configure BERGEN, please read our [configuration guide](documentation/config.md)
-
-## Evaluation
-
-Run the evaluation script to calculate LLMEval metrics and print the results:
-
-```bash
-python3 evaluate.py --experiments_folder experiments/ --llm_batch_size 16 --split 'dev' --llm vllm_SOLAR-107B
-
-#parse all the experiments files into a panda dataframe
-python print_results.py --folder experiments/ --format=tiny
-```
-
-Bergen also offers the possiblity to run pairwise comparisons using an LLM as judge. For more evaluation options and details, refer to the [Evaluation section](documentation/evaluations.md) in the complete documentation.
-
-## RAG Baselines
-Bergen provides results for several models and many datasets aiming to **provide strong baselines**. On the important datasets for RAG, the match metric is given by this table (see more in our paper): 
-### Match Metric
- Model | ASQA | NQ | TriviaQA | POPQA | HotPotQA|
-:----------:|:----------:|:----------:|:----------:|:----------:|:----------:
-Llama-2-7B  | 68.4 | 61.6 | 87.9 | 60.2 |  45.9|
-Llama-2-70B | 73.2 | 65.8 | 92.3 | 65.5  | 53.6|
-Mistral-8x7B| 73.5 | 67.1 | 91.8 | 67.9 |  54.5|
-Solar-10.7B   | 76.2 | 70.2 | 92.8 | 71.2 |  53.9|
-
-## Thai RAG Benchmark
-
-This fork evaluates full RAG pipelines on **Thai** tasks over a Thai Wikipedia datastore (MKQA `lang=th` queries over `wiki-100w-th` chunks). String metrics alone under-credit Thai answers (different transliteration of the same entity, or a correct refusal such as `ไม่พบข้อมูล`), so results are reported with both lexical metrics and the LLM-as-judge — full details in the [evaluation guide](documentation/evaluations.md).
-
-### MKQA `mkqa_th` (dev, 2,827 questions) — judge score `LLMeval_judge_pct` is the headline
-Retrieval: BGE-M3 (top-100) → rerank: BGE-reranker-v2-M3 (top-10) → generation over top-5 docs.
-
-| Generator (LLM) | `M_th` | `F1_th` | `Recall_th` | `LLMeval_judge_pct` |
-|:---:|:---:|:---:|:---:|:---:|
-| DeepSeek-V4.1F | 23.5 | 13.3 | 32.4 | **64.3** |
-
-Reproduce:
-
-```bash
-# full Thai pipeline (BGE-M3 retrieval + rerank via an OpenAI-compatible endpoint,
-# generation via a compatible chat endpoint) — cost-guardrailed
 python3 bergen.py dataset='mkqa/mkqa_th.retrieve_th' \
   retriever='api-embed-openai-compatible' retriever.init_args.model_name=BAAI/bge-m3 \
   reranker='api-rerank-openai-compatible' \
   generator='openai_compatible' generator.init_args.model_name=DEEPSEEK-V4.1F \
   retrieve_top_k=100 rerank_top_k=10 generation_top_k=5
+```
 
-# score it (Thai string metrics auto-enable; the judge reads only on-disk data)
-python3 evaluate.py --folder experiments/<exp_folder> --split dev --judge
+Score:
+
+```bash
+python3 evaluate.py --folder experiments/<exp_id> --split dev --judge
 python3 print_results.py --folder experiments/ --format=tiny
 ```
 
-> Note: the `api-*-openai-compatible` configs used above are thin wrappers over the OpenAI-compatible endpoint you point them at — set `EMBED_BASE_URL`, `RERANK_BASE_URL`, `LLM_BASE_URL` and the matching `*_API_KEY` in `.env` (see `example.env` and [documentation/apis.md](documentation/apis.md)). The BGE-M3 / BGE-reranker-v2-M3 ids shown are just the model names your endpoint serves, so any compatible endpoint works.
+## Datasets
 
-## Multilingual Experiments
+### Doc corpus — Thai Wikipedia
 
-Refer to our [multilingual RAG guide](documentation/multilingual.md) for running experiments with multilingual user queries and/or multilingual Wikipedia as a datastore.
+`ThaiWikiV4` — PyThaiNLP `thai-wiki-dataset-v4` chunked into 1000-word passages, `sources=[thwiki]`. 179k passages. Configure via:
 
-
-## Training
-
-To train a model, add a training config:
-
-```bash
-python3 bergen.py retriever="bm25" reranker="minilm6" generator='tinyllama-chat' dataset='kilt_nq' train='lora'
+```yaml
+dev:
+  doc:
+    init_args:
+      _target_: modules.dataset_processor.ThaiWikiV4
+      split: train
+      num_words: 1000
+      sources: [thwiki]
 ```
 
-## Extensions
+### Queries — Thai QA
 
-To add new datasets and models, or configure prompts, see our [reference guide](/extensions.md).
+| Dataset | Questions | Provenance | Notes |
+|---|---:|---|---|
+| **mkqa_th** (wikiv4) | 2,827 dev | 771 with Thai qrels | English-answer mapping to Thai wiki; 2056 lack Thai provenance |
+| **thai_wiki_v4_qa** (new) | ~2,000 (in progress) | 100% provenance | LLM-generated Q/A from Thai wiki, judged by a second LLM |
 
+Configure via:
+
+```yaml
+dev:
+  query:
+    init_args:
+      _target_: modules.processors.mrag_dataset_processor.MKQA  # or ThaiWikiV4QA
+      split: train
+      lang: th  # MKQA only
+```
+
+## Thai metrics
+
+| Metric | Meaning |
+|---|---|
+| `M`, `EM`, `F1`, `Recall` | Lexical metrics over whitespace tokens |
+| `M_th`, `F1_th`, `Recall_th` | Same, but tokenized with `pythainlp` (Thai-aware) |
+| `LLMeval_judge_pct` | % of answers rated factually correct by LLM judge vs retrieved context |
+
+**The judge is the headline metric.** String-based EM is stricter in Thai because of transliteration.
+
+## Baseline (MKQA `mkqa_th`, dev)
+
+Retrieval: BGE-M3 (top-100) → rerank: BGE-reranker-v2-m3 (top-10) → generation: top-5 docs.
+
+| Generator | `M_th` | `F1_th` | `Recall_th` | `LLMeval_judge_pct` |
+|:---|:---:|:---:|:---:|:---:|
+| DeepSeek-V4.1F | 23.5 | 13.3 | 32.4 | **64.3** |
+
+See [documentation/evaluations.md](documentation/evaluations.md) for metrics and scoring.
+
+## Repository structure
+
+- `bergen.py` — main entrypoint (wire dataset + retriever + reranker + generator)
+- `evaluate.py` — score experiments
+- `inspect_app.py` — browse generated outputs in a web UI (`python3 inspect_app.py`)
+- `modules/`, `models/` — pluggable pipeline components
+- `config/` — YAML configs for datasets, retrievers, generators
+- `th_data_gen/` — Thai QA generation pipeline (LLM-driven, judged, built from `thai-wiki-dataset-v4`)
+- `scripts/`, `qrels/` — utilities and ground truth
+- `HOW_IT_WORK.md` — pipeline architecture + Thai corpus specifics
+- `documentation/legacy/` — upstream BERGEN docs (paper PDF, generic README)
+
+## Installation
+
+```bash
+./install.sh
+```
+
+See [documentation/INSTALL.md](documentation/INSTALL.md) for details.
 
 ## Cite
 
-If you use BERGEN for your research, please consider citing:
+**BERGEN (original fork):**
 
 ```bibtex
-@misc{rau2024bergenbenchmarkinglibraryretrievalaugmented,
-      title={BERGEN: A Benchmarking Library for Retrieval-Augmented Generation}, 
-      author={David Rau and Hervé Déjean and Nadezhda Chirkova and Thibault Formal and
-      Shuai Wang and Vassilina Nikoulina and Stéphane Clinchant},
-      year={2024},
-      eprint={2407.01102},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2407.01102}, 
+@misc{rau2024bergen,
+  title={BERGEN: A Benchmarking Library for Retrieval-Augmented Generation},
+  author={David Rau and Hervé Déjean and Nadezhda Chirkova and Thibault Formal
+    and Shuai Wang and Vassilina Nikoulina and Stéphane Clinchant},
+  year={2024}, eprint={2407.01102}, archivePrefix={arXiv}
 }
+```
 
-@misc{chirkova2024retrievalaugmentedgenerationmultilingualsettings,
-      title={Retrieval-augmented generation in multilingual settings}, 
-      author={Nadezhda Chirkova and David Rau and Hervé Déjean and Thibault Formal and Stéphane Clinchant and Vassilina Nikoulina},
-      year={2024},
-      eprint={2407.01463},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2407.01463}, 
+**BERGEN multilingual extension:**
+
+```bibtex
+@misc{chirkova2024mkqa,
+  title={Evaluating Multilingual RAG Systems over Wikipedia},
+  author={Nadezhda Chirkova and David Rau and Thibault Formal and Vassilina Nikoulina
+    and Stéphane Clinchant},
+  year={2024}, eprint={2407.01463}
+}
+```
+
+**PyThaiNLP (Thai NLP toolkit + corpus):**
+
+```bibtex
+@misc{phatthiyaphaibun2023pythainlp,
+  title={PyThaiNLP: Thai Natural Language Processing in Python},
+  author={Wannaphong Phatthiyaphaibun and Korakot Chaovavanich and Charin Polpanumas
+    and Arthit Suriyawongkul and Lalita Lowphansirikul and Pattarawat Chormai},
+  year={2023}
 }
 ```
 
 ## License
 
-BERGEN is released under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 license. For more details, see the [LICENSE](LICENSE) file.
-
----
+CC BY-NC-SA 4.0 — see [LICENCE.md](LICENCE.md) and upstream [BERGEN](https://github.com/naver/bergen).
