@@ -37,6 +37,48 @@ class MKQA(Processor):
         return dataset
 
 
+class ThaiWikiV4QA(Processor):
+    """Thai QA generated from thai-wiki-dataset-v4 (PyThaiNLP).
+
+    Loads the verified Thai QA triples produced by the th_data_gen pipeline
+    (generate → verify → build_dataset) and exposes them in bergen format:
+    content=question, label=[answer], ranking_label=[[article_id]].
+
+    Priority of sources:
+      1. qa_path override (exact local parquet file to read)
+      2. Default local file th_data_gen/output/final/thai_qa_v1.parquet
+      3. HF Hub repo (hf_repo_id override, then dataset_name default)
+
+    HF token via HF_TOKEN env (preferred) or hf_token param.
+    """
+
+    DEFAULT_LOCAL_PATH = 'th_data_gen/output/final/thai_qa_v1.parquet'
+
+    def __init__(self, qa_path=None, hf_repo_id=None, hf_token=None, *args, **kwargs):
+        dataset_name = 'thai_wiki_v4_qa'
+        super().__init__(*args, **kwargs, dataset_name=dataset_name)
+        self.qa_path = qa_path
+        self.hf_repo_id = hf_repo_id
+        self.hf_token = hf_token
+
+    def process(self):
+        # 1+2. Try local parquet files (override first, then default location)
+        paths = [self.qa_path] if self.qa_path else []
+        paths.append(self.DEFAULT_LOCAL_PATH)
+        for path in paths:
+            if os.path.exists(path):
+                return Dataset.from_pandas(pd.read_parquet(path), preserve_index=False)
+
+        # 3. HF Hub — datasets.load_dataset caches in ~/.cache/huggingface
+        token = os.environ.get('HF_TOKEN') or self.hf_token
+        if token:
+            from huggingface_hub import login
+            login(token=token, add_to_git_credential=False)
+
+        repo = self.hf_repo_id or 'beam-ai/thai-wiki-v4-qa'   # placeholder repo id — set hf_repo_id when published
+        return datasets.load_dataset(repo)[self.split or 'train']
+
+
 class XORQA(Processor):
     def __init__(self, lang, *args, **kwargs):
         dataset_name = f'xor_tydiqa_{lang}'

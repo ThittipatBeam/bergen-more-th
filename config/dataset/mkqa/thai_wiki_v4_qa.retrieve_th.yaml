@@ -1,0 +1,20 @@
+train:
+    doc: null
+    query: null
+dev:
+    doc:
+      init_args:
+        _target_: modules.dataset_processor.ThaiWikiV4
+        split: train
+        num_words: 1000
+        sources: [thwiki]
+    query:
+      init_args:
+        _target_: modules.processors.mrag_dataset_processor.ThaiWikiV4QA
+        split: train
+        qa_path: null            # override: exact local parquet path
+        hf_repo_id: null         # override: HF repo id (falls back to default placeholder)
+        hf_token: null           # override: HF token (falls back to HF_TOKEN env)
+test:
+    doc: null
+    query: null
