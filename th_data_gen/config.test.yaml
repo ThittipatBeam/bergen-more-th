@@ -1,0 +1,25 @@
+# Test config — small subset for validation
+# LLM (uses OPENAI_BASE_URL / OPENAI_API_KEY from root .env)
+model:
+  name: DEEPSEEK-V4.1F          # change to whatever your gateway serves
+  max_tokens: 1024
+  temperature: 0.7
+  concurrency_: 4                 # lower concurrency for test
+
+filter:
+  min_tokens: 200                # pythainlp tokens
+  tokenizer_engine: newmm
+
+article_selection:
+  source: thwiki                 # only main wikipedia (skip quotes/books)
+  max_articles: 10                # TEST: just 10 articles
+  random_seed: 42
+
+generation:
+  questions_per_article: 2       # candidate Q/A pairs per article
+  require_answer_in_text: true   # answer must literally appear in article text
+  min_answer_tokens: 1           # reject trivially short answers (yes/no, single chars)
+
+output:
+  dir: th_data_gen/output/raw
+  filename: test_candidates.jsonl  # separate test output

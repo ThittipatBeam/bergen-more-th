@@ -1,0 +1,13 @@
+# Judge model — different from generation to avoid confirmation bias
+model:
+  name: KIMI-K3                # judge model on your gateway
+  max_tokens: 512
+  temperature: 0.0             # deterministic judging
+  concurrency_: 8              # parallel requests
+
+input:
+  file: th_data_gen/output/raw/candidates.jsonl  # output of generate.py
+
+output:
+  dir: th_data_gen/output/candidates
+  filename: verified.jsonl

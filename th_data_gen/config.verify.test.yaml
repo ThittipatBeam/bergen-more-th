@@ -1,0 +1,13 @@
+# Test config — verify the test_candidates.jsonl from the small test run
+model:
+  name: KIMI-K3                # judge model on your gateway
+  max_tokens: 512
+  temperature: 0.0             # deterministic judging
+  concurrency_: 4              # lower for test
+
+input:
+  file: th_data_gen/output/raw/test_candidates.jsonl
+
+output:
+  dir: th_data_gen/output/candidates
+  filename: test_verified.jsonl

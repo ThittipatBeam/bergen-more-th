@@ -1,0 +1,9 @@
+input:
+  file: th_data_gen/output/candidates/test_verified.jsonl
+
+output:
+  parquet_path: th_data_gen/output/final/thai_qa_test.parquet
+  dataset_dir: th_data_gen/output/final/thai_qa_test_dataset
+
+stats:
+  print_per_bucket: true
