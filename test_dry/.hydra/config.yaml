@@ -1,0 +1,76 @@
+run_name: null
+dataset_folder: datasets/
+index_folder: indexes/
+runs_folder: runs/
+generated_query_folder: generated_queries/
+processed_context_folder: processed_contexts/
+experiments_folder: experiments/
+retrieve_top_k: 100
+rerank_top_k: 10
+generation_top_k: 5
+thai_metrics: null
+pyserini_num_threads: 20
+processing_num_proc: 40
+retriever:
+  init_args:
+    _target_: models.retrievers.dense_api.DenseAPI
+    model_name: BAAI/bge-m3
+    provider: openai_compatible
+    similarity:
+      _target_: models.retrievers.similarities.CosineSim
+    dimensions: null
+    max_retries: 6
+    batch_pause: 0.0
+    dry_run: false
+    require_confirmation: true
+  batch_size: 256
+  batch_size_sim: 2048
+reranker:
+  init_args:
+    _target_: models.rerankers.api_reranker.APIReranker
+    model_name: bge-reranker-v2-m3
+    provider: openai_compatible
+    base_url: ${oc.env:RERANK_BASE_URL,null}
+    max_retries: 6
+    batch_pause: 0.0
+    max_doc_chars: null
+    dry_run: false
+    require_confirmation: true
+  batch_size: 100
+generator:
+  init_args:
+    _target_: models.generators.llm_openai.OpenAI
+    model_name: DEEPSEEK-V4.1F
+    max_new_tokens: 512
+    max_length: 32000
+    batch_size: 16
+    concurrency: 8
+dataset:
+  train:
+    doc: null
+    query: null
+  dev:
+    doc:
+      init_args:
+        _target_: modules.dataset_processor.ThaiWikiV4
+        split: train
+        num_words: 1000
+        sources:
+        - thwiki
+    query:
+      init_args:
+        _target_: modules.processors.mrag_dataset_processor.ThaiWikiV4QA
+        split: train
+        qa_path: null
+        hf_repo_id: null
+        hf_token: null
+  test:
+    doc: null
+    query: null
+prompt:
+  system: You are a helpful assistant. Your task is to extract relevant information
+    from provided documents and to answer to questions as briefly as possible.
+  user: f"Background:\n{docs}\n\nQuestion:\ {question}"
+  system_without_docs: You are a helpful assistant. Answer the questions as briefly
+    as possible.
+  user_without_docs: f"Question:\ {question}"
