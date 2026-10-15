@@ -40,3 +40,9 @@ server/bergen_api.db
 server/logs/
 
 data/
+
+# Thai QA data generation output (scripts kept, data ignored)
+th_data_gen/output/
+th_data_gen/source/
+
+RULE.md
