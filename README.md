@@ -103,7 +103,7 @@ See [documentation/evaluations.md](documentation/evaluations.md) for metrics and
 - `config/` — YAML configs for datasets, retrievers, generators
 - `th_data_gen/` — Thai QA generation pipeline (LLM-driven, judged, built from `thai-wiki-dataset-v4`)
 - `scripts/`, `qrels/` — utilities and ground truth
-- `HOW_IT_WORK.md` — pipeline architecture + Thai corpus specifics
+- `docs/HOW_IT_WORK.md` — pipeline architecture + Thai corpus specifics
 - `documentation/legacy/` — upstream BERGEN docs (paper PDF, generic README)
 
 ## Installation
