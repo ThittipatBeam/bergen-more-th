@@ -23,10 +23,10 @@ This fork adds:
 
 Prereq: one OpenAI-compatible endpoint serving embedding + rerank + LLM. Populate `.env` (see `example.env`).
 
-Full Thai RAG benchmark (BGE-M3 retrieval + rerank via OpenAI-compatible endpoint, generation via compatible chat):
+Full Thai RAG benchmark (BGE-M3 retrieval + rerank + generation on Thai wiki corpus + verified Thai QA):
 
 ```bash
-python3 bergen.py dataset='mkqa/mkqa_th.retrieve_th' \
+python3 bergen.py dataset='mkqa/thai_wiki_v4_qa.retrieve_th' \
   retriever='api-embed-openai-compatible' retriever.init_args.model_name=BAAI/bge-m3 \
   reranker='api-rerank-openai-compatible' \
   generator='openai_compatible' generator.init_args.model_name=DEEPSEEK-V4.1F \
@@ -58,10 +58,14 @@ dev:
 
 ### Queries — Thai QA
 
-| Dataset | Questions | Provenance | Notes |
-|---|---:|---|---|
-| **mkqa_th** (wikiv4) | 2,827 dev | 771 with Thai qrels | English-answer mapping to Thai wiki; 2056 lack Thai provenance |
-| **thai_wiki_v4_qa** (new) | ~2,000 (in progress) | 100% provenance | LLM-generated Q/A from Thai wiki, judged by a second LLM |
+`ThaiWikiV4QA` — LLM-generated Q/A extracted from Thai Wikipedia articles (PyThaiNLP `thai-wiki-dataset-v4`), verified by a second LLM judge. 100% provenance by design.
+
+| Metric | Value |
+|---|---|
+| Questions | ~2,500 (extractive, verified) |
+| Provenance | 100% (every question knows its source article) |
+| Answer style | Short extractive spans (2-10 words typical) — works with EM/F1/Recall |
+| Judge | Different LLM from generation (anti-confirmation-bias) |
 
 Configure via:
 
@@ -69,10 +73,11 @@ Configure via:
 dev:
   query:
     init_args:
-      _target_: modules.processors.mrag_dataset_processor.MKQA  # or ThaiWikiV4QA
+      _target_: modules.processors.mrag_dataset_processor.ThaiWikiV4QA
       split: train
-      lang: th  # MKQA only
 ```
+
+> **Why not MKQA-Thai?** An earlier version used MKQA `lang=th` over `wiki-100w-th`. Underneath: 2,827 questions but only **771 have Thai qrels** — 73% dilute metrics because the English-first mapping can't find Thai ground-truth. `ThaiWikiV4QA` generates from Thai wiki directly, guaranteeing alignment: question ↔ answer ↔ source article.
 
 ## Thai metrics
 
@@ -84,13 +89,15 @@ dev:
 
 **The judge is the headline metric.** String-based EM is stricter in Thai because of transliteration.
 
-## Baseline (MKQA `mkqa_th`, dev)
+## Baseline (ThaiWikiV4QA, dev)
 
 Retrieval: BGE-M3 (top-100) → rerank: BGE-reranker-v2-m3 (top-10) → generation: top-5 docs.
 
 | Generator | `M_th` | `F1_th` | `Recall_th` | `LLMeval_judge_pct` |
 |:---|:---:|:---:|:---:|:---:|
-| DeepSeek-V4.1F | 23.5 | 13.3 | 32.4 | **64.3** |
+| DeepSeek-V4.1F | ~TBD | ~TBD | ~TBD | ~TBD |
+
+*Benchmark run in progress. Earlier MKQA-Thai (cross-lingual) results: `LLMeval_judge_pct` = 64.3%. ThaiWikiV4QA numbers represent pure-Thai RAG (retrieval + generation both over Thai wiki corpus).*
 
 See [documentation/evaluations.md](documentation/evaluations.md) for metrics and scoring.
 
