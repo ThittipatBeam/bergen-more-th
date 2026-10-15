@@ -168,7 +168,10 @@ def main(output: str = "experiments_data.json", split: str = "dev"):
         raise SystemExit(f"experiments/ directory not found")
 
     experiments = []
-    subdirs = [d for d in exp_root.iterdir() if d.is_dir()]
+    subdirs = [
+        d for d in exp_root.iterdir()
+        if d.is_dir() and not d.name.startswith("tmp_")
+    ]
 
     print(f"Scanning {len(subdirs)} experiments...")
     for d in tqdm(sorted(subdirs)):
