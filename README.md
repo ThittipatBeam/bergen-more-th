@@ -62,7 +62,7 @@ dev:
 
 | Metric | Value |
 |---|---|
-| Questions | ~2,500 (extractive, verified) |
+| Questions | 5,355 (extractive, verified) |
 | Provenance | 100% (every question knows its source article) |
 | Answer style | Short extractive spans (2-10 words typical) — works with EM/F1/Recall |
 | Judge | Different LLM from generation (anti-confirmation-bias) |
