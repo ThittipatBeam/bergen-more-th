@@ -40,6 +40,8 @@ __pycache__/
 .impeccable/
 .agents/
 .claude/
+.codex/
+.gemini/
 plugins/
 skills-lock.json
 RESTRUCTURE_PLAN.md
