@@ -83,7 +83,8 @@ class Processor(object):
         if os.path.exists(out_folder) and not self.overwrite:
             dataset = datasets.load_from_disk(out_folder)
             if self.debug:
-                dataset = dataset.select(range(min(len(dataset), 50)))
+                limit = int(os.environ.get('BERGEN_DEBUG_SAMPLES', '50'))
+                dataset = dataset.select(range(min(len(dataset), limit)))
             if self.shuffle_labels:
                 dataset = self.shuffled_labels_as_content(dataset)
             #id2index = self.tsv_to_dict(f'{out_folder}/id2index.csv')
@@ -95,7 +96,8 @@ class Processor(object):
             id2index = self.get_index_to_id(dataset)
             pickle.dump(id2index, open(f'{out_folder}/id2index.p', 'wb'))
             if self.debug:
-                dataset = dataset.select(range(min(len(dataset), 50)))
+                limit = int(os.environ.get('BERGEN_DEBUG_SAMPLES', '50'))
+                dataset = dataset.select(range(min(len(dataset), limit)))
             if self.shuffle_labels:
                 dataset = self.shuffled_labels_as_content(dataset)
             dataset.id2index = id2index
@@ -765,7 +767,8 @@ class MergedDocDataset(Processor):
         id2index = self.get_index_to_id(dataset) 
         dataset.id2index = id2index
         if self.debug:
-            dataset = dataset.select(range(50))
+            limit = int(os.environ.get('BERGEN_DEBUG_SAMPLES', '50'))
+            dataset = dataset.select(range(min(len(dataset), limit)))
         if self.shuffle_labels:
             dataset = self.shuffled_labels_as_content(dataset)
         dataset.name = self.dataset_name + debug_str + oracle_provenance_str

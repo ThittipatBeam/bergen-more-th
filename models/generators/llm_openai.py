@@ -5,6 +5,7 @@ CC BY-NC-SA 4.0 license
 '''
 
 import os
+import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
@@ -119,7 +120,11 @@ class OpenAI(Generator):
         self.total_cost += t
         self.prompt_cost += p
         self.completion_cost += c
-        return response.choices[0].message.content
+        content = response.choices[0].message.content or ''
+        # Strip thinking / chain-of-thought blocks from reasoning models (e.g. DeepSeek-R1, QwQ)
+        content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL)
+        content = re.sub(r'^.*?<\/think>', '', content, flags=re.DOTALL)
+        return content.strip()
 
 
     def openai_api_calculate_cost(self,usage):

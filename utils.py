@@ -175,7 +175,8 @@ def prepare_dataset_from_ids(dataset, q_ids, d_ids, multi_doc=False, query_field
         return datasets.Dataset.from_generator(mygen)
 
 def print_generate_out(queries, instructions, responses, query_ids, labels, ranking_labels, n=5):
-    rand = random.sample(range(len(query_ids)), n)
+    k = min(n, len(query_ids))
+    rand = random.sample(range(len(query_ids)), k)
     for i in rand:
         print('_'*50)
         print('Query ID:', query_ids[i])
