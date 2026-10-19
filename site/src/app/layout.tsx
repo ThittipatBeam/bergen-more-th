@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SIENNA",
-  description: "Editorial gallery and articles",
+  title: "Thai RAG Benchmark",
+  description: "Standardized evaluation benchmark and leaderboard for Thai retrieval-augmented generation and embedding models.",
 };
 
 export default function RootLayout({
