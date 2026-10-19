@@ -41,7 +41,7 @@ defaults:
 # Set enabled: false if you prefer running the explicit list in `runs:` below.
 # ------------------------------------------------------------------------------
 matrix:
-  enabled: false              # Flip to true to test all combinations below automatically
+  enabled: true              # Flip to true to test all combinations below automatically
 
   generators:
     - name: "DeepSeek-V4.1F"

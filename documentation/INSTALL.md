@@ -1,7 +1,9 @@
 ## Quick install (recommended for API-only / CPU / Apple-Silicon setups)
 
 ```bash
-./install.sh          # core deps + torch for your platform (conda env activated)
+./install.sh          # core deps + torch (auto-detects uv or conda/pip)
+./install.sh --uv     # fast installation via uv
+./install.sh --pip    # standard pip installation (in active conda or venv)
 ./install.sh --all    # ... plus all API provider clients (openai, cohere, voyageai, google-genai)
 ```
 

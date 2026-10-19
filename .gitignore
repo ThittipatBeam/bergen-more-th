@@ -55,5 +55,8 @@ data/
 # Thai QA data generation output (scripts kept, data ignored)
 th_data_gen/output/
 th_data_gen/source/
-
 RULE.md
+
+# Next.js in site/
+site/node_modules/
+site/.next/
