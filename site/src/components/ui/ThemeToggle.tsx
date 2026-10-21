@@ -28,42 +28,41 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
   }, []);
 
   const handleToggle = useCallback(() => {
-    setTheme((prevTheme) => {
-      const nextTheme = prevTheme === "light" ? "dark" : "light";
+    const isCurrentlyDark = document.documentElement.classList.contains("dark");
+    const nextIsDark = !isCurrentlyDark;
 
-      if (nextTheme === "dark") {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
+    if (nextIsDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setTheme("light");
+    }
 
-      // GSAP 360-degree flip and elastic scale on the theme icon
-      if (iconRef.current) {
-        gsap.fromTo(
-          iconRef.current,
-          { rotation: 0, scale: 0.7 },
-          {
-            rotation: 360,
-            scale: 1,
-            duration: 0.45,
-            ease: "back.out(1.8)",
-          }
-        );
-      }
+    // GSAP 360-degree flip and elastic scale on the theme icon
+    if (iconRef.current) {
+      gsap.fromTo(
+        iconRef.current,
+        { rotation: 0, scale: 0.7 },
+        {
+          rotation: 360,
+          scale: 1,
+          duration: 0.45,
+          ease: "back.out(1.8)",
+        }
+      );
+    }
 
-      // Gentle bounce on the text label
-      if (textRef.current) {
-        gsap.fromTo(
-          textRef.current,
-          { y: 3, opacity: 0.6 },
-          { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" }
-        );
-      }
-
-      return nextTheme;
-    });
+    // Gentle bounce on the text label
+    if (textRef.current) {
+      gsap.fromTo(
+        textRef.current,
+        { y: 3, opacity: 0.6 },
+        { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" }
+      );
+    }
   }, []);
 
   const handleHoverIn = useCallback(() => {

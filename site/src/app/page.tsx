@@ -40,7 +40,7 @@ export default function Home() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-[#F7FBFD]">
+    <div ref={containerRef} className="relative min-h-screen bg-[#F7FBFD] dark:bg-[#0c1218] transition-colors duration-300">
       {/* Pinned Hero Section (Bottom Layer) */}
       <div ref={heroRef} className="relative z-10 w-full will-change-transform">
         <HeroSection />
@@ -50,7 +50,7 @@ export default function Home() {
       <div
         id="leaderboard"
         ref={leaderboardRef}
-        className="relative z-20 w-full bg-white rounded-t-[32px] sm:rounded-t-[40px] shadow-[0_-20px_45px_rgba(16,42,58,0.06)] border-t border-[#DCEAF1] min-h-screen"
+        className="relative z-20 w-full bg-white dark:bg-[#111a22] rounded-t-[32px] sm:rounded-t-[40px] shadow-[0_-20px_45px_rgba(16,42,58,0.06)] dark:shadow-[0_-20px_45px_rgba(0,0,0,0.5)] border-t border-[#DCEAF1] dark:border-[#1e3344] min-h-screen transition-colors duration-300"
       >
         <LeaderboardSection />
       </div>

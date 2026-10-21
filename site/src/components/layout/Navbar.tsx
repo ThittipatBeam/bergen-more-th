@@ -55,14 +55,7 @@ export function Navbar() {
   return (
     <>
       {/* Full-Width Frosted Glass Navbar Header */}
-      <header
-        className="fixed top-0 inset-x-0 z-40 w-full select-none border-b border-[#DCEAF1] dark:border-[#1e3344] transition-all duration-300"
-        style={{
-          background: "rgba(247, 251, 253, 0.85)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-        }}
-      >
+      <header className="fixed top-0 inset-x-0 z-40 w-full select-none border-b border-[#DCEAF1] dark:border-[#1e3344] bg-[#F7FBFD]/85 dark:bg-[#0c1218]/85 backdrop-blur-md transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-2.5 sm:py-3 flex items-center justify-between">
           {/* Left: Brand with Official Cloud Logo */}
           <div className="flex items-center gap-3 sm:gap-4">
@@ -114,12 +107,6 @@ export function Navbar() {
 
           {/* Right: Operational Controls & Switches */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Status Indicator (Desktop only) */}
-            <div className="hidden xl:flex items-center gap-2 text-xs font-mono text-[#607786] dark:text-[#94abbc] mr-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>สถานะปกติ • ICT</span>
-            </div>
-
             {/* Language Switcher with GSAP Animation */}
             <LanguageToggle />
 

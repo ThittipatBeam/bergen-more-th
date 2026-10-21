@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* SIAM.AI Cloudy Sky brand tokens */
   --brand-sky-blue: #0795cf;

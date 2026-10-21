@@ -98,7 +98,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
   return (
     <h1
       ref={containerRef}
-      className={`font-sans font-bold sm:font-extrabold tracking-[-0.03em] leading-[1.08] select-none text-[#102A3A] ${className}`}
+      className={`font-sans font-bold sm:font-extrabold tracking-[-0.03em] leading-[1.08] select-none text-[#102A3A] dark:text-[#f0f7fb] transition-colors duration-200 ${className}`}
     >
       {words.map((word, wordIndex) => (
         <span key={`word-${wordIndex}`} className="inline-block whitespace-nowrap">
