@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -17,41 +17,42 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const isClosingRef = useRef(false);
 
-  const { contextSafe } = useGSAP({ scope: drawerRef });
-
   // Handle smooth closing animation before unmounting
-  const handleAnimatedClose = contextSafe((callback?: () => void) => {
-    if (isClosingRef.current || !drawerRef.current) return;
-    isClosingRef.current = true;
+  const handleAnimatedClose = useCallback(
+    (callback?: () => void) => {
+      if (isClosingRef.current || !drawerRef.current) return;
+      isClosingRef.current = true;
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        isClosingRef.current = false;
-        if (callback) callback();
-        onClose();
-      },
-    });
+      const tl = gsap.timeline({
+        onComplete: () => {
+          isClosingRef.current = false;
+          if (callback) callback();
+          onClose();
+        },
+      });
 
-    // Animate items out quickly in reverse
-    tl.to(".mobile-nav-item", {
-      autoAlpha: 0,
-      y: -15,
-      duration: 0.18,
-      stagger: 0.03,
-      ease: "power2.in",
-    });
-
-    tl.to(
-      drawerRef.current,
-      {
+      // Animate items out quickly in reverse
+      tl.to(".mobile-nav-item", {
         autoAlpha: 0,
-        yPercent: -4,
-        duration: 0.25,
+        y: -15,
+        duration: 0.18,
+        stagger: 0.03,
         ease: "power2.in",
-      },
-      "-=0.1"
-    );
-  });
+      });
+
+      tl.to(
+        drawerRef.current,
+        {
+          autoAlpha: 0,
+          yPercent: -4,
+          duration: 0.25,
+          ease: "power2.in",
+        },
+        "-=0.1"
+      );
+    },
+    [onClose]
+  );
 
   // Entrance animation when drawer opens
   useGSAP(

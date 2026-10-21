@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useCallback } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -14,7 +14,7 @@ interface InteractiveTitleProps {
 export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps) {
   const containerRef = useRef<HTMLHeadingElement>(null);
 
-  const { contextSafe } = useGSAP(
+  useGSAP(
     () => {
       // Gentle wave entrance animation on initial mount
       gsap.fromTo(
@@ -40,51 +40,57 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
   );
 
   // Playful jelly bounce when mouse glides over a character
-  const handleCharHover = contextSafe((e: React.MouseEvent<HTMLSpanElement>) => {
-    const target = e.currentTarget;
-    const randomTilt = (Math.random() - 0.5) * 22; // Random tilt between -11deg and +11deg
+  const handleCharHover = useCallback(
+    (e: React.MouseEvent<HTMLSpanElement>) => {
+      const target = e.currentTarget;
+      const randomTilt = (Math.random() - 0.5) * 22; // Random tilt between -11deg and +11deg
 
-    gsap.timeline({ overwrite: "auto" })
-      .to(target, {
-        y: -22,
-        scaleY: 1.26,
-        scaleX: 0.88,
-        rotation: randomTilt,
-        color: "#4f46e5", // Electric violet pulse on hover
-        duration: 0.12,
-        ease: "power2.out",
-      })
-      .to(target, {
-        y: 0,
-        scaleY: 1,
-        scaleX: 1,
-        rotation: 0,
-        color: "#0c57fb", // Returns to signature Zed electric blue
-        duration: 0.75,
-        ease: "elastic.out(1.25, 0.35)", // Bouncy jelly spring
-      });
-  });
+      gsap.timeline({ overwrite: "auto" })
+        .to(target, {
+          y: -22,
+          scaleY: 1.26,
+          scaleX: 0.88,
+          rotation: randomTilt,
+          color: "#4f46e5", // Electric violet pulse on hover
+          duration: 0.12,
+          ease: "power2.out",
+        })
+        .to(target, {
+          y: 0,
+          scaleY: 1,
+          scaleX: 1,
+          rotation: 0,
+          color: "#0c57fb", // Returns to signature Zed electric blue
+          duration: 0.75,
+          ease: "elastic.out(1.25, 0.35)", // Bouncy jelly spring
+        });
+    },
+    []
+  );
 
   // Easter egg: 360-degree backflip when clicking a letter!
-  const handleCharClick = contextSafe((e: React.MouseEvent<HTMLSpanElement>) => {
-    const target = e.currentTarget;
-    gsap.timeline({ overwrite: "auto" })
-      .to(target, {
-        y: -35,
-        scale: 1.35,
-        rotation: "+=360",
-        color: "#7c3aed",
-        duration: 0.35,
-        ease: "power2.out",
-      })
-      .to(target, {
-        y: 0,
-        scale: 1,
-        color: "#0c57fb",
-        duration: 0.8,
-        ease: "elastic.out(1.2, 0.4)",
-      });
-  });
+  const handleCharClick = useCallback(
+    (e: React.MouseEvent<HTMLSpanElement>) => {
+      const target = e.currentTarget;
+      gsap.timeline({ overwrite: "auto" })
+        .to(target, {
+          y: -35,
+          scale: 1.35,
+          rotation: "+=360",
+          color: "#7c3aed",
+          duration: 0.35,
+          ease: "power2.out",
+        })
+        .to(target, {
+          y: 0,
+          scale: 1,
+          color: "#0c57fb",
+          duration: 0.8,
+          ease: "elastic.out(1.2, 0.4)",
+        });
+    },
+    []
+  );
 
   // Split text into words to prevent breaking words across lines awkwardly
   const words = text.split(" ");
