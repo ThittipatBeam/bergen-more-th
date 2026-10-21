@@ -70,8 +70,8 @@ export function RollingLink({
       onMouseLeave={handleMouseLeave}
       className={`inline-flex items-center min-h-[44px] select-none focus:outline-none ${className}`}
     >
-      {/* Tight clipping container: strictly clips text without any padding bleed */}
-      <span className="relative inline-block overflow-hidden h-[1.15em] leading-none">
+      {/* Clipping container: comfortably fits full uppercase ascenders without clipping letters like Y */}
+      <span className="relative inline-block overflow-hidden h-[1.35em] leading-none py-0.5">
         {/* Primary visible characters */}
         <span className="inline-flex leading-none">
           {characters.map((char, index) => (

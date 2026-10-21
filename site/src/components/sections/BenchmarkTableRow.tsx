@@ -60,7 +60,7 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
             {row.generator}
           </span>
           {isLeader && (
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider uppercase bg-[#0795CF] text-white shadow-2xs shrink-0">
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-sans font-bold tracking-wider uppercase bg-[#0795CF] text-white shadow-2xs shrink-0">
               LEADER
             </span>
           )}

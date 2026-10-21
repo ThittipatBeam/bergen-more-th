@@ -2,19 +2,20 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
+import { useLanguage } from "@/hooks/use-language";
 
 interface ThemeToggleProps {
   className?: string;
 }
 
 export function ThemeToggle({ className = "" }: ThemeToggleProps) {
+  const { language } = useLanguage();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const iconRef = useRef<HTMLSpanElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    // Check initial system / localStorage theme deferred to avoid cascading renders
     const saved = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const isDark = saved === "dark" || (!saved && prefersDark);
@@ -88,6 +89,7 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
   }, []);
 
   const isDark = theme === "dark";
+  const label = language === "EN" ? (isDark ? "Light" : "Dark") : (isDark ? "สว่าง" : "มืด");
 
   return (
     <button
@@ -96,8 +98,12 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
       onClick={handleToggle}
       onMouseEnter={handleHoverIn}
       onMouseLeave={handleHoverOut}
-      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
-      className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#DCEAF1] dark:border-[#1e3344] bg-white/90 dark:bg-[#111a22]/90 backdrop-blur-xs text-[#102A3A] dark:text-[#f0f7fb] text-xs font-medium shadow-xs select-none transition-colors min-h-[38px] cursor-pointer ${className}`}
+      aria-label={
+        language === "EN"
+          ? `Switch to ${isDark ? "light" : "dark"} mode`
+          : `สลับเป็นโหมด${isDark ? "สว่าง" : "มืด"}`
+      }
+      className={`relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#DCEAF1] dark:border-[#1e3344] bg-white/90 dark:bg-[#111a22]/90 backdrop-blur-xs text-[#102A3A] dark:text-[#f0f7fb] text-xs font-sans font-medium shadow-xs select-none transition-colors min-h-[38px] cursor-pointer ${className}`}
     >
       {/* Icon: Crescent Moon for Dark / Sun for Light */}
       <span ref={iconRef} className="inline-flex items-center text-sm will-change-transform">
@@ -108,9 +114,9 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
         )}
       </span>
 
-      {/* Label: Thai "มืด" (Dark) / "สว่าง" (Light) */}
+      {/* Label: Dynamic based on active language ("Dark"/"Light" for EN, "มืด"/"สว่าง" for TH) */}
       <span ref={textRef} className="text-xs font-sans will-change-transform">
-        {isDark ? "สว่าง" : "มืด"}
+        {label}
       </span>
     </button>
   );

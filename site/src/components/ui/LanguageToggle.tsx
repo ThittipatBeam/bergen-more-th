@@ -1,30 +1,24 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useRef, useCallback } from "react";
 import gsap from "gsap";
+import { useLanguage, type Language } from "@/hooks/use-language";
 
 interface LanguageToggleProps {
   className?: string;
-  initialLang?: "TH" | "EN";
-  onChange?: (lang: "TH" | "EN") => void;
 }
 
-export function LanguageToggle({
-  className = "",
-  initialLang = "TH",
-  onChange,
-}: LanguageToggleProps) {
-  const [lang, setLang] = useState<"TH" | "EN">(initialLang);
+export function LanguageToggle({ className = "" }: LanguageToggleProps) {
+  const { language, setLanguage } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const thTextRef = useRef<HTMLSpanElement>(null);
   const enTextRef = useRef<HTMLSpanElement>(null);
 
   const handleToggle = useCallback(
-    (targetLang: "TH" | "EN") => {
-      if (targetLang === lang) return;
+    (targetLang: Language) => {
+      if (targetLang === language) return;
 
-      setLang(targetLang);
-      if (onChange) onChange(targetLang);
+      setLanguage(targetLang);
 
       // Playful GSAP spring bounce on the selected text label
       const activeText = targetLang === "EN" ? enTextRef.current : thTextRef.current;
@@ -36,7 +30,7 @@ export function LanguageToggle({
         );
       }
     },
-    [lang, onChange]
+    [language, setLanguage]
   );
 
   const handleHoverIn = useCallback(() => {
@@ -61,7 +55,7 @@ export function LanguageToggle({
     });
   }, []);
 
-  const isEn = lang === "EN";
+  const isEn = language === "EN";
 
   return (
     <div
@@ -106,7 +100,7 @@ export function LanguageToggle({
       >
         <span
           ref={enTextRef}
-          className={`inline-block font-mono transition-colors duration-150 ${
+          className={`inline-block font-sans font-bold transition-colors duration-150 ${
             isEn
               ? "text-white font-bold"
               : "text-[#496273] dark:text-[#94abbc] hover:text-[#102A3A] dark:hover:text-white"

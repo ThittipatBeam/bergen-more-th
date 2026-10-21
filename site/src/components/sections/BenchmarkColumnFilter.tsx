@@ -72,7 +72,7 @@ export function BenchmarkColumnFilter({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-label="Filter metrics and columns"
-        className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[#73B7DC] text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
+        className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[#73B7DC] text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
       >
         <svg
           className="w-4 h-4 text-[#0795CF]"

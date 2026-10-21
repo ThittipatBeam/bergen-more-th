@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Noto_Sans_Thai, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
+import { LanguageProvider } from "@/hooks/use-language";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -21,7 +22,8 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: "Thai RAG Benchmark",
-  description: "Standardized evaluation benchmark and leaderboard for Thai retrieval-augmented generation and embedding models.",
+  description:
+    "Standardized evaluation benchmark and leaderboard for Thai retrieval-augmented generation and embedding models.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -41,12 +43,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="th"
+      lang="en"
       className={`${spaceGrotesk.variable} ${notoSansThai.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-200 selection:bg-[#0795CF] selection:text-white">
-        <Navbar />
-        {children}
+        <LanguageProvider>
+          <Navbar />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

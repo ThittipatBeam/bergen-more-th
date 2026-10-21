@@ -49,7 +49,7 @@ export function BenchmarkTableHeader({
 
   return (
     <thead>
-      <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-[11px] font-mono uppercase tracking-wider text-[var(--text-secondary)] transition-colors select-none">
+      <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-[11px] font-sans font-semibold uppercase tracking-wider text-[var(--text-secondary)] transition-colors select-none">
         <th className="py-3.5 px-3 w-12 text-center">
           {sortBtn("rank", "#", "center")}
         </th>
