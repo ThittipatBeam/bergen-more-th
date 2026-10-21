@@ -9,16 +9,33 @@ import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 
-interface NavItem {
+export interface NavItem {
   label: string;
   href: string;
+  description?: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { label: "LEADERBOARD", href: "#leaderboard" },
-  { label: "MODELS", href: "#leaderboard" },
-  { label: "METHODOLOGY", href: "#" },
-  { label: "CLOUD", href: "https://siam.ai" },
+export const NAV_ITEMS: NavItem[] = [
+  {
+    label: "LEADERBOARD",
+    href: "#leaderboard",
+    description: "Thai RAG & LLM rankings",
+  },
+  {
+    label: "MODELS",
+    href: "#leaderboard",
+    description: "Evaluated dense & hybrid models",
+  },
+  {
+    label: "METHODOLOGY",
+    href: "#",
+    description: "Evaluation corpus & metrics",
+  },
+  {
+    label: "CLOUD",
+    href: "https://siam.ai",
+    description: "SIAM.AI GPU infrastructure",
+  },
 ];
 
 export function Navbar() {
