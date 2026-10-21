@@ -1,0 +1,243 @@
+[
+  {
+    "experiment_id": "339bf4405410a0f2",
+    "run_date": "2026-10-21T03:04:48.447639",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "QWEN3-EMBED-8B",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "generator": {
+      "model_name": "DEEPSEEK-V4.1F",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 50,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.718,
+      "EM": 0.208,
+      "F1": 0.5070495032641664,
+      "Precision": 0.4378322912633888,
+      "Recall": 0.6935999999999999,
+      "Recall_char3gram": 0.8586343006288748,
+      "Rouge-1": 0.4155816328481338,
+      "Rouge-2": 0.27010790843861626,
+      "Rouge-L": 0.4145181407846418,
+      "M_th": 0.784,
+      "F1_th": 0.5245409198023331,
+      "Precision_th": 0.4349477740712726,
+      "Recall_th": 0.8749166666666667,
+      "LLMeval_judge": 0.966,
+      "LLMeval_judge_pct": 96.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:10:02.08",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.966,
+      "LLMeval_judge_pct": 96.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/339bf4405410a0f2/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/339bf4405410a0f2/eval_dev_out.json",
+      "config_yaml": "experiments/339bf4405410a0f2/config.yaml",
+      "input_retrieval_run": "experiments/339bf4405410a0f2/runs"
+    }
+  },
+  {
+    "experiment_id": "60d641192788ddfd",
+    "run_date": "2026-10-21T02:15:19.346744",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "BAAI/bge-m3",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": "BAAI/bge-reranker-v2-m3",
+      "provider": "openai_compatible",
+      "batch_size": 100
+    },
+    "generator": {
+      "model_name": "DEEPSEEK-V4.1F",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 10,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.728,
+      "EM": 0.194,
+      "F1": 0.5153726523950916,
+      "Precision": 0.4418888934594817,
+      "Recall": 0.7075,
+      "Recall_char3gram": 0.867965754635127,
+      "Rouge-1": 0.4213393895057711,
+      "Rouge-2": 0.26867850288951695,
+      "Rouge-L": 0.4210060561724378,
+      "M_th": 0.8,
+      "F1_th": 0.5291405066375442,
+      "Precision_th": 0.43629750247071103,
+      "Recall_th": 0.8841428571428571,
+      "LLMeval_judge": 0.974,
+      "LLMeval_judge_pct": 97.39999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:10:05.51",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.974,
+      "LLMeval_judge_pct": 97.39999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/60d641192788ddfd/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/60d641192788ddfd/eval_dev_out.json",
+      "config_yaml": "experiments/60d641192788ddfd/config.yaml",
+      "input_retrieval_run": "experiments/60d641192788ddfd/runs"
+    }
+  },
+  {
+    "experiment_id": "old",
+    "run_date": "",
+    "dataset": {
+      "doc": {
+        "target": null,
+        "split": null,
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      },
+      "query": {
+        "target": null,
+        "split": null,
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "reranker": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "generator": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [],
+    "retrieval": {
+      "retrieve_top_k": null,
+      "rerank_top_k": null,
+      "generation_top_k": null
+    },
+    "metrics": {},
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": null,
+    "generation_time": null,
+    "generation_cost": null,
+    "file_paths": {
+      "eval_out": null,
+      "config_yaml": "experiments/old/config.yaml",
+      "input_retrieval_run": "experiments/old/runs"
+    }
+  }
+]
