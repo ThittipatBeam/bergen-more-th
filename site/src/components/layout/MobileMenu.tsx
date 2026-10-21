@@ -123,12 +123,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
       ref={drawerRef}
       role="dialog"
       aria-modal="true"
-      className="pointer-events-auto fixed inset-0 z-50 flex flex-col justify-between px-6 py-6 sm:px-8 text-[#102A3A] select-none opacity-0"
-      style={{
-        background: "rgba(247, 251, 253, 0.96)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-      }}
+      className="pointer-events-auto fixed inset-0 z-50 flex flex-col justify-between px-6 py-6 sm:px-8 text-[var(--text-primary)] bg-[var(--background-canvas)]/96 backdrop-blur-2xl select-none opacity-0 transition-colors"
     >
       {/* Top Header Bar */}
       <div className="mobile-header-bar flex items-center justify-between w-full">

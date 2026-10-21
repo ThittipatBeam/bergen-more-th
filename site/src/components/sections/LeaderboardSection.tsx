@@ -107,26 +107,26 @@ export function LeaderboardSection() {
     <section className="w-full px-4 sm:px-8 md:px-12 py-12 sm:py-16">
       <div className="max-w-6xl mx-auto flex flex-col gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#DCEAF1] dark:border-[#1e3344] transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border-default)] transition-colors">
           <div>
             <span className="text-xs font-mono uppercase tracking-widest text-[#01A9B1] dark:text-[#00A0BE] font-semibold">
               SIAM.AI BENCHMARK • THAI CORPUS & CLOUD RETRIEVAL
             </span>
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#102A3A] dark:text-[#f0f7fb] mt-1 transition-colors">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)] mt-1 transition-colors">
               Top Performing Models
             </h2>
           </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-[#607786] dark:text-[#94abbc]">
+          <div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Updated Today • 8 Models Evaluated</span>
           </div>
         </div>
 
         {/* Responsive Table Card */}
-        <div className="w-full overflow-x-auto rounded-xl border border-[#DCEAF1] dark:border-[#1e3344] bg-white dark:bg-[#111a22] shadow-xs transition-colors">
+        <div className="w-full overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors">
           <table className="w-full text-left border-collapse min-w-[640px]">
             <thead>
-              <tr className="bg-[#F0F8FC] dark:bg-[#16222c] border-b border-[#DCEAF1] dark:border-[#1e3344] text-[11px] font-mono uppercase tracking-wider text-[#496273] dark:text-[#94abbc] transition-colors">
+              <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-[11px] font-mono uppercase tracking-wider text-[var(--text-secondary)] transition-colors">
                 <th className="py-3.5 px-4 w-16">Rank</th>
                 <th className="py-3.5 px-4">Model & Provider</th>
                 <th className="py-3.5 px-3">Type</th>
@@ -136,13 +136,13 @@ export function LeaderboardSection() {
                 <th className="py-3.5 px-4 text-right">Latency</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#DCEAF1]/60 dark:divide-[#1e3344]/60 text-sm transition-colors">
+            <tbody className="divide-y divide-[var(--border-default)]/60 text-sm transition-colors">
               {MODELS.map((m) => (
                 <tr
                   key={m.name}
-                  className="hover:bg-[#EAF6FB]/60 dark:hover:bg-[#16222c]/80 transition-colors group"
+                  className="hover:bg-[var(--surface-brand)]/60 transition-colors group"
                 >
-                  <td className="py-3.5 px-4 font-mono font-medium text-[#607786] dark:text-[#94abbc]">
+                  <td className="py-3.5 px-4 font-mono font-medium text-[var(--text-muted)]">
                     {m.rank === 1 && <span className="text-[#0795CF] font-bold">#1</span>}
                     {m.rank === 2 && <span className="text-[#00A0BE] font-bold">#2</span>}
                     {m.rank === 3 && <span className="text-[#01A9B1] font-bold">#3</span>}
@@ -150,7 +150,7 @@ export function LeaderboardSection() {
                   </td>
                   <td className="py-3.5 px-4">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-[#102A3A] dark:text-[#f0f7fb] font-mono text-sm transition-colors">
+                      <span className="font-semibold text-[var(--text-primary)] font-mono text-sm transition-colors">
                         {m.name}
                       </span>
                       {m.badge && (
@@ -162,30 +162,30 @@ export function LeaderboardSection() {
                               ? "bg-[#0795CF]/15 text-[#0795CF] border-[#73B7DC] dark:border-[#0795CF]/40"
                               : m.badgeVariant === "secondary"
                               ? "bg-[#E6F8F9] dark:bg-[#102830] text-[#01A9B1] border-[#B7DBE8] dark:border-[#1e4650]"
-                              : "bg-[#F0F8FC] dark:bg-[#16222c] text-[#496273] dark:text-[#94abbc] border-[#DCEAF1] dark:border-[#1e3344]"
+                              : "bg-[var(--background-subtle)] text-[var(--text-secondary)] border-[var(--border-default)]"
                           }`}
                         >
                           {m.badge}
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-[#607786] dark:text-[#94abbc] font-sans">{m.provider}</span>
+                    <span className="text-xs text-[var(--text-muted)] font-sans">{m.provider}</span>
                   </td>
                   <td className="py-3.5 px-3">
-                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#F0F8FC] dark:bg-[#16222c] border border-[#DCEAF1] dark:border-[#1e3344] text-[#496273] dark:text-[#94abbc]">
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-[var(--background-subtle)] border border-[var(--border-default)] text-[var(--text-secondary)]">
                       {m.type}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-right font-mono font-semibold text-[#102A3A] dark:text-[#f0f7fb]">
+                  <td className="py-3.5 px-4 text-right font-mono font-semibold text-[var(--text-primary)]">
                     {m.ndcg10.toFixed(3)}
                   </td>
-                  <td className="py-3.5 px-4 text-right font-mono text-[#496273] dark:text-[#94abbc]">
+                  <td className="py-3.5 px-4 text-right font-mono text-[var(--text-secondary)]">
                     {m.recall10.toFixed(3)}
                   </td>
-                  <td className="py-3.5 px-4 text-right font-mono text-[#496273] dark:text-[#94abbc]">
+                  <td className="py-3.5 px-4 text-right font-mono text-[var(--text-secondary)]">
                     {m.mrr10.toFixed(3)}
                   </td>
-                  <td className="py-3.5 px-4 text-right font-mono text-[#607786] dark:text-[#94abbc]">
+                  <td className="py-3.5 px-4 text-right font-mono text-[var(--text-muted)]">
                     {m.latencyMs}ms
                   </td>
                 </tr>

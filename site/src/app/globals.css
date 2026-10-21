@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   /* SIAM.AI Cloudy Sky brand tokens */
@@ -71,4 +71,5 @@ body {
   background: var(--background-canvas);
   color: var(--text-primary);
   font-family: var(--font-space-grotesk), var(--font-noto-sans-thai), sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
