@@ -33,9 +33,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("judgePct");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  const datasetName = rows[0]?.dataset ?? "ThaiWikiV4";
-  const sampleCount = rows[0]?.judgeN ?? 500;
-
   const generators = useMemo(
     () => [...new Set(rows.map((r) => r.generator))],
     [rows]
@@ -110,16 +107,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Editorial Title Header */}
-      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 px-0.5">
-        <h3 className="font-serif font-bold text-xl sm:text-2xl text-[var(--text-primary)] tracking-tight">
-          Measured sheet · {datasetName} · dev · {sampleCount.toLocaleString()}
-        </h3>
-        <span className="text-xs font-mono text-[var(--text-muted)]">
-          Judge score leads. Click a column to sort.
-        </span>
-      </div>
-
       {/* Toolbar & Filters */}
       <BenchmarkTableToolbar
         generators={generators}
@@ -132,8 +119,8 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         resultsCount={processedRows.length}
       />
 
-      {/* Styled Measured Sheet Table */}
-      <div className="overflow-x-auto rounded-xl border border-[#E3DCD1] dark:border-[#2E2A24] bg-[#FAF7F2] dark:bg-[#1C1A17] shadow-xs">
+      {/* Measured Sheet Table Container */}
+      <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors">
         <table className="w-full text-left border-collapse min-w-[800px]">
           <BenchmarkTableHeader
             columns={columns}

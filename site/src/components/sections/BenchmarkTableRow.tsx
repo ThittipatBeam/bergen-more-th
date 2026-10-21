@@ -14,7 +14,6 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
   const padRank = String(row.rank).padStart(2, "0");
 
   const renderMetricCell = (val: number) => {
-    // Proportional underline width between 24px and 48px
     const barWidth = Math.max(22, Math.min(46, Math.round(val * 0.5)));
     return (
       <div className="flex flex-col items-center justify-center">
@@ -22,7 +21,7 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
           {val.toFixed(1)}
         </span>
         <div
-          className="h-[3px] rounded-full bg-[#B83E28] mt-1"
+          className="h-[3px] rounded-full bg-[#0795CF] dark:bg-[#00A0BE] mt-1"
           style={{ width: `${barWidth}px` }}
           aria-hidden="true"
         />
@@ -32,9 +31,9 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
 
   return (
     <tr
-      className={`border-b border-[#E3DCD1]/80 dark:border-[#2E2A24] transition-colors hover:bg-[#F6F1E8]/70 dark:hover:bg-[#25221D]/60 ${
+      className={`border-b border-[var(--border-default)]/70 transition-colors hover:bg-[var(--background-subtle)] ${
         isLeader
-          ? "bg-[#FCF9F3]/90 dark:bg-[#23201C]/80"
+          ? "bg-[#0795CF]/[0.03] dark:bg-[#0795CF]/[0.06]"
           : "bg-transparent"
       }`}
     >
@@ -43,8 +42,8 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
         <span
           className={`font-mono font-bold ${
             isLeader
-              ? "text-[#B83E28] text-sm sm:text-base font-extrabold"
-              : "text-[#736B5E] dark:text-[#A89E90] text-xs font-semibold"
+              ? "text-[#0795CF] text-sm sm:text-base font-extrabold"
+              : "text-[var(--text-muted)] text-xs font-semibold"
           }`}
         >
           {padRank}
@@ -54,14 +53,14 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
       {/* MODEL (Tile + Logo + Name + LEADER badge) */}
       <td className="py-3 px-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg border border-[#E3DCD1] dark:border-[#38332A] bg-white dark:bg-[#1E1C18] flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-8 h-8 rounded-lg border border-[var(--border-default)] bg-[var(--background-primary)] flex items-center justify-center shrink-0 shadow-2xs">
             <BrandIcon name={row.generator} size={18} />
           </div>
           <span className="font-bold text-xs sm:text-sm font-sans tracking-tight text-[var(--text-primary)] whitespace-nowrap">
             {row.generator}
           </span>
           {isLeader && (
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase bg-[#B83E28] text-white shrink-0">
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-wider uppercase bg-[#0795CF] text-white shadow-2xs shrink-0">
               LEADER
             </span>
           )}
@@ -100,10 +99,10 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
         </td>
       )}
 
-      {/* JUDGE SCORE (Highlighted column) */}
+      {/* JUDGE SCORE (Sky-blue highlighted column wash) */}
       {columns.judgePct && (
-        <td className="py-3 px-4 text-right bg-[#FBF1EC]/80 dark:bg-[#3D1E16]/30">
-          <span className="font-mono text-lg sm:text-xl font-bold text-[#B83E28] dark:text-[#E86044] tracking-tight">
+        <td className="py-3 px-4 text-right bg-[#0795CF]/8 dark:bg-[#0795CF]/15">
+          <span className="font-mono text-lg sm:text-xl font-bold text-[#0795CF] dark:text-[#38bdf8] tracking-tight">
             {row.judgePct.toFixed(1)}
           </span>
         </td>

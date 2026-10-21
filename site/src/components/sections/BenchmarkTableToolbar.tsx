@@ -31,14 +31,14 @@ export function BenchmarkTableToolbar({
   resultsCount,
 }: BenchmarkTableToolbarProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-xl border border-[#E3DCD1] dark:border-[#2E2A24] bg-[#FAF7F2] dark:bg-[#1C1A17]">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] transition-colors">
       <div className="flex flex-wrap items-center gap-2">
         {/* Generator Model Filter */}
         <select
           value={generator}
           onChange={(e) => onGeneratorChange(e.target.value)}
           aria-label="Filter by model"
-          className="min-h-[44px] px-3 rounded-lg border border-[#E3DCD1] dark:border-[#332E27] bg-white dark:bg-[#23201C] text-xs font-mono text-[var(--text-primary)] cursor-pointer focus:outline-none"
+          className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-xs font-mono text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[#0795CF] transition-colors"
         >
           <option value="all">All Models ({generators.length})</option>
           {generators.map((g) => (
@@ -49,16 +49,16 @@ export function BenchmarkTableToolbar({
         </select>
 
         {/* Reranker Segmented Filter */}
-        <div className="inline-flex items-center rounded-lg border border-[#E3DCD1] dark:border-[#332E27] bg-[#F1ECE1] dark:bg-[#23201C] p-0.5">
+        <div className="inline-flex items-center rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-0.5">
           {RERANKER_OPTIONS.map((opt) => (
             <button
               key={opt.id}
               type="button"
               onClick={() => onRerankerChange(opt.id)}
-              className={`min-h-[38px] px-3 rounded-md text-xs font-mono font-medium transition-all cursor-pointer ${
+              className={`min-h-[38px] px-3 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
                 reranker === opt.id
-                  ? "bg-white dark:bg-[#1E1C18] text-[var(--text-primary)] shadow-2xs font-bold"
-                  : "text-[#736B5E] dark:text-[#A89E90] hover:text-[var(--text-primary)]"
+                  ? "bg-[var(--background-primary)] text-[#0795CF] shadow-2xs font-bold"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               }`}
             >
               {opt.label}

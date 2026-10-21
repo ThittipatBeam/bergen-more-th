@@ -22,13 +22,13 @@ export function BenchmarkTableHeader({
   const renderIndicator = (key: SortKey) => {
     if (sortKey === key) {
       return (
-        <span className="ml-1 text-[#B83E28] font-bold">
+        <span className="ml-1 text-[#0795CF] font-bold">
           {sortDirection === "asc" ? "↑" : "↓"}
         </span>
       );
     }
     return (
-      <span className="ml-1 text-[#9E9485] opacity-40 group-hover:opacity-100 transition-opacity">
+      <span className="ml-1 text-[var(--text-muted)] opacity-35 group-hover:opacity-100 transition-opacity">
         ↕
       </span>
     );
@@ -49,7 +49,7 @@ export function BenchmarkTableHeader({
 
   return (
     <thead>
-      <tr className="bg-[#F1ECE1] dark:bg-[#25221D] border-b border-[#E3DCD1] dark:border-[#38332A] text-[11px] font-mono uppercase tracking-wider text-[#736B5E] dark:text-[#A89E90] transition-colors select-none">
+      <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-[11px] font-mono uppercase tracking-wider text-[var(--text-secondary)] transition-colors select-none">
         <th className="py-3.5 px-3 w-12 text-center">
           {sortBtn("rank", "#", "center")}
         </th>
@@ -69,7 +69,7 @@ export function BenchmarkTableHeader({
         )}
 
         {columns.judgePct && (
-          <th className="py-3.5 px-4 text-right bg-[#EFE3DB]/60 dark:bg-[#3D1E16]/40">
+          <th className="py-3.5 px-4 text-right bg-[#0795CF]/10 dark:bg-[#0795CF]/20 text-[#0795CF] dark:text-[#73B7DC]">
             {sortBtn("judgePct", "JUDGE SCORE", "right")}
           </th>
         )}
