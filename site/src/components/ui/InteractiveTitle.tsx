@@ -3,6 +3,7 @@
 import React, { useRef, useCallback } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 gsap.registerPlugin(useGSAP);
 
@@ -13,9 +14,13 @@ interface InteractiveTitleProps {
 
 export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps) {
   const containerRef = useRef<HTMLHeadingElement>(null);
+  const reducedMotion = useReducedMotion();
 
   useGSAP(
     () => {
+      // Reduced motion: title renders in final state, no entrance wave
+      if (reducedMotion) return;
+
       // Gentle wave entrance animation on initial mount
       gsap.fromTo(
         ".interactive-char",
@@ -36,12 +41,13 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
         }
       );
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [reducedMotion] }
   );
 
   // Playful jelly bounce when mouse glides over a character
   const handleCharHover = useCallback(
     (e: React.MouseEvent<HTMLSpanElement>) => {
+      if (reducedMotion) return;
       const target = e.currentTarget;
       const randomTilt = (Math.random() - 0.5) * 22; // Random tilt between -11deg and +11deg
 
@@ -65,12 +71,13 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           ease: "elastic.out(1.25, 0.35)", // Bouncy jelly spring
         });
     },
-    []
+    [reducedMotion]
   );
 
   // Easter egg: 360-degree backflip when clicking a letter!
   const handleCharClick = useCallback(
     (e: React.MouseEvent<HTMLSpanElement>) => {
+      if (reducedMotion) return;
       const target = e.currentTarget;
       gsap.timeline({ overwrite: "auto" })
         .to(target, {
@@ -89,7 +96,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           ease: "elastic.out(1.2, 0.4)",
         });
     },
-    []
+    [reducedMotion]
   );
 
   // Split text into words to prevent breaking words across lines awkwardly
@@ -98,7 +105,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
   return (
     <h1
       ref={containerRef}
-      className={`font-sans font-bold sm:font-extrabold tracking-[-0.03em] leading-[1.08] select-none text-[#102A3A] dark:text-[#f0f7fb] transition-colors duration-200 ${className}`}
+      className={`font-sans font-bold sm:font-extrabold tracking-[-0.03em] leading-[1.08] select-none text-[var(--text-primary)] transition-colors duration-200 ${className}`}
     >
       {words.map((word, wordIndex) => (
         <span key={`word-${wordIndex}`} className="inline-block whitespace-nowrap">
@@ -107,7 +114,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
               key={`char-${wordIndex}-${charIndex}`}
               onMouseEnter={handleCharHover}
               onClick={handleCharClick}
-              className="interactive-char inline-block cursor-pointer will-change-transform transform-gpu"
+              className="interactive-char inline-block cursor-pointer transform-gpu"
             >
               {char}
             </span>

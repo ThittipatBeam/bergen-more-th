@@ -121,6 +121,10 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
       {/* Measured Sheet Table Container */}
       <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors">
         <table className="w-full text-left border-collapse min-w-[800px]">
+          <caption className="sr-only">
+            Leaderboard of evaluated Thai RAG pipeline combinations, ranked by
+            LLM judge score. Column headers are sortable buttons.
+          </caption>
           <BenchmarkTableHeader
             columns={columns}
             sortKey={sortKey}
@@ -136,8 +140,20 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         </table>
 
         {processedRows.length === 0 && (
-          <div className="py-12 text-center text-xs font-mono text-[var(--text-muted)]">
-            No benchmark runs match the current filters.
+          <div className="py-12 text-center font-mono">
+            <p className="text-xs text-[var(--text-muted)]">
+              No benchmark runs match the current filters.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setGenerator("all");
+                setReranker("all");
+              }}
+              className="mt-3 min-h-[44px] px-4 rounded-xl border border-[var(--border-default)] text-xs font-semibold text-[var(--brand-text)] hover:border-[var(--border-focus)] transition-colors cursor-pointer"
+            >
+              Reset filters
+            </button>
           </div>
         )}
       </div>

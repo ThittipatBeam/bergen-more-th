@@ -22,7 +22,27 @@
   /* Typography */
   --text-primary: #102a3a;
   --text-secondary: #496273;
-  --text-muted: #607786;
+  --text-muted: #54687a; /* was #607786 — failed AA on subtle surfaces (4.36:1) */
+
+  /* Functional brand pairings: #0795CF is the display hue (3.38:1 — fails AA
+     as text and as white-text background); these pass on every surface */
+  --brand-text: #006b91; /* brand as text on light surfaces: 5.56–5.98:1 */
+  --brand-cta: #006b91; /* action background, white text: 5.98:1 */
+  --brand-cta-hover: #055672;
+
+  /* Rank medals (light-theme values pass AA as text on white: ≥4.5:1) */
+  --medal-gold: #8a6d1c;
+  --medal-silver: #6e7881;
+  --medal-bronze: #96591f;
+
+  /* Semantic color language — every hue has exactly one job:
+     brand blue = the quality signal (Judge Score) + interactive affordances
+     amber      = speed / latency
+     medals     = rank 1–3 (always redundant with the rank number)
+     teal       = live/fresh status dots only
+     Neutrals carry everything else. */
+  --perf-text: #a05a00; /* white 5.31:1, canvas 5.10:1, subtle 4.94:1 */
+  --status-live: #0d9488; /* non-text indicator, ≥3:1 */
 
   /* Borders */
   --border-default: #dceaf1;
@@ -38,7 +58,20 @@
 
   --text-primary: #f0f7fb;
   --text-secondary: #94abbc;
-  --text-muted: #6b8293;
+  --text-muted: #8ca2b2; /* was #6b8293 — failed AA on surfaces (4.03–4.39:1) */
+
+  /* Dark-appropriate functional pairings (measured ≥4.7:1 on all dark surfaces);
+     CTA background stays #006B91 in both themes — white on #0795CF is 3.38:1 */
+  --brand-text: #73b7dc;
+  --brand-cta: #006b91;
+  --brand-cta-hover: #055672;
+
+  --medal-gold: #e8c547;
+  --medal-silver: #b4bcc4;
+  --medal-bronze: #c98a5b;
+
+  --perf-text: #f5b84c;
+  --status-live: #34d399;
 
   --border-default: #1e3344;
   --border-strong: #2a475e;
@@ -51,6 +84,16 @@
   --color-brand-soft: var(--brand-light-blue);
   --color-brand-tint: var(--surface-brand);
   --color-brand-hover: #006b91;
+
+  /* AA-safe functional brand pairings */
+  --color-brand-accessible: var(--brand-text);
+  --color-brand-cta: var(--brand-cta);
+  --color-brand-cta-hover: var(--brand-cta-hover);
+
+  /* Rank medals */
+  --color-medal-gold: var(--medal-gold);
+  --color-medal-silver: var(--medal-silver);
+  --color-medal-bronze: var(--medal-bronze);
 
   --color-canvas: var(--background-canvas);
   --color-surface: var(--background-primary);
@@ -72,4 +115,11 @@ body {
   color: var(--text-primary);
   font-family: var(--font-space-grotesk), var(--font-noto-sans-thai), sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Keyboard focus is always visible; --border-focus passes 3:1 on every surface */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
 }

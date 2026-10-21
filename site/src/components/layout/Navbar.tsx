@@ -9,6 +9,7 @@ import { RollingLink } from "@/components/ui/RollingLink";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export interface NavItem {
   label: string;
@@ -43,10 +44,12 @@ export function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const cloudIconRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const reducedMotion = useReducedMotion();
 
   // Playful spring hover on the cloud logo emblem
   const handleLogoHover = useCallback(() => {
-    if (!cloudIconRef.current) return;
+    if (!cloudIconRef.current || reducedMotion) return;
     gsap.fromTo(
       cloudIconRef.current,
       { scale: 0.95, rotation: -4 },
@@ -58,10 +61,10 @@ export function Navbar() {
         ease: "back.out(2.2)",
       }
     );
-  }, []);
+  }, [reducedMotion]);
 
   const handleLogoLeave = useCallback(() => {
-    if (!cloudIconRef.current) return;
+    if (!cloudIconRef.current || reducedMotion) return;
     gsap.to(cloudIconRef.current, {
       scale: 1,
       rotation: 0,
@@ -69,12 +72,12 @@ export function Navbar() {
       duration: 0.3,
       ease: "power2.out",
     });
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <>
       {/* Full-Width Frosted Glass Navbar Header */}
-      <header className="fixed top-0 inset-x-0 z-40 w-full select-none border-b border-[#DCEAF1] dark:border-[#1e3344] bg-[#F7FBFD]/85 dark:bg-[#0c1218]/85 backdrop-blur-md transition-colors duration-300">
+      <header className="fixed top-0 inset-x-0 z-40 w-full select-none border-b border-[var(--border-default)] bg-[var(--background-canvas)]/85 backdrop-blur-md transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-2.5 sm:py-3 flex items-center justify-between">
           {/* Left: Brand with Official Cloud Logo */}
           <div className="flex items-center gap-3 sm:gap-4">
@@ -86,26 +89,26 @@ export function Navbar() {
             >
               <div
                 ref={cloudIconRef}
-                className="relative w-8 h-5 sm:w-9 sm:h-5.5 flex items-center justify-center will-change-transform"
+                className="relative w-8 h-5 sm:w-9 sm:h-5.5 flex items-center justify-center"
               >
                 <Image
                   src="/logo.png"
                   alt="SIAM Logo"
                   width={36}
-                  height={22}
-                  className="w-full h-auto object-contain"
+                  height={19}
+                  className="object-contain"
                   priority
                 />
               </div>
 
               <div className="flex items-baseline gap-1">
-                <span className="font-sans font-bold text-base sm:text-lg tracking-tight text-[#102A3A] dark:text-[#f0f7fb] group-hover:text-[#0795CF] transition-colors">
+                <span className="font-sans font-bold text-base sm:text-lg tracking-tight text-[var(--text-primary)] group-hover:text-[var(--brand-text)] transition-colors">
                   SIAM
                 </span>
-                <span className="font-sans font-bold text-base sm:text-lg text-[#0795CF]">
+                <span className="font-sans font-bold text-base sm:text-lg text-[var(--brand-text)]">
                   .AI
                 </span>
-                <span className="hidden lg:inline-block text-[10px] font-mono uppercase tracking-widest text-[#607786] dark:text-[#94abbc] border-l border-[#DCEAF1] dark:border-[#1e3344] pl-2 ml-1">
+                <span className="hidden lg:inline-block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] border-l border-[var(--border-default)] pl-2 ml-1">
                   BENCHMARK
                 </span>
               </div>
@@ -126,12 +129,12 @@ export function Navbar() {
                     label={item.label}
                     className={`text-xs font-semibold tracking-[0.16em] transition-colors ${
                       isActive
-                        ? "text-[#0795CF] font-bold"
-                        : "text-[#102A3A] dark:text-[#f0f7fb] hover:text-[#0795CF]"
+                        ? "text-[var(--brand-text)] font-bold"
+                        : "text-[var(--text-primary)] hover:text-[var(--brand-text)]"
                     }`}
                   />
                   {isActive && (
-                    <span className="absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-[#0795CF]" />
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-[var(--brand-sky-blue)]" />
                   )}
                 </div>
               );
@@ -148,10 +151,13 @@ export function Navbar() {
 
             {/* Mobile Menu Trigger (< md) */}
             <button
+              ref={menuButtonRef}
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open navigation menu"
-              className="md:hidden min-h-[44px] min-w-[44px] -mr-1 flex items-center justify-center text-xs font-semibold tracking-[0.18em] text-[#102A3A] dark:text-[#f0f7fb] hover:text-[#0795CF]"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu-drawer"
+              className="md:hidden min-h-[44px] min-w-[44px] -mr-1 flex items-center justify-center text-xs font-semibold tracking-[0.18em] text-[var(--text-primary)] hover:text-[var(--brand-text)]"
             >
               MENU
             </button>
@@ -164,6 +170,7 @@ export function Navbar() {
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         items={NAV_ITEMS}
+        returnFocusRef={menuButtonRef}
       />
     </>
   );

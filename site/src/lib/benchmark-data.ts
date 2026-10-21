@@ -72,13 +72,6 @@ export const BENCHMARK_ROWS: BenchmarkRow[] = (
 
 const firstWithJudge = BENCHMARK_ROWS.find((row) => row.judgeName);
 
-/** "KIMI-K3 · n=500" attribution for headers; empty when unknown. */
-export const JUDGE_LABEL = firstWithJudge?.judgeName
-  ? `${firstWithJudge.judgeName}${
-      firstWithJudge.judgeN ? ` · n=${firstWithJudge.judgeN}` : ""
-    }`
-  : "";
-
 export const JUDGE_NAME = firstWithJudge?.judgeName ?? "KIMI-K3";
 export const JUDGE_N = firstWithJudge?.judgeN ?? 500;
 
@@ -100,10 +93,10 @@ if (judgeBest) {
     tabLabel: "Highest score",
     categoryTitle: "Highest Judge Approval",
     badge: "#1 Overall",
-    storyTitle: "Top-rated Thai answers with 97.4% judge approval.",
+    storyTitle: `Top-rated Thai answers with ${judgeBest.judgePct.toFixed(1)}% judge approval.`,
     storyText: `In this evaluation, ${judgeBest.generator} paired with ${judgeBest.retriever} achieved the highest response quality rated by ${judgeBest.judgeName ?? "Kimi-K3"}.`,
     icon: "trophy",
-    accent: "#0795CF",
+    accent: "var(--brand-text)",
     primaryMetric: {
       label: "LLM Judge Score",
       value: `${judgeBest.judgePct.toFixed(1)}%`,
@@ -131,7 +124,7 @@ if (speedBest) {
       speedBest.genSeconds
     )}, maintaining a competitive ${speedBest.judgePct.toFixed(1)}% judge score.`,
     icon: "bolt",
-    accent: "#01A9B1",
+    accent: "var(--perf-text)",
     primaryMetric: {
       label: "Generation Time",
       value: formatClock(speedBest.genSeconds),
@@ -157,7 +150,7 @@ if (matchBest) {
       3
     )} M-score and ${matchBest.f1Th.toFixed(3)} F1.`,
     icon: "target",
-    accent: "#00A0BE",
+    accent: "var(--brand-text)",
     primaryMetric: {
       label: "Thai M-Score",
       value: matchBest.mTh.toFixed(3),

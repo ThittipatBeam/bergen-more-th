@@ -86,11 +86,11 @@ export function StackedFolderCard({
       className={`absolute inset-x-0 top-0 h-[380px] sm:h-[364px] rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${
         isActive
           ? "border-[var(--border-default)] bg-[var(--background-primary)] shadow-[0_20px_48px_-16px_rgba(7,149,207,0.18)] dark:shadow-[0_24px_48px_-16px_rgba(0,0,0,0.85)]"
-          : "border-[var(--border-default)]/90 bg-[var(--background-subtle)] hover:border-[#73B7DC] cursor-pointer shadow-sm"
+          : "border-[var(--border-default)]/90 bg-[var(--background-subtle)] hover:border-[var(--brand-sky-light)] cursor-pointer shadow-sm"
       }`}
     >
-      {/* Tab Strip: 44px tap target */}
-      <div className="relative flex items-center justify-between h-11 px-5 border-b border-[var(--border-default)]/50 bg-[var(--background-subtle)]/60">
+      {/* Tab Strip: 44px+ tap target */}
+      <div className="relative flex items-center justify-between h-12 px-5 border-b border-[var(--border-default)]/50 bg-[var(--background-subtle)]/60">
         <div className="flex items-center gap-2.5">
           <CategoryIcon icon={pick.icon} accent={pick.accent} />
           <span className="text-xs sm:text-sm font-mono font-semibold tracking-wide text-[var(--text-primary)]">
@@ -99,14 +99,7 @@ export function StackedFolderCard({
         </div>
 
         <div className="flex items-center gap-2">
-          <span
-            style={{
-              borderColor: `${pick.accent}55`,
-              backgroundColor: `${pick.accent}15`,
-              color: pick.accent,
-            }}
-            className="text-[10px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded-full border font-semibold"
-          >
+          <span className="text-xs font-mono uppercase tracking-widest px-2.5 py-0.5 rounded-full border border-[var(--border-default)] bg-[var(--background-subtle)] text-[var(--text-secondary)] font-semibold">
             {pick.badge}
           </span>
         </div>
@@ -123,7 +116,7 @@ export function StackedFolderCard({
 
       {/* Card Body: fades in when active */}
       <div
-        className={`px-4 sm:px-6 pt-3 pb-4 flex flex-col justify-between h-[calc(100%-44px)] transition-all duration-300 ${
+        className={`px-4 sm:px-6 pt-3 pb-4 flex flex-col justify-between h-[calc(100%-48px)] transition-all duration-300 ${
           isActive
             ? "opacity-100 visible translate-y-0 delay-100"
             : "opacity-0 invisible translate-y-2 pointer-events-none"
@@ -139,17 +132,17 @@ export function StackedFolderCard({
               >
                 {pick.primaryMetric.value}
               </span>
-              <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+              <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold">
                 {pick.primaryMetric.label}
               </span>
             </div>
-            <p className="text-[11px] font-mono text-[var(--text-muted)] mt-0.5">
+            <p className="text-xs font-mono text-[var(--text-muted)] mt-0.5">
               {pick.primaryMetric.detail}
             </p>
           </div>
 
           <div className="text-right shrink-0">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] block">
+            <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)] block">
               {pick.secondaryMetric.label}
             </span>
             <span className="font-mono text-base sm:text-lg font-bold text-[var(--text-primary)]">
@@ -160,9 +153,8 @@ export function StackedFolderCard({
 
         {/* 2. RAG Pipeline (Clear 3-Stage Architecture) */}
         <div className="rounded-xl border border-[var(--border-default)]/80 bg-[var(--background-subtle)]/70 p-2.5 sm:p-3">
-          <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 font-semibold">
+          <div className="flex items-center justify-between text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 font-semibold">
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0795CF]" />
               RAG Pipeline Architecture
             </span>
             <span className="text-[var(--text-secondary)] font-mono">
@@ -173,8 +165,7 @@ export function StackedFolderCard({
           <div className="flex flex-col gap-1.5">
             {/* Stage 1: Retrieval */}
             <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
-              <span className="text-[10px] uppercase font-semibold text-[#0795CF] flex items-center gap-1.5 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#0795CF]" />
+              <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
                 1. Retrieval
               </span>
               <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
@@ -187,8 +178,7 @@ export function StackedFolderCard({
 
             {/* Stage 2: Reranker */}
             <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
-              <span className="text-[10px] uppercase font-semibold text-[#01A9B1] flex items-center gap-1.5 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#01A9B1]" />
+              <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
                 2. Reranker
               </span>
               <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
@@ -201,8 +191,7 @@ export function StackedFolderCard({
 
             {/* Stage 3: Generator */}
             <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
-              <span className="text-[10px] uppercase font-semibold text-[#00A0BE] flex items-center gap-1.5 shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00A0BE]" />
+              <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
                 3. Generator
               </span>
               <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
@@ -217,13 +206,13 @@ export function StackedFolderCard({
 
         {/* 3. Footer */}
         <div className="flex items-center justify-between text-xs font-mono pt-0.5 text-[var(--text-muted)]">
-          <span className="text-[11px] truncate text-[var(--text-muted)]">
+          <span className="text-xs truncate text-[var(--text-muted)]">
             Corpus: Thai Wikipedia QA
           </span>
 
           <a
             href="#leaderboard"
-            className="shrink-0 text-xs font-mono font-semibold text-[#0795CF] hover:text-[#006B91] transition-colors min-h-[44px] inline-flex items-center"
+            className="shrink-0 text-xs font-mono font-semibold text-[var(--brand-text)] hover:text-[var(--brand-cta-hover)] transition-colors min-h-[44px] inline-flex items-center"
           >
             Full results &darr;
           </a>

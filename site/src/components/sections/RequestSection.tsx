@@ -26,9 +26,6 @@ export function RequestSection() {
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-8 md:px-12 pt-28 pb-16 flex flex-col gap-8">
       {/* Header */}
       <div className="flex flex-col gap-2 pb-6 border-b border-[var(--border-default)]">
-        <span className="text-xs font-sans uppercase tracking-widest text-[#0795CF] font-semibold">
-          SIAM.AI BENCHMARK • COMMUNITY REQUESTS
-        </span>
         <h1 className="text-3xl sm:text-4xl font-sans font-bold tracking-tight text-[var(--text-primary)]">
           Request Benchmark Combination
         </h1>
@@ -60,9 +57,10 @@ export function RequestSection() {
               </label>
               <select
                 id="generator-select"
+                required
                 value={generator}
                 onChange={(e) => setGenerator(e.target.value)}
-                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[#0795CF] cursor-pointer"
+                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] cursor-pointer"
               >
                 <option value="DeepSeek-V3">DeepSeek-V3</option>
                 <option value="DEEPSEEK-V4.1F">DeepSeek-V4.1F</option>
@@ -84,9 +82,10 @@ export function RequestSection() {
               </label>
               <select
                 id="retriever-select"
+                required
                 value={retriever}
                 onChange={(e) => setRetriever(e.target.value)}
-                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[#0795CF] cursor-pointer"
+                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] cursor-pointer"
               >
                 <option value="BAAI/bge-m3">BAAI/bge-m3 (Dense + Multi-ling)</option>
                 <option value="QWEN3-EMBED-8B">Qwen3-Embed-8B</option>
@@ -108,7 +107,7 @@ export function RequestSection() {
                 id="reranker-select"
                 value={reranker}
                 onChange={(e) => setReranker(e.target.value)}
-                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[#0795CF] cursor-pointer"
+                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] cursor-pointer"
               >
                 <option value="BAAI/bge-reranker-v2-m3">BAAI/bge-reranker-v2-m3</option>
                 <option value="cohere-rerank-v3">Cohere Rerank v3</option>
@@ -126,9 +125,10 @@ export function RequestSection() {
               </label>
               <select
                 id="dataset-select"
+                required
                 value={dataset}
                 onChange={(e) => setDataset(e.target.value)}
-                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[#0795CF] cursor-pointer"
+                className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] cursor-pointer"
               >
                 <option value="ThaiWikiV4">ThaiWikiV4 (General Knowledge, 500 samples)</option>
                 <option value="MKQA/th">MKQA/th (Factoid Multilingual QA)</option>
@@ -151,7 +151,7 @@ export function RequestSection() {
               value={contact}
               onChange={(e) => setContact(e.target.value)}
               placeholder="e.g. name@company.ai or @github_handle"
-              className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[#0795CF]"
+              className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)]"
             />
           </div>
 
@@ -169,7 +169,7 @@ export function RequestSection() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Specific top-k passages, custom system prompt, or quantizations..."
-              className="p-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[#0795CF] resize-y"
+              className="p-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] resize-y"
             />
           </div>
 
@@ -179,7 +179,7 @@ export function RequestSection() {
             </span>
             <button
               type="submit"
-              className="min-h-[44px] px-6 rounded-xl bg-[#0795CF] hover:bg-[#006B91] text-white text-xs font-sans font-semibold transition-colors cursor-pointer shadow-2xs"
+              className="min-h-[44px] px-6 rounded-xl bg-[var(--brand-cta)] hover:bg-[var(--brand-cta-hover)] text-white text-sm font-sans font-semibold transition-colors cursor-pointer shadow-2xs"
             >
               Queue Benchmark Run &rarr;
             </button>

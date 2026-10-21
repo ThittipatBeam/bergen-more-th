@@ -72,7 +72,7 @@ export function BenchmarkColumnFilter({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-label="Filter metrics and columns"
-        className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[#73B7DC] text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
+        className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[var(--brand-sky-light)] text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
       >
         <svg
           className="w-4 h-4 text-[#0795CF]"
@@ -87,7 +87,7 @@ export function BenchmarkColumnFilter({
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
         </svg>
         <span>Customize Metrics</span>
-        <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#0795CF]/15 text-[#0795CF] font-bold">
+        <span className="px-1.5 py-0.5 rounded-full text-xs bg-[var(--brand-sky-blue)]/15 text-[var(--brand-text)] font-bold">
           {activeCount}/{COLUMN_OPTIONS.length}
         </span>
       </button>
@@ -99,11 +99,11 @@ export function BenchmarkColumnFilter({
             <span className="text-xs font-mono font-bold text-[var(--text-primary)]">
               Display Metrics & Columns
             </span>
-            <div className="flex items-center gap-2 text-[10px] font-mono">
+            <div className="flex items-center gap-2 text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setAll(true)}
-                className="text-[#0795CF] hover:underline cursor-pointer"
+                className="min-w-[44px] min-h-[44px] px-2 inline-flex items-center justify-center text-[var(--brand-text)] hover:underline cursor-pointer"
               >
                 All
               </button>
@@ -111,7 +111,7 @@ export function BenchmarkColumnFilter({
               <button
                 type="button"
                 onClick={() => setAll(false)}
-                className="text-[var(--text-muted)] hover:underline cursor-pointer"
+                className="min-w-[44px] min-h-[44px] px-2 inline-flex items-center justify-center text-[var(--text-muted)] hover:underline cursor-pointer"
               >
                 Clear
               </button>
@@ -122,7 +122,7 @@ export function BenchmarkColumnFilter({
             {COLUMN_OPTIONS.map((opt) => (
               <label
                 key={opt.key}
-                className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-[var(--background-subtle)] cursor-pointer text-xs font-mono transition-colors"
+                className="flex items-center gap-2.5 px-2 min-h-[44px] rounded-lg hover:bg-[var(--background-subtle)] cursor-pointer text-xs font-mono transition-colors"
               >
                 <input
                   type="checkbox"
@@ -137,7 +137,7 @@ export function BenchmarkColumnFilter({
             ))}
           </div>
 
-          <div className="pt-2 border-t border-[var(--border-default)]/60 text-[10px] font-mono text-[var(--text-muted)] text-center">
+          <div className="pt-2 border-t border-[var(--border-default)]/60 text-xs font-mono text-[var(--text-muted)] text-center">
             Check or uncheck to show/hide columns
           </div>
         </div>

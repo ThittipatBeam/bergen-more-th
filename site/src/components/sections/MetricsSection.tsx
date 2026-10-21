@@ -1,12 +1,10 @@
-"use client";
-
 import Link from "next/link";
 
 const METRIC_CARDS = [
   {
     title: "LLM Judge Score",
     tag: "Kimi-K3 · Semantic Quality",
-    accent: "#0795CF",
+    accent: "var(--brand-sky-blue)",
     description:
       "Automated evaluation by Kimi-K3 rating Thai response accuracy, absence of hallucinations, and semantic alignment with reference QA pairs on a 0–100 scale.",
     formula: "Score = JudgeApproval / TotalEvaluated × 100",
@@ -14,7 +12,7 @@ const METRIC_CARDS = [
   {
     title: "Thai M-Score (M_th)",
     tag: "Lexical & Word Overlap",
-    accent: "#01A9B1",
+    accent: "var(--brand-turquoise)",
     description:
       "Measures token-level and unigram surface overlap directly against human reference answers in Thai, normalized for Thai word boundaries.",
     formula: "M_th = OverlappingTokens / ReferenceTokens",
@@ -22,7 +20,7 @@ const METRIC_CARDS = [
   {
     title: "Exact Match (EM)",
     tag: "Strict Correctness",
-    accent: "#00A0BE",
+    accent: "var(--brand-ocean-cyan)",
     description:
       "Strict binary string and token equality against ground-truth reference texts. Crucial for factoid and extraction benchmarks.",
     formula: "EM = 1 if Predicted == GroundTruth else 0",
@@ -30,7 +28,7 @@ const METRIC_CARDS = [
   {
     title: "Thai F1-Score (F1_th)",
     tag: "Token Balance",
-    accent: "#0795CF",
+    accent: "var(--brand-sky-blue)",
     description:
       "The harmonic mean of precision and recall over segmented Thai tokens, balancing completeness with conciseness.",
     formula: "F1 = 2 × (Precision × Recall) / (Precision + Recall)",
@@ -38,7 +36,7 @@ const METRIC_CARDS = [
   {
     title: "Thai Precision & Recall",
     tag: "Completeness & Hallucination",
-    accent: "#01A9B1",
+    accent: "var(--brand-turquoise)",
     description:
       "Precision_th measures what fraction of generated tokens were relevant, while Recall_th measures what fraction of reference tokens were captured.",
     formula: "Precision = Matched / Output | Recall = Matched / Reference",
@@ -46,7 +44,7 @@ const METRIC_CARDS = [
   {
     title: "Generation Latency",
     tag: "End-to-End Speed",
-    accent: "#73B7DC",
+    accent: "var(--brand-sky-light)",
     description:
       "Execution time in minutes and seconds (m:ss) encompassing the full pipeline: dense embedding retrieval, reranking pass, and LLM text generation.",
     formula: "Latency = t_retrieval + t_rerank + t_generation",
@@ -58,9 +56,6 @@ export function MetricsSection() {
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 md:px-12 pt-28 pb-16 flex flex-col gap-10">
       {/* Header */}
       <div className="flex flex-col gap-2 pb-6 border-b border-[var(--border-default)]">
-        <span className="text-xs font-sans uppercase tracking-widest text-[#0795CF] font-semibold">
-          SIAM.AI BENCHMARK • EVALUATION SUITE
-        </span>
         <h1 className="text-3xl sm:text-4xl font-sans font-bold tracking-tight text-[var(--text-primary)]">
           Evaluation Metrics & Protocol
         </h1>
@@ -74,11 +69,11 @@ export function MetricsSection() {
         {METRIC_CARDS.map((card) => (
           <div
             key={card.title}
-            className="flex flex-col justify-between p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[#73B7DC] transition-all shadow-2xs group"
+            className="flex flex-col justify-between p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[var(--brand-sky-light)] transition-all shadow-2xs group"
           >
             <div>
               <div className="flex items-center justify-between gap-2 pb-2">
-                <span className="text-[10px] font-sans uppercase tracking-wider font-bold text-[#0795CF]">
+                <span className="text-xs font-sans uppercase tracking-wider font-bold text-[var(--brand-text)]">
                   {card.tag}
                 </span>
                 <span
@@ -98,10 +93,10 @@ export function MetricsSection() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-[var(--border-default)]/60">
-              <span className="text-[10px] font-mono text-[var(--text-muted)] block">
+              <span className="text-xs font-mono text-[var(--text-muted)] block">
                 FORMULA / COMPUTATION
               </span>
-              <code className="text-[11px] font-mono text-[var(--text-primary)] bg-[var(--background-subtle)] px-2 py-1 rounded-md block mt-1 overflow-x-auto">
+              <code className="text-xs font-mono text-[var(--text-primary)] bg-[var(--background-subtle)] px-2 py-1 rounded-md block mt-1 overflow-x-auto">
                 {card.formula}
               </code>
             </div>
@@ -121,7 +116,7 @@ export function MetricsSection() {
         </div>
         <Link
           href="/"
-          className="min-h-[44px] px-5 rounded-xl bg-[#0795CF] hover:bg-[#006B91] text-white text-xs font-sans font-semibold inline-flex items-center justify-center transition-colors shadow-2xs shrink-0"
+          className="min-h-[44px] px-5 rounded-xl bg-[var(--brand-cta)] hover:bg-[var(--brand-cta-hover)] text-white text-xs font-sans font-semibold inline-flex items-center justify-center transition-colors shadow-2xs shrink-0"
         >
           View Leaderboard &rarr;
         </Link>

@@ -52,7 +52,10 @@ export function BrandIcon({
   for (const rule of RULES) {
     if (rule.test(normalized)) {
       return (
-        <span className={`inline-flex shrink-0 items-center ${className}`}>
+        <span
+          aria-hidden="true"
+          className={`inline-flex shrink-0 items-center ${className}`}
+        >
           {rule.render(size)}
         </span>
       );

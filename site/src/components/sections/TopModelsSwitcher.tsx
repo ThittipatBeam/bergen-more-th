@@ -69,7 +69,7 @@ export function TopModelsSwitcher() {
       {/* Straight-to-the-point Judge Badge */}
       <div className="flex items-center justify-center lg:justify-start px-1">
         <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--background-primary)] px-3.5 py-1.5 shadow-2xs transition-colors">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-semibold">
+          <span className="text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] font-semibold">
             LLM Judge
           </span>
           <span className="h-3.5 w-px bg-[var(--border-default)]" aria-hidden="true" />
@@ -78,7 +78,7 @@ export function TopModelsSwitcher() {
             {JUDGE_NAME}
           </span>
           {JUDGE_N && (
-            <span className="text-[10px] font-mono text-[var(--text-muted)] font-medium">
+            <span className="text-xs font-mono text-[var(--text-muted)] font-medium">
               · {JUDGE_N} QA pairs
             </span>
           )}

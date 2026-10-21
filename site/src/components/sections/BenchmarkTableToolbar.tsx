@@ -38,9 +38,9 @@ export function BenchmarkTableToolbar({
           value={generator}
           onChange={(e) => onGeneratorChange(e.target.value)}
           aria-label="Filter by model"
-          className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-xs font-sans font-medium text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[#0795CF] transition-colors"
+          className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans font-medium text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[var(--border-focus)] transition-colors"
         >
-          <option value="all">All Models ({generators.length})</option>
+          <option value="all">All models</option>
           {generators.map((g) => (
             <option key={g} value={g}>
               {g}
@@ -49,15 +49,20 @@ export function BenchmarkTableToolbar({
         </select>
 
         {/* Reranker Segmented Filter */}
-        <div className="inline-flex items-center rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-0.5">
+        <div
+          role="group"
+          aria-label="Filter by reranker"
+          className="inline-flex items-center rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-0.5"
+        >
           {RERANKER_OPTIONS.map((opt) => (
             <button
               key={opt.id}
               type="button"
               onClick={() => onRerankerChange(opt.id)}
-              className={`min-h-[38px] px-3.5 rounded-lg text-xs font-sans font-medium transition-all cursor-pointer ${
+              aria-pressed={reranker === opt.id}
+              className={`min-w-[44px] min-h-[44px] px-3.5 rounded-lg text-xs font-sans font-medium transition-all cursor-pointer ${
                 reranker === opt.id
-                  ? "bg-[var(--background-primary)] text-[#0795CF] shadow-2xs font-bold"
+                  ? "bg-[var(--background-primary)] text-[var(--brand-text)] shadow-2xs font-bold"
                   : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               }`}
             >

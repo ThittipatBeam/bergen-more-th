@@ -24,7 +24,7 @@ export function HeroSection() {
           <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center lg:justify-start">
             <a
               href="#leaderboard"
-              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[#0795CF] hover:bg-[#006B91] text-white text-sm font-medium transition-all shadow-xs"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[var(--brand-cta)] hover:bg-[var(--brand-cta-hover)] text-white text-sm font-medium transition-all shadow-xs"
             >
               Explore Leaderboard
             </a>
@@ -45,9 +45,9 @@ export function HeroSection() {
       </div>
 
       {/* Scroll cue */}
-      <div className="relative z-10 mt-14 sm:mt-16 flex flex-col items-center gap-1.5 opacity-70 text-xs font-mono tracking-widest uppercase text-[var(--text-muted)]">
+      <div className="relative z-10 mt-14 sm:mt-16 flex flex-col items-center gap-1.5 text-xs font-mono tracking-widest uppercase text-[var(--text-muted)]">
         <span>Scroll to explore models</span>
-        <span className="animate-bounce text-sm text-[#0795CF]">&darr;</span>
+        <span className="animate-bounce motion-reduce:animate-none text-sm text-[var(--brand-text)]">&darr;</span>
       </div>
     </section>
   );

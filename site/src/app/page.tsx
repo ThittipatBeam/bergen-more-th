@@ -16,6 +16,11 @@ export default function Home() {
 
   useGSAP(
     () => {
+      // Reduced motion: static stacked layout, no pinned scrub
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+      }
+
       // Pin the hero and let the leaderboard sheet slide up and over it
       // As the leaderboard covers it, the hero smoothly recedes and fades away
       const tl = gsap.timeline({
@@ -40,7 +45,7 @@ export default function Home() {
   );
 
   return (
-    <div
+    <main
       ref={containerRef}
       className="relative min-h-screen bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-300"
     >
@@ -57,6 +62,6 @@ export default function Home() {
       >
         <LeaderboardSection />
       </div>
-    </div>
+    </main>
   );
 }
