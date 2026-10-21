@@ -51,7 +51,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           scaleY: 1.26,
           scaleX: 0.88,
           rotation: randomTilt,
-          color: "#4f46e5", // Electric violet pulse on hover
+          color: "#0795CF", // SIAM.AI Sky Blue pulse on hover
           duration: 0.12,
           ease: "power2.out",
         })
@@ -60,7 +60,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           scaleY: 1,
           scaleX: 1,
           rotation: 0,
-          color: "#0c57fb", // Returns to signature Zed electric blue
+          color: "inherit",
           duration: 0.75,
           ease: "elastic.out(1.25, 0.35)", // Bouncy jelly spring
         });
@@ -77,14 +77,14 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           y: -35,
           scale: 1.35,
           rotation: "+=360",
-          color: "#7c3aed",
+          color: "#01A9B1", // SIAM.AI Turquoise accent on click
           duration: 0.35,
           ease: "power2.out",
         })
         .to(target, {
           y: 0,
           scale: 1,
-          color: "#0c57fb",
+          color: "inherit",
           duration: 0.8,
           ease: "elastic.out(1.2, 0.4)",
         });
@@ -98,7 +98,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
   return (
     <h1
       ref={containerRef}
-      className={`font-sans font-bold sm:font-extrabold tracking-[-0.03em] leading-[1.08] select-none text-[#0c57fb] ${className}`}
+      className={`font-sans font-bold sm:font-extrabold tracking-[-0.03em] leading-[1.08] select-none text-[#102A3A] ${className}`}
     >
       {words.map((word, wordIndex) => (
         <span key={`word-${wordIndex}`} className="inline-block whitespace-nowrap">

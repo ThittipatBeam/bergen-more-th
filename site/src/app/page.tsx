@@ -40,7 +40,7 @@ export default function Home() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-[#fbfcfd]">
+    <div ref={containerRef} className="relative min-h-screen bg-[#F7FBFD]">
       {/* Pinned Hero Section (Bottom Layer) */}
       <div ref={heroRef} className="relative z-10 w-full will-change-transform">
         <HeroSection />
@@ -48,8 +48,9 @@ export default function Home() {
 
       {/* Leaderboard Section (Top Layer): Slides directly over hero on scroll */}
       <div
+        id="leaderboard"
         ref={leaderboardRef}
-        className="relative z-20 w-full bg-white rounded-t-[32px] sm:rounded-t-[40px] shadow-[0_-24px_50px_rgba(0,0,0,0.07)] border-t border-neutral-200/90 min-h-screen"
+        className="relative z-20 w-full bg-white rounded-t-[32px] sm:rounded-t-[40px] shadow-[0_-20px_45px_rgba(16,42,58,0.06)] border-t border-[#DCEAF1] min-h-screen"
       >
         <LeaderboardSection />
       </div>

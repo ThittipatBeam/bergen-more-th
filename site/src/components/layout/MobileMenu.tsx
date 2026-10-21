@@ -4,6 +4,8 @@ import { useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 gsap.registerPlugin(useGSAP);
 
@@ -121,23 +123,23 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
       ref={drawerRef}
       role="dialog"
       aria-modal="true"
-      className="pointer-events-auto fixed inset-0 z-50 flex flex-col justify-between px-6 py-6 sm:px-8 text-neutral-900 select-none opacity-0"
+      className="pointer-events-auto fixed inset-0 z-50 flex flex-col justify-between px-6 py-6 sm:px-8 text-[#102A3A] select-none opacity-0"
       style={{
-        background: "rgba(255, 255, 255, 0.94)",
+        background: "rgba(247, 251, 253, 0.96)",
         backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
       }}
     >
       {/* Top Header Bar */}
       <div className="mobile-header-bar flex items-center justify-between w-full">
-        <span className="text-xs font-semibold tracking-[0.2em] text-neutral-400 uppercase">
-          Navigation
+        <span className="text-xs font-semibold tracking-[0.2em] text-[#607786] uppercase">
+          SIAM.AI
         </span>
         <button
           type="button"
           onClick={() => handleAnimatedClose()}
           aria-label="Close navigation menu"
-          className="min-h-[44px] min-w-[44px] -mr-2 flex items-center justify-center text-xs font-semibold tracking-[0.2em] text-neutral-900 hover:text-neutral-500 transition-colors"
+          className="min-h-[44px] min-w-[44px] -mr-2 flex items-center justify-center text-xs font-semibold tracking-[0.2em] text-[#102A3A] hover:text-[#0795CF] transition-colors"
         >
           CLOSE
         </button>
@@ -155,12 +157,12 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
                   window.location.href = item.href;
                 });
               }}
-              className="group min-h-[48px] py-2 flex items-center justify-between border-b border-black/10 transition-colors"
+              className="group min-h-[48px] py-2 flex items-center justify-between border-b border-[#DCEAF1] transition-colors"
             >
-              <span className="text-3xl sm:text-4xl font-light tracking-[0.2em] text-neutral-900 group-hover:text-neutral-500 transition-colors">
+              <span className="text-3xl sm:text-4xl font-light tracking-[0.15em] text-[#102A3A] group-hover:text-[#0795CF] transition-colors">
                 {item.label}
               </span>
-              <span className="text-xs tracking-normal text-neutral-400 font-mono">
+              <span className="text-xs tracking-normal text-[#607786] font-mono">
                 0{idx + 1}
               </span>
             </Link>
@@ -168,10 +170,19 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
         ))}
       </nav>
 
+      {/* Mobile Drawer Language & Theme Switches */}
+      <div className="mobile-actions-bar py-4 border-t border-[#DCEAF1] dark:border-[#1e3344] flex items-center justify-between">
+        <span className="text-xs font-mono tracking-wider text-[#607786]">PREFERENCES</span>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
+      </div>
+
       {/* Bottom Footer Bar */}
-      <div className="mobile-footer-bar pt-6 border-t border-black/10 flex items-center justify-between text-[11px] tracking-widest text-neutral-400">
-        <span>SIENNA &copy; {new Date().getFullYear()}</span>
-        <span>EDITORIAL</span>
+      <div className="mobile-footer-bar pt-4 border-t border-[#DCEAF1] dark:border-[#1e3344] flex items-center justify-between text-[11px] tracking-widest text-[#607786]">
+        <span>SIAM.AI &copy; {new Date().getFullYear()}</span>
+        <span className="font-mono text-[#0795CF]">CLOUD BENCHMARK</span>
       </div>
     </div>
   );

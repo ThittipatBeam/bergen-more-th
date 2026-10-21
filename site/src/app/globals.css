@@ -1,19 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  /* SIAM.AI Cloudy Sky brand tokens */
+  --brand-sky-blue: #0795cf;
+  --brand-light-blue: #b7dbe8;
+  --brand-turquoise: #01a9b1;
+  --brand-ocean-cyan: #00a0be;
+  --brand-sky-light: #73b7dc;
+  --brand-cyan: #0198ca;
+  --brand-teal-cyan: #02a5b7;
+  --brand-deep-cyan: #009cc5;
+
+  /* Semantic UI surfaces */
+  --background-canvas: #f7fbfd;
+  --background-primary: #ffffff;
+  --background-subtle: #f0f8fc;
+  --surface-brand: #eaf6fb;
+
+  /* Typography */
+  --text-primary: #102a3a;
+  --text-secondary: #496273;
+  --text-muted: #607786;
+
+  /* Borders */
+  --border-default: #dceaf1;
+  --border-strong: #a8c7d7;
+  --border-focus: #006b91;
+}
+
+.dark {
+  --background-canvas: #0c1218;
+  --background-primary: #111a22;
+  --background-subtle: #16222c;
+  --surface-brand: #142a38;
+
+  --text-primary: #f0f7fb;
+  --text-secondary: #94abbc;
+  --text-muted: #6b8293;
+
+  --border-default: #1e3344;
+  --border-strong: #2a475e;
+  --border-focus: #0795cf;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-brand-primary: var(--brand-sky-blue);
+  --color-brand-secondary: var(--brand-turquoise);
+  --color-brand-soft: var(--brand-light-blue);
+  --color-brand-tint: var(--surface-brand);
+  --color-brand-hover: #006b91;
+
+  --color-canvas: var(--background-canvas);
+  --color-surface: var(--background-primary);
+  --color-surface-subtle: var(--background-subtle);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border-subtle: var(--border-default);
+  --color-border-strong: var(--border-strong);
+
   --font-sans: var(--font-space-grotesk), var(--font-noto-sans-thai), sans-serif;
   --font-mono: var(--font-space-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--background-canvas);
+  color: var(--text-primary);
   font-family: var(--font-space-grotesk), var(--font-noto-sans-thai), sans-serif;
 }

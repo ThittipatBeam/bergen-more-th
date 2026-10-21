@@ -22,6 +22,16 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "Thai RAG Benchmark",
   description: "Standardized evaluation benchmark and leaderboard for Thai retrieval-augmented generation and embedding models.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -34,7 +44,7 @@ export default function RootLayout({
       lang="th"
       className={`${spaceGrotesk.variable} ${notoSansThai.variable} ${spaceMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-black selection:bg-black selection:text-white">
+      <body className="min-h-full flex flex-col bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-200 selection:bg-[#0795CF] selection:text-white">
         <Navbar />
         {children}
       </body>
