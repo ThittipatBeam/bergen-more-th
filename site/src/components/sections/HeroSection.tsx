@@ -37,17 +37,6 @@ export function HeroSection() {
 
       {/* 3. Content Container */}
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center">
-        {/* SIAM.AI Announcement Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[var(--border-default)] bg-[var(--background-primary)]/90 text-[var(--text-primary)] text-xs sm:text-sm font-medium tracking-wide mb-6 sm:mb-8 shadow-xs backdrop-blur-xs transition-colors">
-          <span className="inline-block w-2 h-2 rounded-full bg-[#0795CF] animate-pulse" />
-          <span className="font-semibold text-[#0795CF]">SIAM.AI Benchmark</span>
-          <span className="text-[var(--text-muted)]">•</span>
-          <span>Thai Corpus & Retrieval Evaluation</span>
-          <span aria-hidden="true" className="text-[#0795CF] font-sans">
-            &rarr;
-          </span>
-        </div>
-
         {/* Headline */}
         <InteractiveTitle
           text="Thai RAG & Embedding Leaderboard"
