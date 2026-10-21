@@ -68,15 +68,6 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
         </div>
       </td>
 
-      {/* JUDGE SCORE (right after model: headline metric reachable without horizontal pan) */}
-      {columns.judgePct && (
-        <td className="py-3 px-3 sm:px-4 text-right bg-[var(--brand-sky-blue)]/8 dark:bg-[var(--brand-sky-blue)]/15">
-          <span className="font-mono text-lg sm:text-xl font-bold text-[var(--brand-text)] tracking-tight">
-            {row.judgePct.toFixed(1)}
-          </span>
-        </td>
-      )}
-
       {/* EMBEDDING */}
       {columns.retriever && (
         <td className="py-3 px-4">
@@ -106,6 +97,15 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
           ) : (
             <span className="font-mono text-xs text-[var(--text-muted)]">—</span>
           )}
+        </td>
+      )}
+
+      {/* JUDGE SCORE (follows the connected pipeline: model → embedding → reranker → score) */}
+      {columns.judgePct && (
+        <td className="py-3 px-3 sm:px-4 text-right bg-[var(--brand-sky-blue)]/8 dark:bg-[var(--brand-sky-blue)]/15">
+          <span className="font-mono text-lg sm:text-xl font-bold text-[var(--brand-text)] tracking-tight">
+            {row.judgePct.toFixed(1)}
+          </span>
         </td>
       )}
 

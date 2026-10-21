@@ -77,12 +77,6 @@ export function BenchmarkTableHeader({
 
         <th scope="col" className="py-3.5 px-3 sm:px-4 text-left">Model</th>
 
-        {columns.judgePct && (
-          <th scope="col" aria-sort={ariaSort("judgePct")} className="py-3.5 px-3 sm:px-4 text-right bg-[var(--brand-sky-blue)]/10 dark:bg-[var(--brand-sky-blue)]/20 text-[var(--brand-text)]">
-            {sortBtn("judgePct", "Judge Score", "right")}
-          </th>
-        )}
-
         {columns.retriever && (
           <th scope="col" aria-sort={ariaSort("retriever")} className="py-3.5 px-4 text-left">
             {sortBtn("retriever", "Embedding", "left")}
@@ -92,6 +86,12 @@ export function BenchmarkTableHeader({
         {columns.reranker && (
           <th scope="col" aria-sort={ariaSort("reranker")} className="py-3.5 px-4 text-left">
             {sortBtn("reranker", "Reranker", "left")}
+          </th>
+        )}
+
+        {columns.judgePct && (
+          <th scope="col" aria-sort={ariaSort("judgePct")} className="py-3.5 px-3 sm:px-4 text-right bg-[var(--brand-sky-blue)]/10 dark:bg-[var(--brand-sky-blue)]/20 text-[var(--brand-text)]">
+            {sortBtn("judgePct", "Judge Score", "right")}
           </th>
         )}
 

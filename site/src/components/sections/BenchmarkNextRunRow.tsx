@@ -20,16 +20,16 @@ export function BenchmarkNextRunRow({
           </Link>
         </div>
       </td>
-      {columns.judgePct && (
-        <td className="py-3 px-4 text-right bg-[var(--brand-sky-blue)]/4 dark:bg-[var(--brand-sky-blue)]/8 text-[var(--text-muted)]">
-          —
-        </td>
-      )}
       {columns.retriever && (
         <td className="py-3 px-4 text-[var(--text-muted)]">—</td>
       )}
       {columns.reranker && (
         <td className="py-3 px-4 text-[var(--text-muted)]">—</td>
+      )}
+      {columns.judgePct && (
+        <td className="py-3 px-4 text-right bg-[var(--brand-sky-blue)]/4 dark:bg-[var(--brand-sky-blue)]/8 text-[var(--text-muted)]">
+          —
+        </td>
       )}
       {columns.mTh && (
         <td className="py-3 px-3 text-center text-[var(--text-muted)]">—</td>
