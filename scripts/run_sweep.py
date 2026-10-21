@@ -16,10 +16,12 @@ Usage:
 """
 
 import argparse
+import glob
 import itertools
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import time
@@ -78,20 +80,22 @@ def expand_matrix(matrix_cfg: dict) -> list:
 
     runs = []
     for gen, ret, rer in itertools.product(generators, retrievers, rerankers):
-        g_name = gen.get("name") or gen.get("model", "gen")
-        ret_name = ret.get("name") or ret.get("model", "ret")
-        rer_name = rer.get("name", "No-Rerank") if rer and rer.get("config") else "No-Rerank"
+        g_name = gen.get("name") or gen.get("model") or gen.get("generator") or gen.get("config", "gen")
+        ret_name = ret.get("name") or ret.get("model") or ret.get("config") or ret.get("retriever", "ret")
+        rer_name = "No-Rerank"
+        if rer and (rer.get("config") or rer.get("reranker") or rer.get("model")):
+            rer_name = rer.get("name") or rer.get("model") or rer.get("config") or rer.get("reranker", "rerank")
 
         run_name = f"{g_name} + {ret_name} + {rer_name}"
         run_entry = {
             "name": run_name,
             "enabled": True,
-            "generator": gen.get("generator", "openai_compatible"),
-            "generator_model": gen.get("model"),
-            "retriever": ret.get("config", "api-embed-openai-compatible"),
-            "retriever_model": ret.get("model"),
-            "reranker": rer.get("config") if rer else None,
-            "reranker_model": rer.get("model") if rer else None,
+            "generator": gen.get("generator") or gen.get("config", "openai_compatible"),
+            "generator_model": gen.get("model") or gen.get("generator_model"),
+            "retriever": ret.get("config") or ret.get("retriever", "api-embed-openai-compatible"),
+            "retriever_model": ret.get("model") or ret.get("retriever_model"),
+            "reranker": (rer.get("config") or rer.get("reranker")) if rer else None,
+            "reranker_model": (rer.get("model") or rer.get("reranker_model")) if rer else None,
         }
         runs.append(run_entry)
 
@@ -112,29 +116,36 @@ def build_command_args(run_cfg: dict, defaults: dict, force: bool = False, pilot
         args.append("debug=true")
 
     # Retriever
-    if cfg.get("retriever"):
-        args.append(f"retriever='{cfg['retriever']}'")
+    retriever = cfg.get("retriever")
+    if retriever:
+        retriever_cfg = str(retriever)
+        args.append(f"retriever='{retriever_cfg}'")
         if cfg.get("retriever_model"):
             args.append(f"retriever.init_args.model_name='{cfg['retriever_model']}'")
         if cfg.get("retrieve_top_k") is not None:
             args.append(f"retrieve_top_k={cfg['retrieve_top_k']}")
-        args.append("retriever.init_args.require_confirmation=false")
+        # Only pass require_confirmation for API retrievers
+        if "api" in retriever_cfg.lower():
+            args.append("retriever.init_args.require_confirmation=false")
 
     # Reranker
     reranker = cfg.get("reranker")
-    if reranker and reranker != "null":
-        args.append(f"reranker='{reranker}'")
+    if reranker and str(reranker).lower() not in ("null", "none"):
+        reranker_cfg = str(reranker)
+        args.append(f"reranker='{reranker_cfg}'")
         if cfg.get("reranker_model"):
             args.append(f"reranker.init_args.model_name='{cfg['reranker_model']}'")
         if cfg.get("rerank_top_k") is not None:
             args.append(f"rerank_top_k={cfg['rerank_top_k']}")
-        args.append("reranker.init_args.require_confirmation=false")
-    else:
-        args.append("reranker=null")
+        # Only pass require_confirmation for API rerankers
+        if "api" in reranker_cfg.lower():
+            args.append("reranker.init_args.require_confirmation=false")
 
     # Generator
-    if cfg.get("generator"):
-        args.append(f"generator='{cfg['generator']}'")
+    generator = cfg.get("generator")
+    if generator:
+        gen_cfg = str(generator)
+        args.append(f"generator='{gen_cfg}'")
         if cfg.get("generator_model"):
             args.append(f"generator.init_args.model_name='{cfg['generator_model']}'")
         if cfg.get("generation_top_k") is not None:
@@ -175,9 +186,9 @@ def prepare_environment(run_cfg: dict, defaults: dict, pilot: int = None) -> dic
 
     # Set reranker model in env
     reranker = cfg.get("reranker")
-    if reranker and reranker != "null" and cfg.get("reranker_model"):
+    if reranker and str(reranker).lower() not in ("null", "none") and cfg.get("reranker_model"):
         env["RERANK_MODEL"] = str(cfg["reranker_model"])
-    elif (not reranker or reranker == "null") and "RERANK_MODEL" in env:
+    elif (not reranker or str(reranker).lower() in ("null", "none")) and "RERANK_MODEL" in env:
         # Prevent old RERANK_MODEL from forcing a reranker
         del env["RERANK_MODEL"]
 
@@ -225,6 +236,8 @@ def run_sweep():
                         help="Run quick smoke test with N questions (default: 1) across full pipeline")
     parser.add_argument("--filter", type=str, default=None, help="Filter run names matching this regex/substring")
     parser.add_argument("--force", action="store_true", help="Force re-run and overwrite existing experiments")
+    parser.add_argument("--fresh", action="store_true",
+                        help="Perform a clean run: clears pilot query indexes, runs, and experiments cache before running")
     parser.add_argument("--judge", action="store_true", help="Force enable LLM-as-judge evaluation")
     parser.add_argument("--no-judge", action="store_true", help="Disable LLM-as-judge evaluation")
     parser.add_argument("--list", action="store_true", help="List all configured runs and exit")
@@ -300,6 +313,48 @@ def run_sweep():
         print("\n" + "=" * 80)
         return
 
+    # Fresh run handling: clean intermediate caches
+    if args.fresh:
+        log_info("Fresh run requested (--fresh). Clearing intermediate caches...")
+        if args.pilot:
+            for p in glob.glob("indexes/*debug*"):
+                log_info(f"Removing debug index: {p}")
+                shutil.rmtree(p, ignore_errors=True)
+            for p in glob.glob("runs/run.*debug*"):
+                log_info(f"Removing debug run: {p}")
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
+            for p in glob.glob("experiments/*"):
+                if os.path.isdir(p):
+                    cfg_file = Path(p) / "config.yaml"
+                    if cfg_file.exists():
+                        try:
+                            c = yaml.safe_load(cfg_file.read_text())
+                            if c and c.get("debug") is True:
+                                shutil.rmtree(p, ignore_errors=True)
+                        except Exception:
+                            pass
+                    elif Path(p).name.startswith("tmp_"):
+                        shutil.rmtree(p, ignore_errors=True)
+                else:
+                    try:
+                        os.remove(p)
+                    except OSError:
+                        pass
+        else:
+            log_info("Clearing experiments/ folder for fresh sweep...")
+            for p in glob.glob("experiments/*"):
+                if os.path.isdir(p):
+                    shutil.rmtree(p, ignore_errors=True)
+                else:
+                    try:
+                        os.remove(p)
+                    except OSError:
+                        pass
+        args.force = True
+
     # Ensure log directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     prefix = "pilot_" if args.pilot else "sweep_"
@@ -356,7 +411,7 @@ def run_sweep():
             # Update experiments_data.json
             if r.get("auto_scan", defaults.get("auto_scan", True)):
                 try:
-                    subprocess.run(["python3", "scripts/scan_experiments.py"], check=True, stdout=subprocess.DEVNULL)
+                    subprocess.run([sys.executable, "scripts/scan_experiments.py"], check=True, stdout=subprocess.DEVNULL)
                 except Exception as e:
                     log_warn(f"Failed to auto-scan experiments: {e}")
 

@@ -15,12 +15,12 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-import tyro
+import argparse
 import yaml
 from tqdm import tqdm
 
 # Matches "eval_dev_judge_<modelname>[_500][_seed42]_partial.jsonl"
-JUDGE_FILE_PATTERN = re.compile(r"eval_(.+?)_judge_(.+?)(_partial\.jsonl)?$")
+JUDGE_FILE_PATTERN = re.compile(r"eval_(.+?)_judge_(.+?)(?:_partial\.jsonl)?$")
 
 
 def find_judge_files(exp_dir: Path, split: str = "dev") -> dict:
@@ -30,7 +30,7 @@ def find_judge_files(exp_dir: Path, split: str = "dev") -> dict:
     for f in judge_files:
         m = JUDGE_FILE_PATTERN.match(f.name)
         if m:
-            split_name, judge_model = m.groups()
+            split_name, judge_model = m.group(1), m.group(2)
             judges[judge_model] = {"checkpoint_file": str(f)}
     return judges
 
@@ -188,4 +188,8 @@ def main(output: str = "experiments_data.json", split: str = "dev"):
 
 
 if __name__ == "__main__":
-    tyro.cli(main)
+    parser = argparse.ArgumentParser(description="Scan experiments directory and extract metadata + metrics.")
+    parser.add_argument("--output", type=str, default="experiments_data.json", help="Path to output JSON")
+    parser.add_argument("--split", type=str, default="dev", help="Dataset split (default: dev)")
+    args = parser.parse_args()
+    main(output=args.output, split=args.split)

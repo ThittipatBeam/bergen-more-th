@@ -3,29 +3,30 @@
 # ==============================================================================
 # Usage:
 #   python3 scripts/run_sweep.py [--config sweep_config.yaml] [--dry-run] [--list]
+#   python3 scripts/run_sweep.py --pilot 1   # Smoke-test with 1 question
 # ==============================================================================
 
 # Global defaults applied to every run (unless overridden)
 defaults:
   dataset: "mkqa/thai_wiki_v4_qa.retrieve_th"
   
-  # Default Retriever (Dense embedding via OpenAI-compatible endpoint)
+  # Default Retriever (Dense embedding via OpenAI-compatible endpoint or local)
   retriever: "api-embed-openai-compatible"
   retriever_model: "BAAI/bge-m3"
   retrieve_top_k: 100
   
-  # Default Reranker (Cross-encoder reranking via /rerank endpoint)
+  # Default Reranker (Cross-encoder reranking via /rerank endpoint or local)
   reranker: "api-rerank-openai-compatible"
   reranker_model: "BAAI/bge-reranker-v2-m3"
   rerank_top_k: 10
   
-  # Default Generator
+  # Default Generator (API or local)
   generator: "openai_compatible"
   generator_model: "DEEPSEEK-V4.1F"
   generation_top_k: 5
 
   # Default Judge (LLM-as-judge factuality evaluation)
-  run_judge: false             # Automatically runs judge (evaluate.py --judge) after each run
+  run_judge: true             # Automatically runs judge (evaluate.py --judge) after each run
   judge_model: "KIMI-K3"      # Model ID (matches JUDGE_MODEL in .env; e.g. KIMI-K3, gpt-4o-mini, etc.)
   
   thai_metrics: true          # Compute Thai-aware metrics (M_th, F1_th, etc.)
@@ -38,34 +39,58 @@ defaults:
 # ------------------------------------------------------------------------------
 # When enabled: true, the runner generates the Cartesian product:
 #   [Generators] x [Retrievers] x [Rerankers]
+# You can mix and match API and Local models in any list below!
 # Set enabled: false if you prefer running the explicit list in `runs:` below.
 # ------------------------------------------------------------------------------
 matrix:
   enabled: true              # Flip to true to test all combinations below automatically
 
   generators:
-    - name: "DeepSeek-V4.1F"
+    # --- API Generators (calls OpenAI-compatible endpoint) ---
+    - name: "DeepSeek-V4.1F (API)"
       generator: "openai_compatible"
       model: "DEEPSEEK-V4.1F"
-    - name: "Qwen-2.5-72B"
+    - name: "QWEN3.6-27B (API)"
       generator: "openai_compatible"
-      model: "Qwen/Qwen2.5-72B-Instruct"
+      model: "QWEN3.6-27B"
+    - name: "GPTOSS-120B (API)"
+      generator: "openai_compatible"
+      model: "GPTOSS-120B"
+
+    # --- Local Generators (Auto-downloads from HF and runs on your B200 GPU) ---
+    # - name: "Qwen-2.5-7B (Local)"
+    #   generator: "qwen-25-7b-instruct"
+    #   model: "Qwen/Qwen2.5-7B-Instruct"
 
   retrievers:
-    - name: "BGE-M3"
+    # --- API Embedding (calls /v1/embeddings) ---
+    - name: "BGE-M3 (API)"
       config: "api-embed-openai-compatible"
       model: "BAAI/bge-m3"
-    - name: "Cohere-Embed"
-      config: "api-embed-cohere-embed-multilingual-v3"
-      model: "embed-multilingual-v3"
+    - name: "QWEN3-EMBED-8B (API)"
+      config: "api-embed-openai-compatible"
+      model: "QWEN3-EMBED-8B"
+
+    # --- Local Embedding (Auto-downloads from HF and encodes on your B200 GPU) ---
+    # - name: "BGE-M3 (Local)"
+    #   config: "bge-m3"
+    #   model: "BAAI/bge-m3"
 
   rerankers:
-    - name: "BGE-Rerank"
+    # --- API Reranker (calls /rerank) ---
+    - name: "BGE-Rerank (API)"
       config: "api-rerank-openai-compatible"
       model: "BAAI/bge-reranker-v2-m3"
-    - name: "Cohere-Rerank"
-      config: "api-rerank-cohere-rerank-v3"
-      model: "rerank-multilingual-v3.0"
+    # - name: "Cohere-Rerank (API)"
+    #   config: "api-rerank-cohere-rerank-v3"
+    #   model: "rerank-multilingual-v3.0"
+
+    # --- Local Reranker (Auto-downloads from HF and scores on your B200 GPU) ---
+    # - name: "BGE-Rerank (Local)"
+    #   config: "bge-m3"
+    #   model: "BAAI/bge-reranker-v2-m3"
+
+    # --- No Reranker ---
     - name: "No-Rerank"
       config: null
       model: null
@@ -74,12 +99,12 @@ matrix:
 # Option B: Explicit Combinations List (Hand-picked model swaps)
 # ------------------------------------------------------------------------------
 # Active when matrix.enabled is false.
-# Each entry lets you mix & match any generator, retriever, and reranker.
+# Each entry lets you mix & match ANY generator, retriever, and reranker (Local or API).
 # Toggle `enabled: true/false` to select what to run.
 # ------------------------------------------------------------------------------
 runs:
-  # 1. DeepSeek + BGE-M3 Embed + BGE Rerank
-  - name: "DeepSeek + BGE-M3 + BGE-Rerank"
+  # 1. 100% API Run: DeepSeek + BGE-M3 Embed + BGE Rerank
+  - name: "Pure-API: DeepSeek + BGE-M3 + BGE-Rerank"
     enabled: true
     generator: "openai_compatible"
     generator_model: "DEEPSEEK-V4.1F"
@@ -88,54 +113,34 @@ runs:
     reranker: "api-rerank-openai-compatible"
     reranker_model: "BAAI/bge-reranker-v2-m3"
 
-  # 2. DeepSeek + Cohere Embed + Cohere Rerank
-  - name: "DeepSeek + Qwen-Embed + BGE Rerank"
-    enabled: true
+  # 2. Hybrid Run: Local Embedding + Local Reranker + API Generator (Fast, cheap, high quality)
+  - name: "Hybrid: Local BGE-M3 + Local BGE-Rerank + API DeepSeek"
+    enabled: false
+    generator: "openai_compatible"
+    generator_model: "DEEPSEEK-V4.1F"
+    retriever: "bge-m3"
+    retriever_model: "BAAI/bge-m3"
+    reranker: "bge-m3"
+    reranker_model: "BAAI/bge-reranker-v2-m3"
+
+  # 3. 100% Local Run: Local Embedding + Local Reranker + Local Generator (Fully offline on B200)
+  - name: "Pure-Local: Local BGE-M3 + Local BGE-Rerank + Local Qwen2.5-7B"
+    enabled: false
+    generator: "qwen-25-7b-instruct"
+    generator_model: "Qwen/Qwen2.5-7B-Instruct"
+    retriever: "bge-m3"
+    retriever_model: "BAAI/bge-m3"
+    reranker: "bge-m3"
+    reranker_model: "BAAI/bge-reranker-v2-m3"
+
+  # 4. Direct Retrieval without Reranker (top-5 passed straight to generator)
+  - name: "Direct-Retrieval: DeepSeek + BGE-M3 + No-Rerank"
+    enabled: false
     generator: "openai_compatible"
     generator_model: "DEEPSEEK-V4.1F"
     retriever: "api-embed-openai-compatible"
-    retriever_model: "QWEN3-EMBED-8B"
-    reranker: "api-rerank-openai-compatible"
-    reranker_model: "BAAI/bge-reranker-v2-m3"
-
-  # 3. DeepSeek + Cohere Embed + BGE Rerank (Cross combination)
-  - name: "Qwen3.6-27B + BGE-M3 + BGE-Rerank"
-    enabled: true
-    generator: "openai_compatible"
-    generator_model: "QWEN3.6-27B"
-    retriever: "api-embed-openai-compatible"
     retriever_model: "BAAI/bge-m3"
-    reranker: "api-rerank-openai-compatible"
-    reranker_model: "BAAI/bge-reranker-v2-m3"
-
-  # 4. Qwen-2.5-72B + BGE-M3 + BGE Rerank
-  - name: "Qwen3.6-27B + Qwen-Embed + BGE-Rerank"
-    enabled: true
-    generator: "openai_compatible"
-    generator_model: "QWEN3.6-27B"
-    retriever: "api-embed-openai-compatible"
-    retriever_model: "QWEN3-EMBED-8B"
-    reranker: "api-rerank-openai-compatible"
-    reranker_model: "BAAI/bge-reranker-v2-m3"
-
-  # # 5. Qwen-2.5-72B + Cohere Embed + Cohere Rerank
-  # - name: "Qwen72B + Cohere-Embed + Cohere-Rerank"
-  #   enabled: false
-  #   generator: "openai_compatible"
-  #   generator_model: "Qwen/Qwen2.5-72B-Instruct"
-  #   retriever: "api-embed-cohere-embed-multilingual-v3"
-  #   retriever_model: "embed-multilingual-v3"
-  #   reranker: "api-rerank-cohere-rerank-v3"
-  #   reranker_model: "rerank-multilingual-v3.0"
-
-  # # 6. DeepSeek + BGE-M3 + No Reranker (Direct Top-5 from Retriever)
-  # - name: "DeepSeek + BGE-M3 + No-Rerank"
-  #   enabled: false
-  #   generator: "openai_compatible"
-  #   generator_model: "DEEPSEEK-V4.1F"
-  #   retriever: "api-embed-openai-compatible"
-  #   retriever_model: "BAAI/bge-m3"
-  #   reranker: null
-  #   reranker_model: null
-  #   rerank_top_k: 5
-  #   generation_top_k: 5
+    reranker: null
+    reranker_model: null
+    rerank_top_k: 5
+    generation_top_k: 5

@@ -69,14 +69,20 @@ class ThaiWikiV4QA(Processor):
             if os.path.exists(path):
                 return Dataset.from_pandas(pd.read_parquet(path), preserve_index=False)
 
-        # 3. HF Hub — datasets.load_dataset caches in ~/.cache/huggingface
+        # 3. HF Hub
         token = os.environ.get('HF_TOKEN') or self.hf_token
         if token:
             from huggingface_hub import login
             login(token=token, add_to_git_credential=False)
 
-        repo = self.hf_repo_id or 'beam-ai/thai-wiki-v4-qa'   # placeholder repo id — set hf_repo_id when published
-        return datasets.load_dataset(repo)[self.split or 'train']
+        repo = self.hf_repo_id or 'siamaids/thai-wiki-qa-v1'
+        try:
+            from huggingface_hub import snapshot_download
+            from datasets import load_from_disk
+            local_dir = snapshot_download(repo, repo_type='dataset', token=token)
+            return load_from_disk(local_dir)
+        except Exception:
+            return datasets.load_dataset(repo, token=token)[self.split or 'train']
 
 
 class XORQA(Processor):

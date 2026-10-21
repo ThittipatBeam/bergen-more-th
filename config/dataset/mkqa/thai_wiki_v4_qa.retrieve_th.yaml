@@ -13,7 +13,7 @@ dev:
         _target_: modules.processors.mrag_dataset_processor.ThaiWikiV4QA
         split: train
         qa_path: null            # override: exact local parquet path
-        hf_repo_id: null         # override: HF repo id (falls back to default placeholder)
+        hf_repo_id: "siamaids/thai-wiki-qa-v1"
         hf_token: null           # override: HF token (falls back to HF_TOKEN env)
 test:
     doc: null

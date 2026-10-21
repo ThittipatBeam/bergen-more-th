@@ -31,7 +31,8 @@ class LLM(Generator):
                 gguf_file: str = None,
                 attn_implementation: str = "flash_attention_2",
                 local_path: bool = False,
-                use_middle_truncation: bool = False
+                use_middle_truncation: bool = False,
+                **kwargs
                 ):
         """
         :model_name: hf model name or path to a local checkpoint
@@ -122,6 +123,8 @@ class LLM(Generator):
         else:
             self.model = model_class.from_pretrained(
                 self.model_name,
+                torch_dtype=torch.bfloat16,
+                attn_implementation=attn_implementation,
                 device_map='auto',
                 gguf_file=gguf_file,
             )

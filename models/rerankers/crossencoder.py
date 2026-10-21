@@ -11,7 +11,7 @@ import torch
 from models.rerankers.reranker import Reranker
 
 class CrossEncoder(Reranker):
-    def __init__(self, model_name=None,max_len=512):
+    def __init__(self, model_name=None, max_len=512, **kwargs):
         self.model_name = model_name
         self.max_len= max_len
         self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name, low_cpu_mem_usage=True, torch_dtype=torch.float16)
@@ -31,7 +31,8 @@ class CrossEncoder(Reranker):
         return inp_dict
 
     def __call__(self, kwargs):
-        score = self.model(**kwargs.to('cuda')).logits
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        score = self.model(**kwargs.to(device)).logits
         return {
                 "score": score
             }

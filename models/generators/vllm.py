@@ -28,7 +28,8 @@ class VLLM(Generator):
                 use_beam_search: bool = False,
                 best_of: int = 1,
                 sampling: bool = False,
-                use_middle_truncation: bool = False
+                use_middle_truncation: bool = False,
+                **kwargs
                 ):
         Generator.__init__(self,
                            model_name=model_name,

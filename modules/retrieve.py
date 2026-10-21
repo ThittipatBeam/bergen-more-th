@@ -38,7 +38,26 @@ class Retrieve:
     def index(self, dataset, index_path, query_or_doc, overwrite_index=False):
         dataset = dataset[query_or_doc]
         # if dataset has not been encoded before
-        if not os.path.exists(index_path) or self.continue_batch != None or overwrite_index:
+        has_index = os.path.exists(index_path) and (
+            bool(glob.glob(f'{index_path}/*.pt')) or self.model.model_name in ('bm25', 'oracle_provenance')
+        )
+        if has_index and query_or_doc == 'query' and self.model.model_name not in ('bm25', 'oracle_provenance'):
+            try:
+                emb_files = glob.glob(f'{index_path}/*.pt')
+                total_embs = sum(torch.load(f, map_location='cpu').shape[0] for f in emb_files)
+                if total_embs < len(dataset):
+                    print(f"Existing query index has {total_embs} embeddings, but dataset has {len(dataset)}. Re-indexing queries...")
+                    has_index = False
+            except Exception:
+                has_index = False
+
+        if not has_index or self.continue_batch != None or overwrite_index:
+            if query_or_doc == 'query' and os.path.exists(index_path):
+                for f in glob.glob(f'{index_path}/*.pt'):
+                    try:
+                        os.remove(f)
+                    except OSError:
+                        pass
             if self.model.model_name == 'bm25' and query_or_doc == 'doc':
                 self.model.index(dataset, index_path, num_threads=self.pyserini_num_threads)
             elif self.model.model_name == 'oracle_provenance':

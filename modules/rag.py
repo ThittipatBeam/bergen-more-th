@@ -318,8 +318,14 @@ class RAG:
         )
         doc_embeds_path = get_index_path(self.index_folder, doc_dataset_name, self.retriever.get_clean_model_name(), 'doc')
         query_embeds_path = get_index_path(self.index_folder, query_dataset_name, self.retriever.get_clean_model_name(), 'query', dataset_split=dataset_split, query_generator_name=self.query_generator.get_clean_model_name())
-        if not os.path.exists(ranking_file) or self.overwrite_exp or self.overwrite_index:
-            print(f'Run {ranking_file} does not exists, running retrieve...')
+        rerun_retrieve = not os.path.exists(ranking_file) or self.overwrite_exp or self.overwrite_index
+        if not rerun_retrieve:
+            query_ids, doc_ids, scores = load_trec(ranking_file)
+            if len(query_ids) < len(dataset['query']['id']):
+                rerun_retrieve = True
+
+        if rerun_retrieve:
+            print(f'Run {ranking_file} is missing or incomplete, running retrieve...')
              # retrieve
             out_ranking = self.retriever.retrieve(
                 dataset,
@@ -377,7 +383,13 @@ class RAG:
             self.query_generator.get_clean_model_name()
         )
 
-        if not os.path.exists(reranking_file) or self.overwrite_exp:
+        rerun_rerank = not os.path.exists(reranking_file) or self.overwrite_exp
+        if not rerun_rerank:
+            cached_query_ids, _, _ = load_trec(reranking_file)
+            if len(cached_query_ids) < len(query_ids):
+                rerun_rerank = True
+
+        if rerun_rerank:
             rerank_dataset = prepare_dataset_from_ids(
                     dataset, 
                     query_ids, 

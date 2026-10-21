@@ -32,8 +32,11 @@ dataset_split: "dev"
 # Override per run with thai_metrics=true / thai_metrics=false.
 thai_metrics: null
 
+# Overwrite controls
+overwrite_exp: false
+overwrite_index: false
+overwrite_datasets: false
 
-#
 pyserini_num_threads: 20
 processing_num_proc: 40
 hydra:
