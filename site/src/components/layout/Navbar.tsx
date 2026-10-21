@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { RollingLink } from "@/components/ui/RollingLink";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
@@ -18,27 +19,28 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   {
     label: "LEADERBOARD",
-    href: "#leaderboard",
+    href: "/",
     description: "Thai RAG & LLM rankings",
   },
   {
-    label: "MODELS",
-    href: "#leaderboard",
-    description: "Evaluated dense & hybrid models",
+    label: "METRICS",
+    href: "/metrics",
+    description: "Evaluation metrics & formulas",
   },
   {
     label: "METHODOLOGY",
-    href: "#",
-    description: "Evaluation corpus & metrics",
+    href: "/methodology",
+    description: "Corpus, pipeline & protocol",
   },
   {
-    label: "CLOUD",
-    href: "https://siam.ai",
-    description: "SIAM.AI GPU infrastructure",
+    label: "REQUEST",
+    href: "/request",
+    description: "Request pipeline combination",
   },
 ];
 
 export function Navbar() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const cloudIconRef = useRef<HTMLDivElement>(null);
 
@@ -112,14 +114,28 @@ export function Navbar() {
 
           {/* Center: Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {NAV_ITEMS.map((item) => (
-              <RollingLink
-                key={item.label}
-                href={item.href}
-                label={item.label}
-                className="text-xs font-semibold tracking-[0.16em] text-[#102A3A] dark:text-[#f0f7fb] hover:text-[#0795CF] transition-colors"
-              />
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const isActive =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.href);
+              return (
+                <div key={item.label} className="relative py-2">
+                  <RollingLink
+                    href={item.href}
+                    label={item.label}
+                    className={`text-xs font-semibold tracking-[0.16em] transition-colors ${
+                      isActive
+                        ? "text-[#0795CF] font-bold"
+                        : "text-[#102A3A] dark:text-[#f0f7fb] hover:text-[#0795CF]"
+                    }`}
+                  />
+                  {isActive && (
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-[#0795CF]" />
+                  )}
+                </div>
+              );
+            })}
           </nav>
 
           {/* Right: Operational Controls & Switches */}

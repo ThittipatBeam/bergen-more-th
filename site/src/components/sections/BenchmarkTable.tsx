@@ -12,7 +12,6 @@ import { BenchmarkTableHeader } from "@/components/sections/BenchmarkTableHeader
 import { BenchmarkTableRow } from "@/components/sections/BenchmarkTableRow";
 import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolbar";
 import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
-import { MetricsGuide } from "@/components/sections/MetricsGuide";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
@@ -142,9 +141,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
           </div>
         )}
       </div>
-
-      {/* Metric Explanations Guide */}
-      <MetricsGuide />
     </div>
   );
 }

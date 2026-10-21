@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
@@ -18,6 +19,7 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
+  const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
   const isClosingRef = useRef(false);
 
@@ -60,10 +62,10 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
   const handleItemSelect = useCallback(
     (href: string) => {
       handleAnimatedClose(() => {
-        window.location.href = href;
+        router.push(href);
       });
     },
-    [handleAnimatedClose]
+    [handleAnimatedClose, router]
   );
 
   // Entrance animation when drawer opens
