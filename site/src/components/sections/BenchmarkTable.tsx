@@ -1,144 +1,184 @@
 "use client";
 
-import { useState } from "react";
-import type { BenchmarkRow } from "@/types/benchmark";
-import { RANK_MEDAL_CLASSES } from "@/lib/rank-styles";
-import { BrandIcon } from "@/components/ui/BrandIcon";
-import {
-  BenchmarkFilters,
-  type RerankerFilter,
-} from "@/components/sections/BenchmarkFilters";
+import { useMemo, useState } from "react";
+import type {
+  BenchmarkRow,
+  ColumnVisibility,
+  RerankerFilter,
+  SortDirection,
+  SortKey,
+} from "@/types/benchmark";
+import { BenchmarkColumnFilter } from "@/components/sections/BenchmarkColumnFilter";
+import { BenchmarkTableHeader } from "@/components/sections/BenchmarkTableHeader";
+import { BenchmarkTableRow } from "@/components/sections/BenchmarkTableRow";
+import { MetricsGuide } from "@/components/sections/MetricsGuide";
 
-const FILTERED_EMPTY =
-  "No experiments match these filters.";
+const DEFAULT_COLUMNS: ColumnVisibility = {
+  retriever: true,
+  reranker: true,
+  judgePct: true,
+  mTh: true,
+  em: true,
+  f1Th: true,
+  recallTh: true,
+  latency: true,
+};
 
 export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
+  const [columns, setColumns] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
   const [generator, setGenerator] = useState("all");
   const [reranker, setReranker] = useState<RerankerFilter>("all");
+  const [sortKey, setSortKey] = useState<SortKey>("judgePct");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  const generators = [...new Set(rows.map((row) => row.generator))];
-  const filtered = rows.filter(
-    (row) =>
-      (generator === "all" || row.generator === generator) &&
-      (reranker === "all" ||
-        (reranker === "yes" ? row.reranker !== null : row.reranker === null))
+  const generators = useMemo(
+    () => [...new Set(rows.map((r) => r.generator))],
+    [rows]
   );
 
-  return (
-    <div className="flex flex-col gap-5">
-      <BenchmarkFilters
-        generators={generators}
-        generator={generator}
-        onGenerator={setGenerator}
-        reranker={reranker}
-        onReranker={setReranker}
-      />
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDirection(key === "rank" || key === "latency" ? "asc" : "desc");
+    }
+  };
 
-      <div className="w-full overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors">
-        <table className="w-full text-left border-collapse min-w-[880px]">
-          <thead>
-            <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-[11px] font-mono uppercase tracking-wider text-[var(--text-secondary)] transition-colors">
-              <th className="py-3.5 px-4 w-12">#</th>
-              <th className="py-3.5 px-4">Generator</th>
-              <th className="py-3.5 px-4">Embedding</th>
-              <th className="py-3.5 px-4">Reranker</th>
-              <th className="py-3.5 px-3 text-right">M (TH)</th>
-              <th className="py-3.5 px-3 text-right">EM</th>
-              <th className="py-3.5 px-3 text-right">F1 (TH)</th>
-              <th className="py-3.5 px-3 text-right">Recall (TH)</th>
-              <th className="py-3.5 px-4 text-right">Judge score</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--border-default)]/60 text-sm transition-colors">
-            {filtered.length === 0 && rows.length > 0 && (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="py-10 px-4 text-center text-sm font-mono text-[var(--text-muted)]"
-                >
-                  {FILTERED_EMPTY}
-                </td>
-              </tr>
-            )}
-            {rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="py-10 px-4 text-center text-sm font-mono text-[var(--text-muted)]"
-                >
-                  No benchmark experiments yet — results appear here after a run
-                  is scanned into experiments_data.json.
-                </td>
-              </tr>
-            )}
-            {filtered.map((row, index) => (
-              <tr
-                key={row.id}
-                className="hover:bg-[var(--surface-brand)]/60 transition-colors group"
+  const processedRows = useMemo(() => {
+    const filtered = rows.filter((r) => {
+      if (generator !== "all" && r.generator !== generator) return false;
+      if (reranker === "yes" && !r.reranker) return false;
+      if (reranker === "no" && r.reranker) return false;
+      return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      let aVal: number | string | null = null;
+      let bVal: number | string | null = null;
+
+      if (sortKey === "rank") {
+        aVal = a.rank;
+        bVal = b.rank;
+      } else if (sortKey === "judgePct") {
+        aVal = a.judgePct;
+        bVal = b.judgePct;
+      } else if (sortKey === "mTh") {
+        aVal = a.mTh;
+        bVal = b.mTh;
+      } else if (sortKey === "em") {
+        aVal = a.em;
+        bVal = b.em;
+      } else if (sortKey === "f1Th") {
+        aVal = a.f1Th;
+        bVal = b.f1Th;
+      } else if (sortKey === "recallTh") {
+        aVal = a.recallTh;
+        bVal = b.recallTh;
+      } else if (sortKey === "latency") {
+        aVal = a.genSeconds ?? Number.POSITIVE_INFINITY;
+        bVal = b.genSeconds ?? Number.POSITIVE_INFINITY;
+      } else if (sortKey === "retriever") {
+        aVal = a.retriever;
+        bVal = b.retriever;
+      } else if (sortKey === "reranker") {
+        aVal = a.reranker ?? "";
+        bVal = b.reranker ?? "";
+      }
+
+      if (aVal === bVal) return 0;
+      if (aVal === null) return 1;
+      if (bVal === null) return -1;
+
+      let res = 0;
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        res = aVal < bVal ? -1 : 1;
+      } else {
+        res = String(aVal).localeCompare(String(bVal));
+      }
+      return sortDirection === "asc" ? res : -res;
+    });
+  }, [rows, generator, reranker, sortKey, sortDirection]);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Table Toolbar & Filters */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)]">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Generator Filter */}
+          <select
+            value={generator}
+            onChange={(e) => setGenerator(e.target.value)}
+            aria-label="Filter by generator model"
+            className="min-h-[44px] px-3 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-xs font-mono text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[#73B7DC]"
+          >
+            <option value="all">All Generators ({generators.length})</option>
+            {generators.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+
+          {/* Reranker Segmented Filter */}
+          <div className="inline-flex items-center rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-0.5">
+            {(
+              [
+                { id: "all", label: "All Runs" },
+                { id: "yes", label: "With Reranker" },
+                { id: "no", label: "Dense Only" },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setReranker(opt.id)}
+                className={`min-h-[40px] px-3 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+                  reranker === opt.id
+                    ? "bg-[var(--background-primary)] text-[var(--text-primary)] shadow-2xs"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                }`}
               >
-                <td
-                  className={`py-4 px-4 font-mono font-bold ${
-                    RANK_MEDAL_CLASSES[index + 1] ?? "text-[var(--text-muted)]"
-                  }`}
-                >
-                  #{index + 1}
-                </td>
-                <td className="py-4 px-4 font-mono font-semibold text-[var(--text-primary)] transition-colors">
-                  <div className="flex items-center gap-2">
-                    <BrandIcon name={row.generator} size={18} />
-                    {row.generator}
-                  </div>
-                  <div className="text-[10px] font-normal text-[var(--text-muted)] font-sans mt-0.5">
-                    {row.dataset}
-                  </div>
-                </td>
-                <td className="py-4 px-4 font-mono text-[var(--text-secondary)]">
-                  <span className="inline-flex items-center gap-2">
-                    <BrandIcon name={row.retriever} size={16} />
-                    {row.retriever}
-                  </span>
-                </td>
-                <td className="py-4 px-4 font-mono text-[var(--text-secondary)]">
-                  {row.reranker ? (
-                    <span className="inline-flex items-center gap-2">
-                      <BrandIcon name={row.reranker} size={16} />
-                      {row.reranker}
-                    </span>
-                  ) : (
-                    <span className="text-[var(--text-muted)]">—</span>
-                  )}
-                </td>
-                <td className="py-4 px-3 text-right font-mono text-[var(--text-secondary)]">
-                  {row.mTh.toFixed(3)}
-                </td>
-                <td className="py-4 px-3 text-right font-mono text-[var(--text-secondary)]">
-                  {row.em.toFixed(3)}
-                </td>
-                <td className="py-4 px-3 text-right font-mono text-[var(--text-secondary)]">
-                  {row.f1Th.toFixed(3)}
-                </td>
-                <td className="py-4 px-3 text-right font-mono text-[var(--text-secondary)]">
-                  {row.recallTh.toFixed(3)}
-                </td>
-                <td className="py-4 px-4 text-right">
-                  <span
-                    className={`font-mono font-bold tracking-tight ${
-                      index === 0
-                        ? "text-2xl text-[#0795CF]"
-                        : "text-lg text-[var(--text-primary)]"
-                    }`}
-                  >
-                    {row.judgePct.toFixed(1)}
-                    <span className="text-xs font-medium text-[var(--text-muted)]">
-                      %
-                    </span>
-                  </span>
-                </td>
-              </tr>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Column Customizer with Filter Icon */}
+        <div className="flex items-center justify-between sm:justify-end gap-3">
+          <span className="text-[11px] font-mono text-[var(--text-muted)]">
+            {processedRows.length} runs
+          </span>
+          <BenchmarkColumnFilter columns={columns} onChange={setColumns} />
+        </div>
+      </div>
+
+      {/* Responsive Leaderboard Table */}
+      <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs">
+        <table className="w-full text-left border-collapse min-w-[760px]">
+          <BenchmarkTableHeader
+            columns={columns}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+          />
+          <tbody>
+            {processedRows.map((row) => (
+              <BenchmarkTableRow key={row.id} row={row} columns={columns} />
             ))}
           </tbody>
         </table>
+
+        {processedRows.length === 0 && (
+          <div className="py-12 text-center text-xs font-mono text-[var(--text-muted)]">
+            No benchmark runs match the current filters.
+          </div>
+        )}
       </div>
+
+      {/* Metric Explanations Guide */}
+      <MetricsGuide />
     </div>
   );
 }

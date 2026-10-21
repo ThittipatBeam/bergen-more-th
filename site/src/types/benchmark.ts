@@ -50,6 +50,22 @@ export interface ChampionMetric {
   detail: string;
 }
 
+export type MetricColumnKey =
+  | "retriever"
+  | "reranker"
+  | "judgePct"
+  | "mTh"
+  | "em"
+  | "f1Th"
+  | "recallTh"
+  | "latency";
+
+export type ColumnVisibility = Record<MetricColumnKey, boolean>;
+export type SortKey = MetricColumnKey | "rank";
+export type SortDirection = "asc" | "desc";
+
+export type RerankerFilter = "all" | "yes" | "no";
+
 /** A category-winning experiment surfaced in the hero stacked card deck. */
 export interface ChampionPick {
   id: "judge" | "speed" | "match";
