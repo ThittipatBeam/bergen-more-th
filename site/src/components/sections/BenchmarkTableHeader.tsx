@@ -19,80 +19,94 @@ export function BenchmarkTableHeader({
   sortDirection,
   onSort,
 }: BenchmarkTableHeaderProps) {
-  const renderSortIndicator = (key: SortKey) => {
-    if (sortKey !== key) {
+  const renderIndicator = (key: SortKey) => {
+    if (sortKey === key) {
       return (
-        <span className="opacity-0 group-hover:opacity-60 transition-opacity ml-1">
-          ↕
+        <span className="ml-1 text-[#B83E28] font-bold">
+          {sortDirection === "asc" ? "↑" : "↓"}
         </span>
       );
     }
     return (
-      <span className="ml-1 text-[#0795CF]">
-        {sortDirection === "asc" ? "▲" : "▼"}
+      <span className="ml-1 text-[#9E9485] opacity-40 group-hover:opacity-100 transition-opacity">
+        ↕
       </span>
     );
   };
 
-  const sortButton = (key: SortKey, label: string, align: "left" | "right") => (
+  const sortBtn = (key: SortKey, label: string, align: "left" | "right" | "center") => (
     <button
       type="button"
       onClick={() => onSort(key)}
       className={`group cursor-pointer uppercase inline-flex items-center gap-0.5 text-inherit hover:text-[var(--text-primary)] transition-colors ${
-        align === "right" ? "ml-auto" : ""
+        align === "right" ? "ml-auto" : align === "center" ? "mx-auto" : ""
       }`}
     >
       <span>{label}</span>
-      {renderSortIndicator(key)}
+      {renderIndicator(key)}
     </button>
   );
 
   return (
     <thead>
-      <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-[11px] font-mono uppercase tracking-wider text-[var(--text-secondary)] transition-colors">
-        <th className="py-3.5 px-4 w-14">
-          {sortButton("rank", "#", "left")}
+      <tr className="bg-[#F1ECE1] dark:bg-[#25221D] border-b border-[#E3DCD1] dark:border-[#38332A] text-[11px] font-mono uppercase tracking-wider text-[#736B5E] dark:text-[#A89E90] transition-colors select-none">
+        <th className="py-3.5 px-3 w-12 text-center">
+          {sortBtn("rank", "#", "center")}
         </th>
 
-        <th className="py-3.5 px-4">Generator</th>
+        <th className="py-3.5 px-4 text-left">MODEL</th>
 
-        {columns.retriever && <th className="py-3.5 px-4">Embedding</th>}
+        {columns.retriever && (
+          <th className="py-3.5 px-4 text-left">
+            {sortBtn("retriever", "EMBEDDING", "left")}
+          </th>
+        )}
 
-        {columns.reranker && <th className="py-3.5 px-4">Reranker</th>}
+        {columns.reranker && (
+          <th className="py-3.5 px-4 text-left">
+            {sortBtn("reranker", "RERANKER", "left")}
+          </th>
+        )}
 
         {columns.judgePct && (
-          <th className="py-3.5 px-4 text-right">
-            {sortButton("judgePct", "Judge Score", "right")}
+          <th className="py-3.5 px-4 text-right bg-[#EFE3DB]/60 dark:bg-[#3D1E16]/40">
+            {sortBtn("judgePct", "JUDGE SCORE", "right")}
           </th>
         )}
 
         {columns.mTh && (
-          <th className="py-3.5 px-3 text-right">
-            {sortButton("mTh", "M (TH)", "right")}
-          </th>
-        )}
-
-        {columns.em && (
-          <th className="py-3.5 px-3 text-right">
-            {sortButton("em", "EM", "right")}
+          <th className="py-3.5 px-3 text-center">
+            {sortBtn("mTh", "M_TH", "center")}
           </th>
         )}
 
         {columns.f1Th && (
-          <th className="py-3.5 px-3 text-right">
-            {sortButton("f1Th", "F1 (TH)", "right")}
+          <th className="py-3.5 px-3 text-center">
+            {sortBtn("f1Th", "F1_TH", "center")}
+          </th>
+        )}
+
+        {columns.precisionTh && (
+          <th className="py-3.5 px-3 text-center">
+            {sortBtn("precisionTh", "PRECISION_TH", "center")}
           </th>
         )}
 
         {columns.recallTh && (
-          <th className="py-3.5 px-3 text-right">
-            {sortButton("recallTh", "Recall (TH)", "right")}
+          <th className="py-3.5 px-3 text-center">
+            {sortBtn("recallTh", "RECALL_TH", "center")}
+          </th>
+        )}
+
+        {columns.em && (
+          <th className="py-3.5 px-3 text-center">
+            {sortBtn("em", "EM", "center")}
           </th>
         )}
 
         {columns.latency && (
           <th className="py-3.5 px-4 text-right">
-            {sortButton("latency", "Latency", "right")}
+            {sortBtn("latency", "LATENCY", "right")}
           </th>
         )}
       </tr>

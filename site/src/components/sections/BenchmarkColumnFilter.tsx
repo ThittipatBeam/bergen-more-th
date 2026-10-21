@@ -12,9 +12,10 @@ interface ColumnOption {
 const COLUMN_OPTIONS: ColumnOption[] = [
   { key: "judgePct", label: "Judge Score (%)", category: "metric" },
   { key: "mTh", label: "Thai M-Score (M_th)", category: "metric" },
+  { key: "f1Th", label: "Thai F1-Score (F1_th)", category: "metric" },
+  { key: "precisionTh", label: "Thai Precision (Precision_th)", category: "metric" },
+  { key: "recallTh", label: "Thai Recall (Recall_th)", category: "metric" },
   { key: "em", label: "Exact Match (EM)", category: "metric" },
-  { key: "f1Th", label: "Thai F1-Score", category: "metric" },
-  { key: "recallTh", label: "Thai Recall", category: "metric" },
   { key: "latency", label: "Latency (Gen Time)", category: "metric" },
   { key: "retriever", label: "Embedding (Retriever)", category: "pipeline" },
   { key: "reranker", label: "Reranker Model", category: "pipeline" },

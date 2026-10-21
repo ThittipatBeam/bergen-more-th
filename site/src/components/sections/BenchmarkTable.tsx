@@ -8,9 +8,10 @@ import type {
   SortDirection,
   SortKey,
 } from "@/types/benchmark";
-import { BenchmarkColumnFilter } from "@/components/sections/BenchmarkColumnFilter";
 import { BenchmarkTableHeader } from "@/components/sections/BenchmarkTableHeader";
 import { BenchmarkTableRow } from "@/components/sections/BenchmarkTableRow";
+import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolbar";
+import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
 import { MetricsGuide } from "@/components/sections/MetricsGuide";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
@@ -18,10 +19,11 @@ const DEFAULT_COLUMNS: ColumnVisibility = {
   reranker: true,
   judgePct: true,
   mTh: true,
-  em: true,
   f1Th: true,
+  precisionTh: true,
   recallTh: true,
-  latency: true,
+  em: false,
+  latency: false,
 };
 
 export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
@@ -30,6 +32,9 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
   const [reranker, setReranker] = useState<RerankerFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("judgePct");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  const datasetName = rows[0]?.dataset ?? "ThaiWikiV4";
+  const sampleCount = rows[0]?.judgeN ?? 500;
 
   const generators = useMemo(
     () => [...new Set(rows.map((r) => r.generator))],
@@ -72,6 +77,9 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
       } else if (sortKey === "f1Th") {
         aVal = a.f1Th;
         bVal = b.f1Th;
+      } else if (sortKey === "precisionTh") {
+        aVal = a.precisionTh;
+        bVal = b.precisionTh;
       } else if (sortKey === "recallTh") {
         aVal = a.recallTh;
         bVal = b.recallTh;
@@ -102,61 +110,31 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Table Toolbar & Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)]">
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Generator Filter */}
-          <select
-            value={generator}
-            onChange={(e) => setGenerator(e.target.value)}
-            aria-label="Filter by generator model"
-            className="min-h-[44px] px-3 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-xs font-mono text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[#73B7DC]"
-          >
-            <option value="all">All Generators ({generators.length})</option>
-            {generators.map((g) => (
-              <option key={g} value={g}>
-                {g}
-              </option>
-            ))}
-          </select>
-
-          {/* Reranker Segmented Filter */}
-          <div className="inline-flex items-center rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-0.5">
-            {(
-              [
-                { id: "all", label: "All Runs" },
-                { id: "yes", label: "With Reranker" },
-                { id: "no", label: "Dense Only" },
-              ] as const
-            ).map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setReranker(opt.id)}
-                className={`min-h-[40px] px-3 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
-                  reranker === opt.id
-                    ? "bg-[var(--background-primary)] text-[var(--text-primary)] shadow-2xs"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Column Customizer with Filter Icon */}
-        <div className="flex items-center justify-between sm:justify-end gap-3">
-          <span className="text-[11px] font-mono text-[var(--text-muted)]">
-            {processedRows.length} runs
-          </span>
-          <BenchmarkColumnFilter columns={columns} onChange={setColumns} />
-        </div>
+      {/* Editorial Title Header */}
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 px-0.5">
+        <h3 className="font-serif font-bold text-xl sm:text-2xl text-[var(--text-primary)] tracking-tight">
+          Measured sheet · {datasetName} · dev · {sampleCount.toLocaleString()}
+        </h3>
+        <span className="text-xs font-mono text-[var(--text-muted)]">
+          Judge score leads. Click a column to sort.
+        </span>
       </div>
 
-      {/* Responsive Leaderboard Table */}
-      <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs">
-        <table className="w-full text-left border-collapse min-w-[760px]">
+      {/* Toolbar & Filters */}
+      <BenchmarkTableToolbar
+        generators={generators}
+        generator={generator}
+        onGeneratorChange={setGenerator}
+        reranker={reranker}
+        onRerankerChange={setReranker}
+        columns={columns}
+        onColumnsChange={setColumns}
+        resultsCount={processedRows.length}
+      />
+
+      {/* Styled Measured Sheet Table */}
+      <div className="overflow-x-auto rounded-xl border border-[#E3DCD1] dark:border-[#2E2A24] bg-[#FAF7F2] dark:bg-[#1C1A17] shadow-xs">
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <BenchmarkTableHeader
             columns={columns}
             sortKey={sortKey}
@@ -167,6 +145,7 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
             {processedRows.map((row) => (
               <BenchmarkTableRow key={row.id} row={row} columns={columns} />
             ))}
+            <BenchmarkNextRunRow columns={columns} />
           </tbody>
         </table>
 

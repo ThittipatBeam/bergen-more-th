@@ -39,6 +39,7 @@ export interface BenchmarkRow {
   mTh: number;
   em: number;
   f1Th: number;
+  precisionTh: number;
   recallTh: number;
   judgePct: number;
   genSeconds: number | null;
@@ -55,9 +56,10 @@ export type MetricColumnKey =
   | "reranker"
   | "judgePct"
   | "mTh"
-  | "em"
   | "f1Th"
+  | "precisionTh"
   | "recallTh"
+  | "em"
   | "latency";
 
 export type ColumnVisibility = Record<MetricColumnKey, boolean>;

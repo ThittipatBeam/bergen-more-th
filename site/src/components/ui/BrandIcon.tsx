@@ -1,5 +1,15 @@
 import type { ReactNode } from "react";
-import { BAAI, DeepSeek, Kimi, Qwen } from "@lobehub/icons";
+import {
+  BAAI,
+  Claude,
+  DeepSeek,
+  Google,
+  Kimi,
+  Meta,
+  Mistral,
+  OpenAI,
+  Qwen,
+} from "@lobehub/icons";
 
 /** Model-name matchers -> brand icon (first match wins). */
 const RULES: ReadonlyArray<{
@@ -17,6 +27,11 @@ const RULES: ReadonlyArray<{
     ),
   },
   { test: (n) => n.includes("bge") || n.includes("baai"), render: (s) => <BAAI size={s} /> },
+  { test: (n) => n.includes("gpt") || n.includes("openai"), render: (s) => <OpenAI size={s} /> },
+  { test: (n) => n.includes("claude") || n.includes("anthropic"), render: (s) => <Claude.Color size={s} /> },
+  { test: (n) => n.includes("mistral"), render: (s) => <Mistral.Color size={s} /> },
+  { test: (n) => n.includes("llama") || n.includes("meta"), render: (s) => <Meta.Color size={s} /> },
+  { test: (n) => n.includes("gemini") || n.includes("google"), render: (s) => <Google.Color size={s} /> },
 ];
 
 /**

@@ -28,6 +28,11 @@ export const formatClock = (seconds: number | null): string => {
   return `${m}:${String(s).padStart(2, "0")}`;
 };
 
+const toPercent = (v: number | undefined | null): number => {
+  if (typeof v !== "number") return 0;
+  return v <= 1 ? v * 100 : v;
+};
+
 const toRow = (exp: ExperimentRecord): BenchmarkRow | null => {
   const metrics = exp.metrics ?? {};
   const retriever = exp.retriever?.model_name;
@@ -46,10 +51,11 @@ const toRow = (exp: ExperimentRecord): BenchmarkRow | null => {
       ? judgeShortName(exp.judge_candidates[0])
       : null,
     judgeN: metrics.LLMeval_judge_n ?? null,
-    mTh: metrics.M_th ?? 0,
-    em: metrics.EM ?? 0,
-    f1Th: metrics.F1_th ?? 0,
-    recallTh: metrics.Recall_th ?? 0,
+    mTh: toPercent(metrics.M_th),
+    em: toPercent(metrics.EM),
+    f1Th: toPercent(metrics.F1_th),
+    precisionTh: toPercent(metrics.Precision_th),
+    recallTh: toPercent(metrics.Recall_th),
     judgePct,
     genSeconds: exp.generation_time ? parseClock(exp.generation_time) : null,
   };
