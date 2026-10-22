@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { NAV_ITEMS_EN } from "@/lib/i18n/translations";
+import { usePageTransition } from "@/components/providers/PageTransitionProvider";
 
 export interface NavItem {
   label: string;
@@ -26,6 +27,7 @@ export function Navbar() {
   const cloudIconRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
+  const { laserRef } = usePageTransition();
   // Nav bar remains strictly in English across all language toggles
   const navItems = NAV_ITEMS_EN;
 
@@ -142,7 +144,7 @@ export function Navbar() {
                     }`}
                   />
                   {isActive && (
-                    <span className="absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-[var(--brand-sky-blue)]" />
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-[var(--brand-sky-blue)] shadow-[0_0_6px_var(--brand-sky-light)] animate-in fade-in zoom-in-90 duration-200" />
                   )}
                 </div>
               );
@@ -171,6 +173,13 @@ export function Navbar() {
             </button>
           </div>
         </div>
+
+        {/* Luminous page transition laser beam glued to the bottom border */}
+        <div
+          ref={laserRef}
+          aria-hidden="true"
+          className="absolute -bottom-[1px] left-0 right-0 h-[2.5px] pointer-events-none origin-left scale-x-0 opacity-0 bg-gradient-to-r from-transparent via-[var(--brand-sky-light)] to-[var(--brand-sky-blue)] shadow-[0_0_12px_var(--brand-sky-light),0_0_2px_var(--brand-sky-blue)]"
+        />
       </header>
 
       {/* Animated GSAP Mobile Drawer */}

@@ -10,6 +10,7 @@ import { MobileMenuItem } from "@/components/layout/MobileMenuItem";
 import { MobileMenuHeader } from "@/components/layout/MobileMenuHeader";
 import { NavItem } from "@/components/layout/Navbar";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { usePageTransition } from "@/components/providers/PageTransitionProvider";
 
 gsap.registerPlugin(useGSAP);
 
@@ -22,6 +23,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose, items, returnFocusRef }: MobileMenuProps) {
   const router = useRouter();
+  const { navigateTo } = usePageTransition();
   const drawerRef = useRef<HTMLDivElement>(null);
   const isClosingRef = useRef(false);
   const reducedMotion = useReducedMotion();
@@ -75,10 +77,10 @@ export function MobileMenu({ isOpen, onClose, items, returnFocusRef }: MobileMen
   const handleItemSelect = useCallback(
     (href: string) => {
       handleAnimatedClose(() => {
-        router.push(href);
+        navigateTo(href, { skipExit: true });
       });
     },
-    [handleAnimatedClose, router]
+    [handleAnimatedClose, navigateTo]
   );
 
   // Entrance animation when drawer opens

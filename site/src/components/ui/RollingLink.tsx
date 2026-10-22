@@ -5,6 +5,7 @@ import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { usePageTransition } from "@/components/providers/PageTransitionProvider";
 
 gsap.registerPlugin(useGSAP);
 
@@ -24,6 +25,7 @@ export function RollingLink({
   const containerRef = useRef<HTMLAnchorElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const reducedMotion = useReducedMotion();
+  const { navigateTo } = usePageTransition();
   const characters = useMemo(() => label.split(""), [label]);
 
   useGSAP(
@@ -88,11 +90,28 @@ export function RollingLink({
     tlRef.current.timeScale(1.3).reverse();
   };
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (tlRef.current) {
       tlRef.current.timeScale(2).reverse();
     }
     onClick?.();
+
+    // Respect modifier keys
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return;
+    }
+
+    if (href.startsWith("/") && !href.startsWith("//")) {
+      e.preventDefault();
+      navigateTo(href);
+    }
   };
 
   return (

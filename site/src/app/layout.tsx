@@ -4,6 +4,10 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { LanguageProvider } from "@/hooks/use-language";
+import {
+  PageTransitionProvider,
+  PageTransitionView,
+} from "@/components/providers/PageTransitionProvider";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -59,9 +63,13 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-200 selection:bg-[var(--brand-sky-blue)] selection:text-white">
         <LanguageProvider>
-          <Navbar />
-          {children}
-          <SiteFooter />
+          <PageTransitionProvider>
+            <Navbar />
+            <PageTransitionView>
+              {children}
+              <SiteFooter />
+            </PageTransitionView>
+          </PageTransitionProvider>
         </LanguageProvider>
       </body>
     </html>
