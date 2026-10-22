@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BrandIcon } from "@/components/ui/BrandIcon";
+import { useLanguage } from "@/hooks/use-language";
 
 interface BenchmarkModelFilterProps {
   generators: string[];
@@ -36,6 +37,8 @@ export function BenchmarkModelFilter({
   value,
   onChange,
 }: BenchmarkModelFilterProps) {
+  const { language } = useLanguage();
+  const allLabel = language === "TH" ? "โมเดลทั้งหมด" : "All models";
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,7 +47,7 @@ export function BenchmarkModelFilter({
 
   const options = [ALL, ...generators];
   const selectedIndex = Math.max(0, options.indexOf(value));
-  const label = value === ALL ? "All models" : value;
+  const label = value === ALL ? allLabel : value;
 
   const close = useCallback((restoreFocus: boolean) => {
     setIsOpen(false);
@@ -197,7 +200,7 @@ export function BenchmarkModelFilter({
                   ) : (
                     <BrandIcon name={option} size={16} />
                   )}
-                  <span className="flex-1 truncate">{option === ALL ? "All models" : option}</span>
+                  <span className="flex-1 truncate">{option === ALL ? allLabel : option}</span>
                   {isSelected && (
                     <svg
                       className="w-4 h-4 shrink-0"

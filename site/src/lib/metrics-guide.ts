@@ -1,3 +1,5 @@
+import type { Language } from "@/hooks/use-language";
+
 /** "Which score should I use?" cheat sheet. */
 export interface WhichScoreRow {
   need: string;
@@ -5,7 +7,7 @@ export interface WhichScoreRow {
   why: string;
 }
 
-export const WHICH_SCORE_ROWS: WhichScoreRow[] = [
+export const WHICH_SCORE_ROWS_EN: WhichScoreRow[] = [
   {
     need: "One number to rank pipelines on",
     use: "Overall",
@@ -37,3 +39,42 @@ export const WHICH_SCORE_ROWS: WhichScoreRow[] = [
     why: "Model writing time only.",
   },
 ];
+
+export const WHICH_SCORE_ROWS_TH: WhichScoreRow[] = [
+  {
+    need: "ต้องการตัวเลขเดียวสำหรับจัดอันดับ",
+    use: "Overall",
+    why: "ถ่วงน้ำหนักรวม 4 มิติวัดความถูกต้อง โดยให้ความสำคัญกับ Judge สูงสุด",
+  },
+  {
+    need: "ต้องการรู้ว่าคำตอบถูกต้องและไว้ใจได้ไหม",
+    use: "Judge",
+    why: "ตัดสินจากความหมายของเนื้อหา ไม่ยึดติดกับการสะกดหรือ Paraphrase",
+  },
+  {
+    need: "ต้องการตรวจสอบว่าเนื้อหาเฉลยถูกครอบคลุมครบ",
+    use: "Recall · F1",
+    why: "วัดสัดส่วนคำตอบเฉลยที่โมเดลตอบได้ครอบคลุม",
+  },
+  {
+    need: "ต้องการดักจับโมเดลที่ตอบเวิ่นเว้อหรือน้ำท่วมทุ่ง",
+    use: "Precision",
+    why: "ทุกคำที่ไม่จำเป็นที่โมเดลใส่เข้ามาจะทำให้คะแนนลดลง",
+  },
+  {
+    need: "ต้องการข้อความที่ตรงกับเฉลยแบบ 100%",
+    use: "EM",
+    why: "ข้อความต้องตรงกันทุกประการ (วัดแบบผ่านหรือไม่ผ่าน)",
+  },
+  {
+    need: "ต้องการความเร็วและต้นทุนต่ำในระบบจริง",
+    use: "Generation time",
+    why: "วัดเวลาสร้างคำตอบจริงของโมเดลเท่านั้น",
+  },
+];
+
+export function getWhichScoreRows(lang: Language = "EN"): WhichScoreRow[] {
+  return lang === "TH" ? WHICH_SCORE_ROWS_TH : WHICH_SCORE_ROWS_EN;
+}
+
+export const WHICH_SCORE_ROWS = WHICH_SCORE_ROWS_EN;

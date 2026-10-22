@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import { Github, HuggingFace } from "@lobehub/icons";
 import { AboutReveal } from "@/components/sections/AboutReveal";
-import { ABOUT_CREDITS, ABOUT_POWERED_BY } from "@/lib/about-data";
+import { getAboutCredits, getAboutPoweredBy } from "@/lib/about-data";
 import type { AboutCredit } from "@/types/about";
+import { useLanguage } from "@/hooks/use-language";
 
 function BrandIcon({
   brand,
@@ -24,11 +27,19 @@ function BrandIcon({
 
 /** The projects this benchmark builds on, plus the cloud it runs on. */
 export function AboutCredits() {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
+  const credits = getAboutCredits(language);
+  const poweredBy = getAboutPoweredBy(language);
+
   return (
     <AboutReveal>
       <div className="flex flex-col gap-4">
-        <ul aria-label="Credits" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {ABOUT_CREDITS.map((credit) => (
+        <ul
+          aria-label={isTh ? "กิตติกรรมประกาศ" : "Credits"}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+        >
+          {credits.map((credit) => (
             <li
               key={credit.name}
               data-reveal
@@ -65,8 +76,12 @@ export function AboutCredits() {
                 className="mt-auto inline-flex min-h-[44px] w-fit items-center gap-1.5 font-sans text-sm font-semibold text-[var(--brand-text)] underline-offset-2 transition-colors hover:text-[var(--brand-cta-hover)] hover:underline"
               >
                 {credit.brand === "github"
-                  ? "View on GitHub"
-                  : "Open on Hugging Face"}
+                  ? isTh
+                    ? "ดูบน GitHub"
+                    : "View on GitHub"
+                  : isTh
+                    ? "ดูบน Hugging Face"
+                    : "Open on Hugging Face"}
                 <span aria-hidden="true">↗</span>
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
@@ -75,7 +90,7 @@ export function AboutCredits() {
         </ul>
 
         <a
-          href={ABOUT_POWERED_BY.href}
+          href={poweredBy.href}
           target="_blank"
           rel="noopener noreferrer"
           data-reveal
@@ -102,10 +117,10 @@ export function AboutCredits() {
 
           <div className="flex min-w-0 flex-col">
             <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-text)]">
-              {ABOUT_POWERED_BY.label}
+              {poweredBy.label}
             </span>
             <p className="font-sans text-base leading-7 text-[var(--text-secondary)]">
-              {ABOUT_POWERED_BY.description}
+              {poweredBy.description}
             </p>
           </div>
 
@@ -114,7 +129,7 @@ export function AboutCredits() {
             <span aria-hidden="true">↗</span>
           </span>
           <span className="sr-only">
-            {ABOUT_POWERED_BY.name} (opens in a new tab)
+            {poweredBy.name} (opens in a new tab)
           </span>
         </a>
       </div>

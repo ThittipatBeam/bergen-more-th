@@ -1,22 +1,34 @@
+"use client";
+
 import { HuggingFace } from "@lobehub/icons";
 import {
-  DATASET_RESULT,
   DATASET_SIZE,
-  DATASET_STEPS,
-  SAMPLE_REASONS,
+  getDatasetResult,
+  getDatasetSteps,
+  getSampleReasons,
 } from "@/lib/methodology-data";
+import { useLanguage } from "@/hooks/use-language";
 
 const format = (value: number) => value.toLocaleString("en-US");
 
 /** How the question bank is built, step by step, then why a run uses 500 of it. */
 export function DatasetStory() {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
+  const steps = getDatasetSteps(language);
+  const reasons = getSampleReasons(language);
+  const resultText = getDatasetResult(language);
+
   const usedShare = (DATASET_SIZE.perRun / DATASET_SIZE.bank) * 100;
-  const lastStep = DATASET_STEPS.length - 1;
+  const lastStep = steps.length - 1;
 
   return (
     <div className="flex flex-col gap-10">
-      <ol aria-label="How the question bank is built" className="flex flex-col">
-        {DATASET_STEPS.map((step, index) => (
+      <ol
+        aria-label={isTh ? "ขั้นตอนการสร้างชุดคำถาม Benchmark" : "How the question bank is built"}
+        className="flex flex-col"
+      >
+        {steps.map((step, index) => (
           <li
             key={step.title}
             className="relative grid grid-cols-[auto_minmax(0,1fr)] gap-4 pb-12 last:pb-0 sm:gap-6"
@@ -65,9 +77,9 @@ export function DatasetStory() {
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--text-primary)]">
-          The result.{" "}
+          {isTh ? "ผลลัพธ์. " : "The result. "}
         </span>
-        {DATASET_RESULT}
+        {resultText}
       </p>
 
       <section
@@ -76,26 +88,27 @@ export function DatasetStory() {
       >
         <header className="flex flex-col gap-2">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
-            The bank and the run
+            {isTh ? "คลังข้อสอบและขนาดกลุ่มตัวอย่าง" : "The bank and the run"}
           </span>
           <h3
             id="bank-and-run-title"
             className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
           >
-            {format(DATASET_SIZE.bank)} questions on file,{" "}
-            {format(DATASET_SIZE.perRun)} per run
+            {isTh
+              ? `${format(DATASET_SIZE.bank)} คำถามในคลัง, ใช้ ${format(DATASET_SIZE.perRun)} ข้อต่อหนึ่งรัน`
+              : `${format(DATASET_SIZE.bank)} questions on file, ${format(DATASET_SIZE.perRun)} per run`}
           </h3>
           <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-            Running every pipeline over all {format(DATASET_SIZE.bank)} questions
-            would take hours and cost real money. So a leaderboard run uses a
-            fixed sample of {format(DATASET_SIZE.perRun)} instead.
+            {isTh
+              ? `การรันทุกไปป์ไลน์บนคำถามทั้งหมด ${format(DATASET_SIZE.bank)} ข้อต้องใช้เวลาหลายชั่วโมงและค่าใช้จ่ายสูง ลีดเดอร์บอร์ดจึงสุ่มกลุ่มตัวอย่างคงที่ขนาด ${format(DATASET_SIZE.perRun)} ข้อมาใช้วัดผลมาตรฐาน`
+              : `Running every pipeline over all ${format(DATASET_SIZE.bank)} questions would take hours and cost real money. So a leaderboard run uses a fixed sample of ${format(DATASET_SIZE.perRun)} instead.`}
           </p>
         </header>
 
         <dl className="grid grid-cols-3 gap-4 border-t border-[var(--border-default)] pt-6 sm:gap-8">
           <div className="flex flex-col gap-1">
             <dt className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              On file
+              {isTh ? "ในคลัง" : "On file"}
             </dt>
             <dd className="font-mono text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
               {format(DATASET_SIZE.bank)}
@@ -103,7 +116,7 @@ export function DatasetStory() {
           </div>
           <div className="flex flex-col gap-1">
             <dt className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Per run
+              {isTh ? "ใช้ต่อรัน" : "Per run"}
             </dt>
             <dd className="font-mono text-2xl font-bold text-[var(--brand-text)] sm:text-3xl">
               {format(DATASET_SIZE.perRun)}
@@ -111,7 +124,7 @@ export function DatasetStory() {
           </div>
           <div className="flex flex-col gap-1">
             <dt className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Share used
+              {isTh ? "สัดส่วนที่ใช้" : "Share used"}
             </dt>
             <dd className="font-mono text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
               {usedShare.toFixed(1)}%
@@ -122,11 +135,11 @@ export function DatasetStory() {
         <div className="flex flex-col gap-2">
           <div
             role="img"
-            aria-label={`Each run uses ${format(
-              DATASET_SIZE.perRun
-            )} of ${format(DATASET_SIZE.bank)} questions, about ${usedShare.toFixed(
-              1
-            )} percent`}
+            aria-label={
+              isTh
+                ? `แต่ละรันใช้ ${format(DATASET_SIZE.perRun)} จาก ${format(DATASET_SIZE.bank)} คำถาม หรือประมาณ ${usedShare.toFixed(1)} เปอร์เซ็นต์`
+                : `Each run uses ${format(DATASET_SIZE.perRun)} of ${format(DATASET_SIZE.bank)} questions, about ${usedShare.toFixed(1)} percent`
+            }
             className="h-3 w-full overflow-hidden rounded-full bg-[var(--background-primary)]"
           >
             <div
@@ -135,13 +148,13 @@ export function DatasetStory() {
             />
           </div>
           <div className="flex justify-between font-mono text-xs text-[var(--text-muted)]">
-            <span>{format(DATASET_SIZE.perRun)} used</span>
-            <span>{format(DATASET_SIZE.bank)} on file</span>
+            <span>{isTh ? `ใช้ ${format(DATASET_SIZE.perRun)} ข้อ` : `${format(DATASET_SIZE.perRun)} used`}</span>
+            <span>{isTh ? `ทั้งหมด ${format(DATASET_SIZE.bank)} ข้อ` : `${format(DATASET_SIZE.bank)} on file`}</span>
           </div>
         </div>
 
         <ul className="grid gap-6 border-t border-[var(--border-default)] pt-6 sm:grid-cols-3 sm:gap-8">
-          {SAMPLE_REASONS.map((reason) => (
+          {reasons.map((reason) => (
             <li key={reason.title} className="flex flex-col gap-1.5">
               <p className="font-sans text-base font-semibold leading-snug text-[var(--text-primary)]">
                 {reason.title}

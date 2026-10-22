@@ -1,8 +1,11 @@
+"use client";
+
 import { Fragment } from "react";
 import { Github, HuggingFace } from "@lobehub/icons";
 import { AboutReveal } from "@/components/sections/AboutReveal";
-import { ABOUT_RESOURCES } from "@/lib/about-data";
+import { getAboutResources } from "@/lib/about-data";
 import type { AboutResource } from "@/types/about";
+import { useLanguage } from "@/hooks/use-language";
 
 function BrandIcon({
   brand,
@@ -24,10 +27,16 @@ function BrandIcon({
 
 /** The repo and the dataset: where every published number comes from. */
 export function AboutResources() {
+  const { language } = useLanguage();
+  const resources = getAboutResources(language);
+
   return (
     <AboutReveal>
-      <ul aria-label="Public resources" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {ABOUT_RESOURCES.map((resource) => (
+      <ul
+        aria-label={language === "TH" ? "แหล่งข้อมูลและคลังโค้ดเปิด" : "Public resources"}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+      >
+        {resources.map((resource) => (
           <li
             key={resource.name}
             data-reveal
@@ -51,7 +60,13 @@ export function AboutResources() {
               </span>
               <div className="flex min-w-0 flex-col">
                 <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  {resource.kind === "code" ? "Code" : "Dataset"}
+                  {resource.kind === "code"
+                    ? language === "TH"
+                      ? "คลังโค้ด"
+                      : "Code"
+                    : language === "TH"
+                      ? "ชุดข้อมูล"
+                      : "Dataset"}
                 </span>
                 <h3 className="break-words font-mono text-[13px] font-semibold text-[var(--text-primary)] lg:text-sm">
                   {resource.name.split("/").map((part, index) => (

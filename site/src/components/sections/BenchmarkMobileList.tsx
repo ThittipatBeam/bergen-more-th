@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { BenchmarkRow } from "@/types/benchmark";
 import {
@@ -8,6 +10,8 @@ import {
 import { RANK_MEDAL_CLASSES } from "@/lib/rank-styles";
 import { SCORE_BAND_CLASSES, scoreBand } from "@/lib/score-scale";
 import { BrandIcon } from "@/components/ui/BrandIcon";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 interface BenchmarkMobileListProps {
   rows: BenchmarkRow[];
@@ -29,10 +33,14 @@ function MobileMetric({ label, value }: { label: string; value: number }) {
 /** Phone view of the leaderboard: one row per pipeline, every headline metric
  *  visible without sideways scrolling. The table takes over at md. */
 export function BenchmarkMobileList({ rows }: BenchmarkMobileListProps) {
+  const { language } = useLanguage();
+  const t = I18N[language].leaderboard;
+  const isTh = language === "TH";
+
   return (
     <div className="flex flex-col gap-3 md:hidden">
       <p className="text-xs leading-5 text-[var(--text-muted)]">
-        Ranked by overall score. Generation time excludes retrieval and scoring.
+        {t.mobileLead}
       </p>
 
       <ol className="divide-y divide-[var(--border-default)] overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs">
@@ -79,20 +87,20 @@ export function BenchmarkMobileList({ rows }: BenchmarkMobileListProps) {
                     {row.q.toFixed(1)}
                   </span>
                   <span className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[var(--text-secondary)]">
-                    Overall
+                    {t.overall}
                   </span>
                 </div>
               </div>
 
               <dl className="grid grid-cols-4 gap-2 border-t border-[var(--border-default)]/60 pt-3">
-                <MobileMetric label="Judge" value={row.judgePct} />
-                <MobileMetric label="Match TH" value={row.mTh} />
-                <MobileMetric label="F1 TH" value={row.f1Th} />
-                <MobileMetric label="EM" value={row.em} />
+                <MobileMetric label={t.colJudge} value={row.judgePct} />
+                <MobileMetric label={t.colMatchTh} value={row.mTh} />
+                <MobileMetric label={t.colF1Th} value={row.f1Th} />
+                <MobileMetric label={t.colEm} value={row.em} />
               </dl>
 
               <p className="font-mono text-[11px] text-[var(--text-muted)]">
-                Gen {formatClock(row.genSeconds)}
+                {t.genPrefix} {formatClock(row.genSeconds)}
               </p>
             </li>
           );
@@ -103,7 +111,9 @@ export function BenchmarkMobileList({ rows }: BenchmarkMobileListProps) {
         href="/request"
         className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-dashed border-[var(--border-strong)] px-4 font-mono text-xs font-semibold tracking-wide text-[var(--brand-text)] transition-colors hover:border-[var(--brand-sky-light)] hover:text-[var(--brand-cta-hover)]"
       >
-        Missing a combination? Request a run &rarr;
+        {isTh
+          ? "ไม่พบไปป์ไลน์ที่คุณต้องการ? ส่งคำขอทดสอบ →"
+          : "Missing a combination? Request a run →"}
       </Link>
     </div>
   );

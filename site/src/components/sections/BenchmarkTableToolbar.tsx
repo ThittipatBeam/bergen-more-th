@@ -5,6 +5,8 @@ import { QUALITY_MAX, QUALITY_MIN } from "@/lib/benchmark-data";
 import { SCORE_BAND_CLASSES, SCORE_BAND_ORDER } from "@/lib/score-scale";
 import { BenchmarkColumnFilter } from "@/components/sections/BenchmarkColumnFilter";
 import { BenchmarkModelFilter } from "@/components/sections/BenchmarkModelFilter";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 interface BenchmarkTableToolbarProps {
   generators: string[];
@@ -17,12 +19,6 @@ interface BenchmarkTableToolbarProps {
   resultsCount: number;
 }
 
-const RERANKER_OPTIONS: Array<{ id: RerankerFilter; label: string }> = [
-  { id: "all", label: "All" },
-  { id: "yes", label: "With Reranker" },
-  { id: "no", label: "Dense Only" },
-];
-
 export function BenchmarkTableToolbar({
   generators,
   generator,
@@ -33,6 +29,15 @@ export function BenchmarkTableToolbar({
   onColumnsChange,
   resultsCount,
 }: BenchmarkTableToolbarProps) {
+  const { language } = useLanguage();
+  const t = I18N[language].leaderboard;
+
+  const rerankerOptions: Array<{ id: RerankerFilter; label: string }> = [
+    { id: "all", label: t.rerankerAll },
+    { id: "yes", label: t.rerankerYes },
+    { id: "no", label: t.rerankerNo },
+  ];
+
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] transition-colors">
       <div className="flex flex-wrap items-center gap-2">
@@ -46,10 +51,10 @@ export function BenchmarkTableToolbar({
         {/* Reranker Segmented Filter */}
         <div
           role="group"
-          aria-label="Filter by reranker"
+          aria-label={language === "TH" ? "กรองตามประเภท Reranker" : "Filter by reranker"}
           className="inline-flex items-center rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-0.5"
         >
-          {RERANKER_OPTIONS.map((opt) => (
+          {rerankerOptions.map((opt) => (
             <button
               key={opt.id}
               type="button"
@@ -71,10 +76,10 @@ export function BenchmarkTableToolbar({
       <div className="flex items-center justify-between sm:justify-end gap-3">
         <div
           className="hidden lg:flex items-center gap-1.5 whitespace-nowrap"
-          title={`Overall score tint: ${QUALITY_MIN.toFixed(1)} → ${QUALITY_MAX.toFixed(1)}`}
+          title={t.overallTintTitle(QUALITY_MIN, QUALITY_MAX)}
         >
           <span className="text-xs font-sans text-[var(--text-muted)]">
-            Overall
+            {t.overall}
           </span>
           <span className="flex items-center gap-0.5" aria-hidden="true">
             {SCORE_BAND_ORDER.map((band) => (
@@ -90,7 +95,7 @@ export function BenchmarkTableToolbar({
         </div>
 
         <span className="whitespace-nowrap text-xs font-sans text-[var(--text-muted)]">
-          <span className="font-mono font-semibold text-[var(--text-secondary)]">{resultsCount}</span> runs
+          <span className="font-mono font-semibold text-[var(--text-secondary)]">{resultsCount}</span> {t.runsCount}
         </span>
         <BenchmarkColumnFilter columns={columns} onChange={onColumnsChange} />
       </div>

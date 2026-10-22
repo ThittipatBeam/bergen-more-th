@@ -1,8 +1,12 @@
+"use client";
+
 import type {
   ColumnVisibility,
   SortDirection,
   SortKey,
 } from "@/types/benchmark";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 interface BenchmarkTableHeaderProps {
   columns: ColumnVisibility;
@@ -12,7 +16,7 @@ interface BenchmarkTableHeaderProps {
 }
 
 /** One-line meaning per column, surfaced as tooltip + accessible name. */
-const COLUMN_DEFS: Record<SortKey, string> = {
+const COLUMN_DEFS_EN: Record<SortKey, string> = {
   rank: "Rank — position by overall score",
   retriever: "Embedding — the dense retrieval model",
   reranker: "Reranker — optional second-pass scoring model",
@@ -30,12 +34,35 @@ const COLUMN_DEFS: Record<SortKey, string> = {
     "Generation time — model generation only (m:ss); excludes retrieval, reranking and scoring",
 };
 
+const COLUMN_DEFS_TH: Record<SortKey, string> = {
+  rank: "อันดับ — จัดอันดับตามคะแนน Overall Score",
+  retriever: "Embedding — โมเดล Dense Retrieval",
+  reranker: "Reranker — โมเดลจัดอันดับซ้ำรอบสอง (ไม่บังคับ)",
+  q: "Overall score — 45% Judge + 20% Match TH + 20% F1 TH + 15% Exact Match (0–100) ไม่รวมเวลาสร้างคำตอบ",
+  judgePct:
+    "Judge Score — สัดส่วนคำตอบที่ LLM Judge ตัดสินว่าถูกต้อง (0–100)",
+  mTh: "Match TH — สัดส่วนคำถามที่มีคำตอบเฉลยครบถ้วนในข้อความ (M_th, ไม่สนใจช่องว่าง)",
+  f1Th: "F1 TH — ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall ภาษาไทย (F1_th)",
+  precisionTh:
+    "Precision TH — สัดส่วนคำภาษาไทยของโมเดลที่ตรงกับคำตอบเฉลย (Precision_th)",
+  recallTh:
+    "Recall TH — สัดส่วนคำภาษาไทยในเฉลยที่โมเดลตอบได้ครอบคลุม (Recall_th)",
+  em: "Exact Match — สัดส่วนคำตอบที่ตรงกับเฉลยแบบ 100% (EM)",
+  latency:
+    "เวลา Generation — เฉพาะเวลาที่โมเดลสร้างคำตอบ (นาที:วินาที) ไม่รวมการค้นคืนและให้คะแนน",
+};
+
 export function BenchmarkTableHeader({
   columns,
   sortKey,
   sortDirection,
   onSort,
 }: BenchmarkTableHeaderProps) {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
+  const defs = isTh ? COLUMN_DEFS_TH : COLUMN_DEFS_EN;
+  const t = I18N[language].leaderboard;
+
   const renderIndicator = (key: SortKey) => {
     // Both states share one size so activating a sort never shifts the layout.
     if (sortKey === key) {
@@ -63,8 +90,8 @@ export function BenchmarkTableHeader({
     <button
       type="button"
       onClick={() => onSort(key)}
-      title={COLUMN_DEFS[key]}
-      aria-label={`${COLUMN_DEFS[key]}. Activate to sort.`}
+      title={defs[key]}
+      aria-label={`${defs[key]}. ${isTh ? "คลิกเพื่อเรียงลำดับ" : "Activate to sort."}`}
       className={`group cursor-pointer uppercase min-w-[44px] min-h-[44px] inline-flex items-center gap-0.5 text-inherit hover:text-[var(--text-primary)] transition-colors ${
         align === "right" ? "ml-auto" : align === "center" ? "mx-auto justify-center" : ""
       }`}
@@ -82,73 +109,73 @@ export function BenchmarkTableHeader({
           aria-sort={ariaSort("rank")}
           className="sticky left-0 z-20 w-10 bg-[var(--background-subtle)] py-3.5 px-1.5 text-center"
         >
-          {sortBtn("rank", "#", "center")}
+          {sortBtn("rank", t.colRank, "center")}
         </th>
 
         <th
           scope="col"
           className="sticky left-14 z-20 bg-[var(--background-subtle)] py-3.5 px-2 text-left sm:px-3"
         >
-          Model
+          {t.colModel}
         </th>
 
         {columns.retriever && (
           <th scope="col" aria-sort={ariaSort("retriever")} className="py-3.5 px-3 text-left">
-            {sortBtn("retriever", "Embedding", "left")}
+            {sortBtn("retriever", t.colRetriever, "left")}
           </th>
         )}
 
         {columns.reranker && (
           <th scope="col" aria-sort={ariaSort("reranker")} className="py-3.5 px-3 text-left">
-            {sortBtn("reranker", "Reranker", "left")}
+            {sortBtn("reranker", t.colReranker, "left")}
           </th>
         )}
 
         {columns.q && (
           <th scope="col" aria-sort={ariaSort("q")} className="py-3.5 px-2 sm:px-3 text-right bg-[var(--surface-brand)] text-[var(--brand-text)]">
-            {sortBtn("q", "Overall", "right")}
+            {sortBtn("q", t.colOverall, "right")}
           </th>
         )}
 
         {columns.judgePct && (
           <th scope="col" aria-sort={ariaSort("judgePct")} className="py-3.5 px-2 text-center">
-            {sortBtn("judgePct", "Judge", "center")}
+            {sortBtn("judgePct", t.colJudge, "center")}
           </th>
         )}
 
         {columns.mTh && (
           <th scope="col" aria-sort={ariaSort("mTh")} className="py-3.5 px-2 text-center">
-            {sortBtn("mTh", "Match TH", "center")}
+            {sortBtn("mTh", t.colMatchTh, "center")}
           </th>
         )}
 
         {columns.f1Th && (
           <th scope="col" aria-sort={ariaSort("f1Th")} className="py-3.5 px-2 text-center">
-            {sortBtn("f1Th", "F1 TH", "center")}
+            {sortBtn("f1Th", t.colF1Th, "center")}
           </th>
         )}
 
         {columns.precisionTh && (
           <th scope="col" aria-sort={ariaSort("precisionTh")} className="py-3.5 px-2 text-center">
-            {sortBtn("precisionTh", "Precision TH", "center")}
+            {sortBtn("precisionTh", t.colPrecisionTh, "center")}
           </th>
         )}
 
         {columns.recallTh && (
           <th scope="col" aria-sort={ariaSort("recallTh")} className="py-3.5 px-2 text-center">
-            {sortBtn("recallTh", "Recall TH", "center")}
+            {sortBtn("recallTh", t.colRecallTh, "center")}
           </th>
         )}
 
         {columns.em && (
           <th scope="col" aria-sort={ariaSort("em")} className="py-3.5 px-2 text-center">
-            {sortBtn("em", "EM", "center")}
+            {sortBtn("em", t.colEm, "center")}
           </th>
         )}
 
         {columns.latency && (
           <th scope="col" aria-sort={ariaSort("latency")} className="py-3.5 px-2 text-right">
-            {sortBtn("latency", "Gen Time", "right")}
+            {sortBtn("latency", t.colLatency, "right")}
           </th>
         )}
       </tr>

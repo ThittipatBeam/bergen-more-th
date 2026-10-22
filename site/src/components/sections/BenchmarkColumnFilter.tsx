@@ -2,24 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ColumnVisibility, MetricColumnKey } from "@/types/benchmark";
+import { useLanguage } from "@/hooks/use-language";
 
 interface ColumnOption {
   key: MetricColumnKey;
-  label: string;
+  labelEn: string;
+  labelTh: string;
   category: "metric" | "pipeline";
 }
 
 const COLUMN_OPTIONS: ColumnOption[] = [
-  { key: "q", label: "Overall Score", category: "metric" },
-  { key: "judgePct", label: "Judge Score (%)", category: "metric" },
-  { key: "mTh", label: "Thai M-Score (M_th)", category: "metric" },
-  { key: "f1Th", label: "Thai F1-Score (F1_th)", category: "metric" },
-  { key: "precisionTh", label: "Thai Precision (Precision_th)", category: "metric" },
-  { key: "recallTh", label: "Thai Recall (Recall_th)", category: "metric" },
-  { key: "em", label: "Exact Match (EM)", category: "metric" },
-  { key: "latency", label: "Generation Time (m:ss)", category: "metric" },
-  { key: "retriever", label: "Embedding (Retriever)", category: "pipeline" },
-  { key: "reranker", label: "Reranker Model", category: "pipeline" },
+  { key: "q", labelEn: "Overall Score", labelTh: "Overall Score", category: "metric" },
+  { key: "judgePct", labelEn: "Judge Score (%)", labelTh: "คะแนน Judge (%)", category: "metric" },
+  { key: "mTh", labelEn: "Thai M-Score (M_th)", labelTh: "Thai M-Score (M_th)", category: "metric" },
+  { key: "f1Th", labelEn: "Thai F1-Score (F1_th)", labelTh: "Thai F1-Score (F1_th)", category: "metric" },
+  { key: "precisionTh", labelEn: "Thai Precision (Precision_th)", labelTh: "Thai Precision (Precision_th)", category: "metric" },
+  { key: "recallTh", labelEn: "Thai Recall (Recall_th)", labelTh: "Thai Recall (Recall_th)", category: "metric" },
+  { key: "em", labelEn: "Exact Match (EM)", labelTh: "Exact Match (EM)", category: "metric" },
+  { key: "latency", labelEn: "Generation Time (m:ss)", labelTh: "เวลา Generation (m:ss)", category: "metric" },
+  { key: "retriever", labelEn: "Embedding (Retriever)", labelTh: "โมเดล Embedding", category: "pipeline" },
+  { key: "reranker", labelEn: "Reranker Model", labelTh: "โมเดล Reranker", category: "pipeline" },
 ];
 
 export function BenchmarkColumnFilter({
@@ -29,6 +31,8 @@ export function BenchmarkColumnFilter({
   columns: ColumnVisibility;
   onChange: (columns: ColumnVisibility) => void;
 }) {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -72,7 +76,7 @@ export function BenchmarkColumnFilter({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        aria-label="Filter metrics and columns"
+        aria-label={isTh ? "เลือกแสดงคอลัมน์และเมทริกซ์" : "Filter metrics and columns"}
         className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[var(--brand-sky-light)] text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
       >
         <svg
@@ -87,7 +91,7 @@ export function BenchmarkColumnFilter({
         >
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
         </svg>
-        <span className="whitespace-nowrap">Customize Metrics</span>
+        <span className="whitespace-nowrap">{isTh ? "เลือกคอลัมน์" : "Customize Metrics"}</span>
         <span className="px-1.5 py-0.5 rounded-full text-xs bg-[var(--brand-sky-blue)]/15 text-[var(--brand-text)] font-bold">
           {activeCount}/{COLUMN_OPTIONS.length}
         </span>
@@ -98,7 +102,7 @@ export function BenchmarkColumnFilter({
         <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] p-3.5 shadow-xl z-30 transition-all">
           <div className="flex items-center justify-between pb-2.5 border-b border-[var(--border-default)]/60">
             <span className="text-xs font-mono font-bold text-[var(--text-primary)]">
-              Display Metrics & Columns
+              {isTh ? "แสดงคอลัมน์และเมทริกซ์" : "Display Metrics & Columns"}
             </span>
             <div className="flex items-center gap-2 text-xs font-mono">
               <button
@@ -106,7 +110,7 @@ export function BenchmarkColumnFilter({
                 onClick={() => setAll(true)}
                 className="min-w-[44px] min-h-[44px] px-2 inline-flex items-center justify-center text-[var(--brand-text)] hover:underline cursor-pointer"
               >
-                All
+                {isTh ? "ทั้งหมด" : "All"}
               </button>
               <span>&bull;</span>
               <button
@@ -114,7 +118,7 @@ export function BenchmarkColumnFilter({
                 onClick={() => setAll(false)}
                 className="min-w-[44px] min-h-[44px] px-2 inline-flex items-center justify-center text-[var(--text-muted)] hover:underline cursor-pointer"
               >
-                Clear
+                {isTh ? "ล้าง" : "Clear"}
               </button>
             </div>
           </div>
@@ -132,14 +136,14 @@ export function BenchmarkColumnFilter({
                   className="rounded border-[var(--border-default)] text-[var(--brand-sky-blue)] focus:ring-[var(--border-focus)] cursor-pointer"
                 />
                 <span className="text-[var(--text-secondary)] font-medium">
-                  {opt.label}
+                  {isTh ? opt.labelTh : opt.labelEn}
                 </span>
               </label>
             ))}
           </div>
 
           <div className="pt-2 border-t border-[var(--border-default)]/60 text-xs font-mono text-[var(--text-muted)] text-center">
-            Check or uncheck to show/hide columns
+            {isTh ? "เลือกเพื่อแสดงหรือซ่อนคอลัมน์ในตาราง" : "Check or uncheck to show/hide columns"}
           </div>
         </div>
       )}

@@ -1,3 +1,8 @@
+"use client";
+
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
+
 interface RequestSuccessCardProps {
   generator: string;
   embedding: string;
@@ -13,10 +18,14 @@ export function RequestSuccessCard({
   email,
   onReset,
 }: RequestSuccessCardProps) {
+  const { language } = useLanguage();
+  const t = I18N[language].request;
+  const isTh = language === "TH";
+
   const parts: { label: string; value: string; fallback?: string }[] = [
-    { label: "Generator", value: generator.trim() },
-    { label: "Embedding", value: embedding.trim() },
-    { label: "Reranker", value: reranker.trim(), fallback: "None" },
+    { label: isTh ? "โมเดล Generator" : "Generator", value: generator.trim() },
+    { label: isTh ? "โมเดล Embedding" : "Embedding", value: embedding.trim() },
+    { label: isTh ? "โมเดล Reranker" : "Reranker", value: reranker.trim(), fallback: t.noneFallback },
   ];
 
   return (
@@ -27,12 +36,22 @@ export function RequestSuccessCard({
 
       <div className="flex flex-col gap-2">
         <h2 className="font-sans text-2xl font-bold text-[var(--text-primary)]">
-          Request received
+          {t.successTitle}
         </h2>
         <p className="max-w-[52ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-          We will reply to{" "}
-          <span className="font-mono text-[var(--brand-text)]">{email}</span>{" "}
-          before the run is scheduled.
+          {isTh ? (
+            <>
+              ทีมงานจะติดต่อกลับไปยัง{" "}
+              <span className="font-mono text-[var(--brand-text)]">{email}</span>{" "}
+              ก่อนกำหนดการเริ่มรันการทดสอบ
+            </>
+          ) : (
+            <>
+              We will reply to{" "}
+              <span className="font-mono text-[var(--brand-text)]">{email}</span>{" "}
+              before the run is scheduled.
+            </>
+          )}
         </p>
       </div>
 
@@ -59,8 +78,9 @@ export function RequestSuccessCard({
       <button
         type="button"
         onClick={onReset}
-        className="mt-1 min-h-[44px] cursor-pointer rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"      >
-        Submit another request
+        className="mt-1 min-h-[44px] cursor-pointer rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"
+      >
+        {t.submitAnother}
       </button>
     </div>
   );

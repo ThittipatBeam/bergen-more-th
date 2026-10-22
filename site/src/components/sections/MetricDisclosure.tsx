@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { MetricIcon } from "@/components/ui/MetricIcon";
+import { useLanguage } from "@/hooks/use-language";
 
 interface MetricDisclosureProps {
   /** The metric name, so the control is unambiguous out of context. */
@@ -17,8 +18,18 @@ interface MetricDisclosureProps {
  * out of the accessibility tree.
  */
 export function MetricDisclosure({ label, children }: MetricDisclosureProps) {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
   const [open, setOpen] = useState(false);
   const panelId = useId();
+
+  const toggleText = open
+    ? isTh
+      ? "ซ่อนสูตรคำนวณ"
+      : "Hide the math"
+    : isTh
+      ? "ดูสูตรคำนวณเชิงลึก"
+      : "Show the math";
 
   return (
     <>
@@ -27,11 +38,11 @@ export function MetricDisclosure({ label, children }: MetricDisclosureProps) {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
-        className="mt-1 flex min-h-[44px] w-full items-center justify-between gap-2 border-t border-[var(--border-default)] pt-2 font-sans text-sm font-semibold text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
+        className="mt-1 flex min-h-[44px] w-full items-center justify-between gap-2 border-t border-[var(--border-default)] pt-2 font-sans text-sm font-semibold text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] cursor-pointer"
       >
         <span>
           <span className="sr-only">{label}: </span>
-          {open ? "Hide the math" : "Show the math"}
+          {toggleText}
         </span>
         <MetricIcon
           name="expand_more"

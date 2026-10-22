@@ -1,3 +1,5 @@
+"use client";
+
 import {
   MODEL_TOKENS,
   REFERENCE_TOKENS,
@@ -5,8 +7,9 @@ import {
   WORKED_EXAMPLE,
 } from "@/lib/metrics-story";
 import type { StoryToken } from "@/types/metrics";
+import { useLanguage } from "@/hooks/use-language";
 
-function TokenChip({ token }: { token: StoryToken }) {
+function TokenChip({ token, isTh }: { token: StoryToken; isTh: boolean }) {
   return (
     <span
       lang="th"
@@ -17,13 +20,29 @@ function TokenChip({ token }: { token: StoryToken }) {
       }`}
     >
       <span aria-hidden="true">{token.matched ? "✓" : "≠"}</span>
-      <span className="sr-only">{token.matched ? "matches:" : "differs:"}</span>
+      <span className="sr-only">
+        {token.matched
+          ? isTh
+            ? "ตรงกัน:"
+            : "matches:"
+          : isTh
+            ? "ต่างกัน:"
+            : "differs:"}
+      </span>
       {token.text}
     </span>
   );
 }
 
-function TokenRow({ label, tokens }: { label: string; tokens: StoryToken[] }) {
+function TokenRow({
+  label,
+  tokens,
+  isTh,
+}: {
+  label: string;
+  tokens: StoryToken[];
+  isTh: boolean;
+}) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
       <span className="w-32 shrink-0 pt-1 font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
@@ -31,7 +50,11 @@ function TokenRow({ label, tokens }: { label: string; tokens: StoryToken[] }) {
       </span>
       <div className="flex flex-wrap gap-1.5">
         {tokens.map((token) => (
-          <TokenChip key={`${label}-${token.text}`} token={token} />
+          <TokenChip
+            key={`${label}-${token.text}`}
+            token={token}
+            isTh={isTh}
+          />
         ))}
       </div>
     </div>
@@ -44,6 +67,9 @@ function TokenRow({ label, tokens }: { label: string; tokens: StoryToken[] }) {
  * against modules/metrics.py — see metrics-story.ts.
  */
 export function MetricsWorkedExample() {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
+
   return (
     <section
       id="worked-example"
@@ -52,13 +78,15 @@ export function MetricsWorkedExample() {
     >
       <header className="flex flex-col gap-2">
         <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
-          Worked example
+          {isTh ? "ตัวอย่างการคำนวณจริง" : "Worked example"}
         </span>
         <h2
           id="worked-example-title"
           className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
-          Follow one answer through every score
+          {isTh
+            ? "ไล่ดูผลคะแนนจริงของคำตอบตัวอย่างในทุกเมทริกซ์"
+            : "Follow one answer through every score"}
         </h2>
       </header>
 
@@ -66,7 +94,7 @@ export function MetricsWorkedExample() {
         <div className="flex flex-col gap-5 rounded-2xl bg-[var(--background-subtle)] p-5 sm:p-6">
           <div>
             <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Question
+              {isTh ? "คำถาม" : "Question"}
             </span>
             <p
               lang="th"
@@ -84,7 +112,7 @@ export function MetricsWorkedExample() {
 
           <div>
             <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Answer key
+              {isTh ? "คำตอบเฉลย (Ground Truth)" : "Answer key"}
             </span>
             <p
               lang="th"
@@ -104,7 +132,7 @@ export function MetricsWorkedExample() {
         <div className="flex flex-col gap-5 rounded-2xl border border-[var(--brand-sky-light)]/40 bg-[var(--surface-brand)] p-5 sm:p-6">
           <div>
             <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Model answer
+              {isTh ? "คำตอบจากโมเดล" : "Model answer"}
             </span>
             <p
               lang="th"
@@ -120,17 +148,28 @@ export function MetricsWorkedExample() {
             </p>
           </div>
           <p className="font-sans text-base leading-relaxed text-[var(--text-secondary)]">
-            Same meaning, shorter name — every score below follows from it.
+            {isTh
+              ? "ความหมายเหมือนกัน แต่สะกดด้วยชื่อย่อ — ทุกผลคะแนนด้านล่างสะท้อนจากจุดนี้"
+              : "Same meaning, shorter name — every score below follows from it."}
           </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        <TokenRow label="Answer key" tokens={REFERENCE_TOKENS} />
-        <TokenRow label="Model answer" tokens={MODEL_TOKENS} />
+        <TokenRow
+          label={isTh ? "คำตอบเฉลย" : "Answer key"}
+          tokens={REFERENCE_TOKENS}
+          isTh={isTh}
+        />
+        <TokenRow
+          label={isTh ? "คำตอบโมเดล" : "Model answer"}
+          tokens={MODEL_TOKENS}
+          isTh={isTh}
+        />
         <p className="font-sans text-sm leading-relaxed text-[var(--text-muted)]">
-          PyThaiNLP split ประเทศไทย into ประเทศ + ไทย, so each answer is{" "}
-          {WORKED_EXAMPLE.tokenCount} word pieces long — not five.
+          {isTh
+            ? `PyThaiNLP ตัดคำ "ประเทศไทย" ออกเป็น "ประเทศ" + "ไทย" ดังนั้นคำตอบจึงมีทั้งหมด ${WORKED_EXAMPLE.tokenCount} หน่วยคำ (Token)`
+            : `PyThaiNLP split ประเทศไทย into ประเทศ + ไทย, so each answer is ${WORKED_EXAMPLE.tokenCount} word pieces long — not five.`}
         </p>
       </div>
 
@@ -162,7 +201,13 @@ export function MetricsWorkedExample() {
             </div>
             {score.verdict !== null && (
               <span className="sr-only">
-                {score.verdict ? "correct" : "not correct"}
+                {score.verdict
+                  ? isTh
+                    ? "ถูกต้อง"
+                    : "correct"
+                  : isTh
+                    ? "ไม่ตรง"
+                    : "not correct"}
               </span>
             )}
           </li>
@@ -170,7 +215,9 @@ export function MetricsWorkedExample() {
       </ul>
 
       <p className="font-sans text-sm text-[var(--text-muted)]">
-        Illustrative verdict — leaderboard scores come from real runs.
+        {isTh
+          ? "คำตอบตัวอย่างเพื่อสาธิตวิธีการคำนวณ — ผลคะแนนบนลีดเดอร์บอร์ดมาจากการทดสอบจริง"
+          : "Illustrative verdict — leaderboard scores come from real runs."}
       </p>
     </section>
   );

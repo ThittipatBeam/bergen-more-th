@@ -1,8 +1,11 @@
+"use client";
+
 import { MathFormula } from "@/components/ui/MathFormula";
 import { MetricIcon } from "@/components/ui/MetricIcon";
 import { FAMILY_COLORS } from "@/lib/metrics-styles";
 import type { MetricDefinition } from "@/types/metrics";
 import { MetricDisclosure } from "./MetricDisclosure";
+import { useLanguage } from "@/hooks/use-language";
 
 interface MetricCardProps {
   metric: MetricDefinition;
@@ -16,6 +19,8 @@ interface MetricCardProps {
  * inside the chapter's card, so nothing nests.
  */
 export function MetricCard({ metric, example }: MetricCardProps) {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
   const color = FAMILY_COLORS[metric.family];
   const higher = metric.direction === "higher";
 
@@ -36,7 +41,7 @@ export function MetricCard({ metric, example }: MetricCardProps) {
           className="shrink-0 rounded-full px-2.5 py-1 font-mono text-xs font-semibold"
           style={{ backgroundColor: color.bg, color: color.fg }}
         >
-          {higher ? "Higher" : "Lower"}
+          {isTh ? (higher ? "ยิ่งสูงยิ่งดี" : "ยิ่งต่ำยิ่งดี") : higher ? "Higher" : "Lower"}
           <span aria-hidden="true">{higher ? " ↑" : " ↓"}</span>
           <span className="sr-only"> is better</span>
         </span>
@@ -53,7 +58,7 @@ export function MetricCard({ metric, example }: MetricCardProps) {
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-muted)]">
         <span className="font-mono text-xs font-bold uppercase tracking-wider">
-          Example.{" "}
+          {isTh ? "ตัวอย่าง. " : "Example. "}
         </span>
         {example ?? metric.simple.example}
       </p>
@@ -61,7 +66,7 @@ export function MetricCard({ metric, example }: MetricCardProps) {
       <MetricDisclosure label={metric.name}>
         <p className="font-sans text-base leading-7 text-[var(--text-secondary)]">
           <span className="font-semibold text-[var(--text-primary)]">
-            How to read it.{" "}
+            {isTh ? "วิธีอ่านค่า. " : "How to read it. "}
           </span>
           {metric.technical.reading}
         </p>

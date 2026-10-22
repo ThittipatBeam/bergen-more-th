@@ -8,10 +8,14 @@ import type { RequestFormState } from "@/types/request";
 import { RequestForm } from "@/components/sections/RequestForm";
 import { RequestSuccessCard } from "@/components/sections/RequestSuccessCard";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 export function RequestSection() {
   const [form, setForm] = useState<RequestFormState>(EMPTY_REQUEST_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const { language } = useLanguage();
+  const t = I18N[language].request;
 
   const handleFieldChange = (key: keyof RequestFormState, value: string) =>
     setForm((previous) => ({ ...previous, [key]: value }));
@@ -29,10 +33,10 @@ export function RequestSection() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-4 pt-28 pb-20 sm:gap-12 sm:px-8 md:px-12">
       <PageHeader
-        kicker="Custom evaluation"
-        title="Request a benchmark run"
-        lead="Tell us which generator, embedding and reranker to put in the pipeline. We will reply by email before the run is scheduled."
-        meta={`ThaiWikiV4 · ${JUDGE_N} questions · judge ${JUDGE_NAME}`}
+        kicker={t.kicker}
+        title={t.title}
+        lead={t.lead}
+        meta={t.meta(JUDGE_N, JUDGE_NAME)}
       />
 
       {submitted ? (

@@ -1,7 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 export function SiteFooter() {
+  const { language } = useLanguage();
+  const t = I18N[language].footer;
+
   return (
     <footer className="w-full border-t border-[var(--border-default)] bg-[var(--background-primary)] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -28,9 +35,7 @@ export function SiteFooter() {
             className="h-7 w-px shrink-0 self-center bg-[var(--border-default)]"
           />
           <p className="text-sm font-sans text-[var(--text-muted)] max-w-md leading-relaxed">
-            SIAM.AI Thai RAG Benchmark — open evaluation of Thai
-            retrieval-augmented generation pipelines. New runs are published as
-            they complete.
+            {t.tagline}
           </p>
         </div>
 
@@ -39,31 +44,31 @@ export function SiteFooter() {
             href="/#leaderboard"
             className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
-            Leaderboard
+            {t.leaderboard}
           </Link>
           <Link
             href="/metrics"
             className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
-            Metrics
+            {t.metrics}
           </Link>
           <Link
             href="/methodology"
             className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
-            Methodology
+            {t.methodology}
           </Link>
           <Link
             href="/about"
             className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
-            About
+            {t.about}
           </Link>
           <Link
             href="/request"
             className="inline-flex items-center min-h-[44px] font-semibold text-[var(--brand-text)] hover:text-[var(--brand-cta-hover)] transition-colors"
           >
-            Request a run &rarr;
+            {t.requestRun}
           </Link>
         </nav>
       </div>

@@ -11,15 +11,21 @@ import React, {
 
 export type Language = "TH" | "EN";
 
-interface LanguageContextType {
+export interface LanguageContextType {
   language: Language;
+  isTh: boolean;
   setLanguage: (lang: Language) => void;
+  t: (en: string, th: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType>({
+const defaultContext: LanguageContextType = {
   language: "EN",
+  isTh: false,
   setLanguage: () => {},
-});
+  t: (en: string) => en,
+};
+
+const LanguageContext = createContext<LanguageContextType>(defaultContext);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>("EN");
@@ -40,7 +46,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = lang === "TH" ? "th" : "en";
   }, []);
 
-  const value = useMemo(() => ({ language, setLanguage }), [language, setLanguage]);
+  const t = useCallback(
+    (en: string, th: string) => (language === "TH" ? th : en),
+    [language]
+  );
+
+  const value = useMemo(
+    () => ({
+      language,
+      isTh: language === "TH",
+      setLanguage,
+      t,
+    }),
+    [language, setLanguage, t]
+  );
 
   return (
     <LanguageContext.Provider value={value}>

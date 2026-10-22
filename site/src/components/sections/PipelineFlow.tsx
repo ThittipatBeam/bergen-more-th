@@ -1,4 +1,7 @@
-import { PIPELINE_STAGES } from "@/lib/methodology-data";
+"use client";
+
+import { getPipelineStages } from "@/lib/methodology-data";
+import { useLanguage } from "@/hooks/use-language";
 
 interface PipelineFlowProps {
   accent: { fg: string; bg: string };
@@ -6,12 +9,15 @@ interface PipelineFlowProps {
 
 /** The path one leaderboard row takes, left to right. */
 export function PipelineFlow({ accent }: PipelineFlowProps) {
+  const { language } = useLanguage();
+  const stages = getPipelineStages(language);
+
   return (
     <ol
-      aria-label="Stages of one pipeline run"
+      aria-label={language === "TH" ? "ขั้นตอนของไปป์ไลน์ในการทดสอบ" : "Stages of one pipeline run"}
       className="grid grid-cols-2 gap-3 lg:grid-cols-4"
     >
-      {PIPELINE_STAGES.map((stage, index) => (
+      {stages.map((stage, index) => (
         <li
           key={stage.label}
           className="relative flex flex-col gap-1 rounded-2xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-4 sm:p-5"
@@ -31,7 +37,7 @@ export function PipelineFlow({ accent }: PipelineFlowProps) {
           <span className="font-sans text-sm leading-relaxed text-[var(--text-secondary)]">
             {stage.note}
           </span>
-          {index < PIPELINE_STAGES.length - 1 && (
+          {index < stages.length - 1 && (
             <span
               aria-hidden="true"
               className="absolute -right-2 top-1/2 hidden -translate-y-1/2 text-[var(--text-muted)] lg:block"

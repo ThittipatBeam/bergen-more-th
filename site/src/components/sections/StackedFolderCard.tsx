@@ -1,5 +1,9 @@
+"use client";
+
 import type { ChampionPick } from "@/types/benchmark";
 import { BrandIcon } from "@/components/ui/BrandIcon";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 function CategoryIcon({
   icon,
@@ -74,6 +78,8 @@ export function StackedFolderCard({
   isActive,
   onSelect,
 }: StackedFolderCardProps) {
+  const { language } = useLanguage();
+  const c = I18N[language].champions;
   const { row } = pick;
   const translateY = level * 44;
 
@@ -108,7 +114,7 @@ export function StackedFolderCard({
           <button
             type="button"
             onClick={onSelect}
-            aria-label={`Show ${pick.categoryTitle}`}
+            aria-label={`${language === "TH" ? "แสดง" : "Show"} ${pick.categoryTitle}`}
             className="champion-hit-area absolute inset-0 z-10 h-full w-full cursor-pointer rounded-t-2xl bg-transparent"
           />
         )}
@@ -155,10 +161,10 @@ export function StackedFolderCard({
         <div className="rounded-xl border border-[var(--border-default)]/80 bg-[var(--background-subtle)]/70 p-2.5 sm:p-3">
           <div className="flex items-center justify-between text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] mb-2 font-semibold">
             <span className="flex items-center gap-1.5">
-              RAG Pipeline Architecture
+              {c.ragPipelineArch}
             </span>
             <span className="text-[var(--text-secondary)] font-mono">
-              Rank #{row.rank}
+              {c.rankPrefix}{row.rank}
             </span>
           </div>
 
@@ -166,7 +172,7 @@ export function StackedFolderCard({
             {/* Stage 1: Retrieval */}
             <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
               <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
-                1. Retrieval
+                {c.stageRetrieval}
               </span>
               <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
                 <BrandIcon name={row.retriever} size={15} />
@@ -179,12 +185,12 @@ export function StackedFolderCard({
             {/* Stage 2: Reranker */}
             <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
               <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
-                2. Reranker
+                {c.stageReranker}
               </span>
               <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
                 <BrandIcon name={row.reranker} size={15} />
-                <span className="truncate" title={row.reranker ?? "None"}>
-                  {row.reranker ?? "None (Direct Dense)"}
+                <span className="truncate" title={row.reranker ?? c.noneDirectDense}>
+                  {row.reranker ?? c.noneDirectDense}
                 </span>
               </div>
             </div>
@@ -192,7 +198,7 @@ export function StackedFolderCard({
             {/* Stage 3: Generator */}
             <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
               <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
-                3. Generator
+                {c.stageGenerator}
               </span>
               <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
                 <BrandIcon name={row.generator} size={15} />
@@ -207,14 +213,14 @@ export function StackedFolderCard({
         {/* 3. Footer */}
         <div className="flex items-center justify-between text-xs font-mono pt-0.5 text-[var(--text-muted)]">
           <span className="text-xs truncate text-[var(--text-muted)]">
-            Corpus: Thai Wikipedia QA
+            {c.corpusLabel}
           </span>
 
           <a
             href="#leaderboard"
             className="shrink-0 text-xs font-mono font-semibold text-[var(--brand-text)] hover:text-[var(--brand-cta-hover)] transition-colors min-h-[44px] inline-flex items-center"
           >
-            Full results &darr;
+            {c.fullResults}
           </a>
         </div>
       </div>

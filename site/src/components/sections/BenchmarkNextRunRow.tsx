@@ -1,11 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import type { ColumnVisibility } from "@/types/benchmark";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 export function BenchmarkNextRunRow({
   columns,
 }: {
   columns: ColumnVisibility;
 }) {
+  const { language } = useLanguage();
+  const t = I18N[language].leaderboard;
+
   return (
     <tr className="border-b border-[var(--border-default)]/50 font-mono text-xs">
       <td className="py-3 px-2 text-center text-[var(--text-muted)]" />
@@ -16,7 +23,7 @@ export function BenchmarkNextRunRow({
             href="/request"
             className="inline-flex min-h-[44px] items-center whitespace-nowrap text-xs font-mono font-semibold tracking-wider text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
-            Request a run &rarr;
+            {t.requestRunRow}
           </Link>
         </div>
       </td>

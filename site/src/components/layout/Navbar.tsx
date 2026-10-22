@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -10,6 +10,8 @@ import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useLanguage } from "@/hooks/use-language";
+import { getNavItems, I18N, NAV_ITEMS_EN } from "@/lib/i18n/translations";
 
 export interface NavItem {
   label: string;
@@ -17,33 +19,7 @@ export interface NavItem {
   description?: string;
 }
 
-export const NAV_ITEMS: NavItem[] = [
-  {
-    label: "LEADERBOARD",
-    href: "/",
-    description: "Thai RAG & LLM rankings",
-  },
-  {
-    label: "METHODOLOGY",
-    href: "/methodology",
-    description: "Corpus, pipeline & protocol",
-  },
-  {
-    label: "METRICS",
-    href: "/metrics",
-    description: "Evaluation metrics & formulas",
-  },
-  {
-    label: "REQUEST",
-    href: "/request",
-    description: "Request pipeline combination",
-  },
-  {
-    label: "ABOUT",
-    href: "/about",
-    description: "About the benchmark",
-  },
-];
+export const NAV_ITEMS: NavItem[] = NAV_ITEMS_EN;
 
 export function Navbar() {
   const pathname = usePathname();
@@ -51,6 +27,9 @@ export function Navbar() {
   const cloudIconRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
+  const { language } = useLanguage();
+  const t = I18N[language];
+  const navItems = useMemo(() => getNavItems(language), [language]);
 
   // Playful spring hover on the cloud logo emblem
   const handleLogoHover = useCallback(() => {
@@ -148,7 +127,7 @@ export function Navbar() {
 
           {/* Center: Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-3 lg:gap-7">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive =
                 item.href === "/"
                   ? pathname === "/"
@@ -185,12 +164,12 @@ export function Navbar() {
               ref={menuButtonRef}
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open navigation menu"
+              aria-label={t.nav.openMenuAria}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               className="md:hidden min-h-[44px] min-w-[44px] -mr-1 flex items-center justify-center text-xs font-semibold tracking-[0.18em] text-[var(--text-primary)] hover:text-[var(--brand-text)]"
             >
-              MENU
+              {t.nav.menu}
             </button>
           </div>
         </div>
@@ -200,7 +179,7 @@ export function Navbar() {
       <MobileMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        items={NAV_ITEMS}
+        items={navItems}
         returnFocusRef={menuButtonRef}
       />
     </>

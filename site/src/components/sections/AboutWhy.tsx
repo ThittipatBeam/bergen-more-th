@@ -1,11 +1,18 @@
-import { WHY_PANEL, WHY_PARAGRAPHS } from "@/lib/about-data";
+"use client";
+
+import { getWhyPanel, getWhyParagraphs } from "@/lib/about-data";
+import { useLanguage } from "@/hooks/use-language";
 
 /** The case for the benchmark, with what stays fixed and what changes. */
 export function AboutWhy() {
+  const { language } = useLanguage();
+  const paragraphs = getWhyParagraphs(language);
+  const panel = getWhyPanel(language);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-        {WHY_PARAGRAPHS.map((paragraph) => (
+        {paragraphs.map((paragraph) => (
           <p
             key={paragraph.slice(0, 32)}
             className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]"
@@ -16,7 +23,7 @@ export function AboutWhy() {
       </div>
 
       <dl className="grid grid-cols-1 gap-6 border-t border-[var(--border-default)] pt-6 sm:grid-cols-2 sm:gap-10">
-        {[WHY_PANEL.fixed, WHY_PANEL.varied].map((item) => (
+        {[panel.fixed, panel.varied].map((item) => (
           <div key={item.label} className="flex flex-col gap-1.5">
             <dt className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
               {item.label}

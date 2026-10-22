@@ -1,4 +1,5 @@
 import rawExperiments from "./experiments-data.json";
+import type { Language } from "@/hooks/use-language";
 import type {
   BenchmarkRow,
   ChampionPick,
@@ -135,96 +136,133 @@ const speedBest = byBest((row) =>
 const matchBest = byBest((row) => row.mTh);
 
 /** Category champions shown in the hero stacked card deck. */
-export const CHAMPION_PICKS: ChampionPick[] = [];
+export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
+  const isTh = lang === "TH";
+  const picks: ChampionPick[] = [];
 
-if (qualityBest) {
-  CHAMPION_PICKS.push({
-    id: "quality",
-    tabLabel: "Best overall",
-    categoryTitle: "Highest Overall Quality",
-    badge: "#1 Overall",
-    storyTitle: `Highest overall score: ${qualityBest.q.toFixed(1)} of 100.`,
-    storyText: `${qualityBest.generator} paired with ${qualityBest.retriever} balances judge approval with exactness and Thai word overlap better than any other pipeline on the board.`,
-    icon: "trophy",
-    accent: "var(--brand-text)",
-    primaryMetric: {
-      label: "Overall Score",
-      value: qualityBest.q.toFixed(1),
-      detail: "45% judge · 20% Match TH · 20% F1 · 15% EM",
-    },
-    secondaryMetric: {
-      label: "LLM Judge Score",
-      value: `${qualityBest.judgePct.toFixed(1)}%`,
-      detail: `Judged by ${qualityBest.judgeName ?? "Kimi-K3"}${
-        qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
-      }`,
-    },
-    row: qualityBest,
-  });
+  if (qualityBest) {
+    picks.push({
+      id: "quality",
+      tabLabel: isTh ? "คะแนนรวมสูงสุด" : "Best overall",
+      categoryTitle: isTh ? "คุณภาพในภาพรวมสูงสุด" : "Highest Overall Quality",
+      badge: isTh ? "อันดับ 1 ในภาพรวม" : "#1 Overall",
+      storyTitle: isTh
+        ? `คะแนนรวมสูงสุดบนลีดเดอร์บอร์ด: ${qualityBest.q.toFixed(1)} จาก 100`
+        : `Highest overall score: ${qualityBest.q.toFixed(1)} of 100.`,
+      storyText: isTh
+        ? `${qualityBest.generator} ร่วมกับ ${qualityBest.retriever} ทำคะแนนจาก Judge, ความตรงกับคำตอบเฉลย และ Word Overlap ภาษาไทยได้สมดุลที่สุดบนบอร์ด`
+        : `${qualityBest.generator} paired with ${qualityBest.retriever} balances judge approval with exactness and Thai word overlap better than any other pipeline on the board.`,
+      icon: "trophy",
+      accent: "var(--brand-text)",
+      primaryMetric: {
+        label: isTh ? "Overall Score" : "Overall Score",
+        value: qualityBest.q.toFixed(1),
+        detail: isTh
+          ? "45% Judge · 20% Match TH · 20% F1 · 15% EM"
+          : "45% judge · 20% Match TH · 20% F1 · 15% EM",
+      },
+      secondaryMetric: {
+        label: isTh ? "คะแนน LLM Judge" : "LLM Judge Score",
+        value: `${qualityBest.judgePct.toFixed(1)}%`,
+        detail: isTh
+          ? `ตัดสินโดย ${qualityBest.judgeName ?? "Kimi-K3"}${
+              qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
+            }`
+          : `Judged by ${qualityBest.judgeName ?? "Kimi-K3"}${
+              qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
+            }`,
+      },
+      row: qualityBest,
+    });
+  }
+
+  if (speedBest) {
+    picks.push({
+      id: "speed",
+      tabLabel: isTh ? "ประมวลผลเร็วที่สุด" : "Fastest delivery",
+      categoryTitle: isTh ? "ความเร็ว Generate สูงสุด" : "Fastest Generation",
+      badge: isTh ? "เร็วที่สุด" : "Top Speed",
+      storyTitle: isTh
+        ? "Generate คำตอบครบ 500 ข้อได้เร็วที่สุด"
+        : "Fastest model generation on the 500-question sample.",
+      storyText: isTh
+        ? `${speedBest.generator} สร้างคำตอบครบ 500 ข้อในเวลาเพียง ${formatClock(
+            speedBest.genSeconds
+          )} โดยยังคงคะแนน Judge สูงถึง ${speedBest.judgePct.toFixed(1)}%`
+        : `${speedBest.generator} generated all 500 answers in ${formatClock(
+            speedBest.genSeconds
+          )}, maintaining a competitive ${speedBest.judgePct.toFixed(1)}% judge score.`,
+      icon: "bolt",
+      accent: "var(--perf-text)",
+      primaryMetric: {
+        label: isTh ? "เวลา Generate" : "Generation Time",
+        value: formatClock(speedBest.genSeconds),
+        detail: isTh
+          ? "เฉพาะเวลาสร้างคำตอบ · ไม่รวมค้นคืนและให้คะแนน"
+          : "Generation only · excludes retrieval and scoring",
+      },
+      secondaryMetric: {
+        label: isTh ? "คุณภาพที่รักษาได้" : "Quality Retained",
+        value: `${speedBest.judgePct.toFixed(1)}%`,
+        detail: isTh ? "สัดส่วนคำตอบที่ Judge รับรอง" : "Judge approval maintained",
+      },
+      row: speedBest,
+    });
+  }
+
+  if (matchBest) {
+    picks.push({
+      id: "match",
+      tabLabel: isTh ? "ตรงกับคำตอบเฉลยสูงสุด" : "Best Thai match",
+      categoryTitle: isTh ? "ตรงกับ Ground Truth สูงสุด" : "Best Ground-Truth Alignment",
+      badge: isTh ? "ความตรงสูงสุด" : "Top Match",
+      storyTitle: isTh
+        ? "มีคำตอบเฉลยปรากฏครบถ้วนที่สุด"
+        : "Most human answers contained in full.",
+      storyText: isTh
+        ? `คำตอบเฉลยปรากฏในผลลัพธ์สูงที่สุด โดยทำคะแนน M-score ได้ ${matchBest.mTh.toFixed(
+            3
+          )} และ F1 ได้ ${matchBest.f1Th.toFixed(3)}`
+        : `Demonstrated the highest gold-answer containment, scoring ${matchBest.mTh.toFixed(
+            3
+          )} M-score and ${matchBest.f1Th.toFixed(3)} F1.`,
+      icon: "target",
+      accent: "var(--brand-text)",
+      primaryMetric: {
+        label: isTh ? "Thai M-Score" : "Thai M-Score",
+        value: matchBest.mTh.toFixed(3),
+        detail: isTh
+          ? "มีคำตอบเฉลย (Gold Answer) ครบถ้วนในคำตอบ"
+          : "Gold answer contained in the response",
+      },
+      secondaryMetric: {
+        label: isTh ? "Thai F1-Score" : "Thai F1-Score",
+        value: matchBest.f1Th.toFixed(3),
+        detail: isTh
+          ? "ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall"
+          : "Precision & recall harmonic",
+      },
+      row: matchBest,
+    });
+  }
+
+  return picks;
 }
 
-if (speedBest) {
-  CHAMPION_PICKS.push({
-    id: "speed",
-    tabLabel: "Fastest delivery",
-    categoryTitle: "Fastest Generation",
-    badge: "Top Speed",
-    storyTitle: "Fastest model generation on the 500-question sample.",
-    storyText: `${speedBest.generator} generated all 500 answers in ${formatClock(
-      speedBest.genSeconds
-    )}, maintaining a competitive ${speedBest.judgePct.toFixed(1)}% judge score.`,
-    icon: "bolt",
-    accent: "var(--perf-text)",
-    primaryMetric: {
-      label: "Generation Time",
-      value: formatClock(speedBest.genSeconds),
-      detail: "Generation only · excludes retrieval and scoring",
-    },
-    secondaryMetric: {
-      label: "Quality Retained",
-      value: `${speedBest.judgePct.toFixed(1)}%`,
-      detail: "Judge approval maintained",
-    },
-    row: speedBest,
-  });
-}
+export const CHAMPION_PICKS: ChampionPick[] = getChampionPicks("EN");
 
-if (matchBest) {
-  CHAMPION_PICKS.push({
-    id: "match",
-    tabLabel: "Best Thai match",
-    categoryTitle: "Best Ground-Truth Alignment",
-    badge: "Top Match",
-    storyTitle: "Most human answers contained in full.",
-    storyText: `Demonstrated the highest gold-answer containment, scoring ${matchBest.mTh.toFixed(
-      3
-    )} M-score and ${matchBest.f1Th.toFixed(3)} F1.`,
-    icon: "target",
-    accent: "var(--brand-text)",
-    primaryMetric: {
-      label: "Thai M-Score",
-      value: matchBest.mTh.toFixed(3),
-      detail: "Gold answer contained in the response",
-    },
-    secondaryMetric: {
-      label: "Thai F1-Score",
-      value: matchBest.f1Th.toFixed(3),
-      detail: "Precision & recall harmonic",
-    },
-    row: matchBest,
-  });
-}
-
-/** "2026-10-21T02:15:19.346744" -> "Oct 21, 2026"; empty when no runs. */
-export const LATEST_RUN_LABEL = (() => {
+export function getLatestRunLabel(lang: Language = "EN"): string {
   const latest = BENCHMARK_ROWS.map((row) => row.runDate)
     .filter(Boolean)
     .sort()
     .pop();
   if (!latest) return "";
-  return new Date(latest).toLocaleDateString("en-US", {
+  return new Date(latest).toLocaleDateString(lang === "TH" ? "th-TH" : "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
-})();
+}
+
+/** "2026-10-21T02:15:19.346744" -> "Oct 21, 2026"; empty when no runs. */
+export const LATEST_RUN_LABEL = getLatestRunLabel("EN");

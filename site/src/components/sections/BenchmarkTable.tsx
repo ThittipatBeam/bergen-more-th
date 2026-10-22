@@ -13,6 +13,8 @@ import { BenchmarkTableRow } from "@/components/sections/BenchmarkTableRow";
 import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolbar";
 import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
 import { BenchmarkMobileList } from "@/components/sections/BenchmarkMobileList";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
@@ -28,6 +30,8 @@ const DEFAULT_COLUMNS: ColumnVisibility = {
 };
 
 export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
+  const { language } = useLanguage();
+  const isTh = language === "TH";
   const [columns, setColumns] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
   const [generator, setGenerator] = useState("all");
   const [reranker, setReranker] = useState<RerankerFilter>("all");
@@ -152,29 +156,31 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           Judge
         </span>{" "}
-        = answers the judge marked correct ·{" "}
+        = {isTh ? "สัดส่วนคำตอบที่ Judge รับรอง" : "answers the judge marked correct"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           Match TH
         </span>{" "}
-        = gold answer found in the answer ·{" "}
+        = {isTh ? "คำตอบเฉลยปรากฏครบถ้วนในข้อความ" : "gold answer found in the answer"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           F1 TH
         </span>{" "}
-        = harmonic mean of Thai precision and recall ·{" "}
+        = {isTh ? "ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall" : "harmonic mean of Thai precision and recall"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           EM
         </span>{" "}
-        = normalized exact match ·{" "}
+        = {isTh ? "ข้อความตรงกับเฉลย 100%" : "normalized exact match"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          Gen Time
+          {isTh ? "เวลา Gen" : "Gen Time"}
         </span>{" "}
-        = generation only
+        = {isTh ? "เฉพาะเวลาสร้างคำตอบ" : "generation only"}
       </p>
 
       {processedRows.length === 0 ? (
         <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] py-12 text-center font-mono">
           <p className="text-xs text-[var(--text-muted)]">
-            No benchmark runs match the current filters.
+            {isTh
+              ? "ไม่พบผลการทดลองที่ตรงกับตัวกรองปัจจุบัน"
+              : "No benchmark runs match the current filters."}
           </p>
           <button
             type="button"
@@ -184,7 +190,7 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
             }}
             className="mt-3 min-h-[44px] rounded-xl border border-[var(--border-default)] px-4 text-xs font-semibold text-[var(--brand-text)] transition-colors hover:border-[var(--border-focus)] cursor-pointer"
           >
-            Reset filters
+            {isTh ? "รีเซ็ตตัวกรอง" : "Reset filters"}
           </button>
         </div>
       ) : (
@@ -198,7 +204,9 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
                 fitsWithoutScroll ? "hidden" : "hidden md:block"
               }`}
             >
-              Scroll sideways for Judge, Match TH, F1, EM and Gen Time →
+              {isTh
+                ? "เลื่อนแถบไปด้านขวาเพื่อดู Judge, Match TH, F1, EM และเวลา Gen →"
+                : "Scroll sideways for Judge, Match TH, F1, EM and Gen Time →"}
             </p>
 
             {/* Measured Sheet Table Container */}

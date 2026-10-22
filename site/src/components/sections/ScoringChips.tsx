@@ -1,10 +1,16 @@
-import { SCORING_CHIPS } from "@/lib/methodology-data";
+"use client";
+
+import { getScoringChips } from "@/lib/methodology-data";
+import { useLanguage } from "@/hooks/use-language";
 
 /** Three settings that make the judge deterministic, in plain language. */
 export function ScoringChips() {
+  const { language } = useLanguage();
+  const chips = getScoringChips(language);
+
   return (
     <ul className="grid gap-3 sm:grid-cols-3">
-      {SCORING_CHIPS.map((chip) => (
+      {chips.map((chip) => (
         <li
           key={chip.label}
           className="flex flex-col gap-2 rounded-2xl bg-[var(--background-subtle)] px-5 py-4"
