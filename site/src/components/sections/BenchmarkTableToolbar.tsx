@@ -1,7 +1,10 @@
 "use client";
 
 import type { ColumnVisibility, RerankerFilter } from "@/types/benchmark";
+import { QUALITY_MAX, QUALITY_MIN } from "@/lib/benchmark-data";
+import { SCORE_BAND_CLASSES, SCORE_BAND_ORDER } from "@/lib/score-scale";
 import { BenchmarkColumnFilter } from "@/components/sections/BenchmarkColumnFilter";
+import { BenchmarkModelFilter } from "@/components/sections/BenchmarkModelFilter";
 
 interface BenchmarkTableToolbarProps {
   generators: string[];
@@ -34,19 +37,11 @@ export function BenchmarkTableToolbar({
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] transition-colors">
       <div className="flex flex-wrap items-center gap-2">
         {/* Generator Model Filter */}
-        <select
+        <BenchmarkModelFilter
+          generators={generators}
           value={generator}
-          onChange={(e) => onGeneratorChange(e.target.value)}
-          aria-label="Filter by model"
-          className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] text-base font-sans font-medium text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[var(--border-focus)] transition-colors"
-        >
-          <option value="all">All models</option>
-          {generators.map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
-          ))}
-        </select>
+          onChange={onGeneratorChange}
+        />
 
         {/* Reranker Segmented Filter */}
         <div
@@ -74,6 +69,26 @@ export function BenchmarkTableToolbar({
 
       {/* Column Customizer with Filter Icon */}
       <div className="flex items-center justify-between sm:justify-end gap-3">
+        <div
+          className="hidden md:flex items-center gap-1.5"
+          title={`Overall score tint: ${QUALITY_MIN.toFixed(1)} → ${QUALITY_MAX.toFixed(1)}`}
+        >
+          <span className="text-xs font-sans text-[var(--text-muted)]">
+            Overall
+          </span>
+          <span className="flex items-center gap-0.5" aria-hidden="true">
+            {SCORE_BAND_ORDER.map((band) => (
+              <span
+                key={band}
+                className={`h-3 w-3 rounded-[2px] border border-[var(--border-default)] ${SCORE_BAND_CLASSES[band]}`}
+              />
+            ))}
+          </span>
+          <span className="text-xs font-mono text-[var(--text-muted)]">
+            {QUALITY_MIN.toFixed(1)}–{QUALITY_MAX.toFixed(1)}
+          </span>
+        </div>
+
         <span className="text-xs font-sans text-[var(--text-muted)]">
           <span className="font-mono font-semibold text-[var(--text-secondary)]">{resultsCount}</span> runs
         </span>

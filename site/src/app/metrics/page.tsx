@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import "katex/dist/katex.min.css";
 import { MetricsSection } from "@/components/sections/MetricsSection";
 
 export const metadata: Metadata = {
-  title: "Evaluation Metrics • SIAM.AI Benchmark",
+  title: "Metrics Explained • SIAM.AI Benchmark",
   description:
-    "Explore the formulas and criteria for Thai RAG evaluation, including LLM judge score, Thai lexical overlap (M_th), exact match, and recall.",
+    "What every Thai RAG benchmark score means — three plain-language sections, the exact formula behind each card, how the scores combine into the overall score that ranks the leaderboard, and a guide to which metric to use.",
 };
 
 export default function MetricsPage() {

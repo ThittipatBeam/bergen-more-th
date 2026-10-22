@@ -5,3 +5,10 @@ export const RANK_MEDAL_CLASSES: Record<number, string> = {
   2: "text-[var(--medal-silver)]", // silver
   3: "text-[var(--medal-bronze)]", // bronze
 };
+
+/** Subtle row wash for the podium; never the only rank cue. */
+export const RANK_ROW_CLASSES: Record<number, string> = {
+  1: "bg-[var(--rank-gold-bg)]",
+  2: "bg-[var(--rank-silver-bg)]",
+  3: "bg-[var(--rank-bronze-bg)]",
+};

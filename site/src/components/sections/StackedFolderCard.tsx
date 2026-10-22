@@ -85,7 +85,7 @@ export function StackedFolderCard({
       }}
       className={`absolute inset-x-0 top-0 h-[380px] sm:h-[364px] rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${
         isActive
-          ? "border-[var(--border-default)] bg-[var(--background-primary)] shadow-[0_20px_48px_-16px_rgba(7,149,207,0.18)] dark:shadow-[0_24px_48px_-16px_rgba(0,0,0,0.85)]"
+          ? "border-[var(--border-default)] bg-[var(--background-primary)] card-shadow"
           : "border-[var(--border-default)]/90 bg-[var(--background-subtle)] hover:border-[var(--brand-sky-light)] cursor-pointer shadow-sm"
       }`}
     >

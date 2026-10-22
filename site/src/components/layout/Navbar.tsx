@@ -24,19 +24,24 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Thai RAG & LLM rankings",
   },
   {
-    label: "METRICS",
-    href: "/metrics",
-    description: "Evaluation metrics & formulas",
-  },
-  {
     label: "METHODOLOGY",
     href: "/methodology",
     description: "Corpus, pipeline & protocol",
   },
   {
+    label: "METRICS",
+    href: "/metrics",
+    description: "Evaluation metrics & formulas",
+  },
+  {
     label: "REQUEST",
     href: "/request",
     description: "Request pipeline combination",
+  },
+  {
+    label: "ABOUT",
+    href: "/about",
+    description: "About the benchmark",
   },
 ];
 
@@ -80,43 +85,68 @@ export function Navbar() {
       <header className="fixed top-0 inset-x-0 z-40 w-full select-none border-b border-[var(--border-default)] bg-[var(--background-canvas)]/85 backdrop-blur-md transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-2.5 sm:py-3 flex items-center justify-between">
           {/* Left: Brand with Official Cloud Logo */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <Link
               href="/"
               onMouseEnter={handleLogoHover}
               onMouseLeave={handleLogoLeave}
-              className="group inline-flex items-center gap-2.5 min-h-[44px] cursor-pointer"
+              className="group inline-flex shrink-0 items-center gap-2.5 min-h-[44px] cursor-pointer"
             >
               <div
                 ref={cloudIconRef}
-                className="relative w-8 h-5 sm:w-9 sm:h-5.5 flex items-center justify-center"
+                className="relative flex items-center justify-center"
               >
-                <Image
-                  src="/logo.png"
-                  alt="SIAM Logo"
-                  width={36}
-                  height={19}
-                  className="object-contain"
-                  priority
-                />
-              </div>
+                {/* Small screens: compact cloud mark */}
+                <span className="flex shrink-0 items-center lg:hidden">
+                  <Image
+                    src="/brand-mark.png"
+                    alt="SIAM.AI"
+                    width={279}
+                    height={140}
+                    unoptimized
+                    priority
+                    className="h-6 w-auto dark:hidden"
+                  />
+                  <Image
+                    src="/brand-mark-white.png"
+                    alt=""
+                    aria-hidden="true"
+                    width={279}
+                    height={140}
+                    unoptimized
+                    priority
+                    className="hidden h-6 w-auto dark:block"
+                  />
+                </span>
 
-              <div className="flex items-baseline gap-1">
-                <span className="font-sans font-bold text-base sm:text-lg tracking-tight text-[var(--text-primary)] group-hover:text-[var(--brand-text)] transition-colors">
-                  SIAM
-                </span>
-                <span className="font-sans font-bold text-base sm:text-lg text-[var(--brand-text)]">
-                  .AI
-                </span>
-                <span className="hidden lg:inline-block text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] border-l border-[var(--border-default)] pl-2 ml-1">
-                  BENCHMARK
+                {/* ≥ lg: full horizontal lockup */}
+                <span className="hidden shrink-0 items-center lg:flex">
+                  <Image
+                    src="/logo-horizontal.png"
+                    alt="SIAMGPT"
+                    width={758}
+                    height={140}
+                    unoptimized
+                    priority
+                    className="h-6 w-auto dark:hidden md:h-7"
+                  />
+                  <Image
+                    src="/logo-horizontal-white.png"
+                    alt=""
+                    aria-hidden="true"
+                    width={758}
+                    height={140}
+                    unoptimized
+                    priority
+                    className="hidden h-6 w-auto dark:block md:h-7"
+                  />
                 </span>
               </div>
             </Link>
           </div>
 
           {/* Center: Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+          <nav className="hidden md:flex items-center gap-3 lg:gap-7">
             {NAV_ITEMS.map((item) => {
               const isActive =
                 item.href === "/"

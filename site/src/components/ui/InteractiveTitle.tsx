@@ -7,6 +7,14 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 gsap.registerPlugin(useGSAP);
 
+/** Read a theme token at event time so hover colors follow the active theme. */
+const readToken = (name: string): string => {
+  if (typeof window === "undefined") return "";
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+};
+
 interface InteractiveTitleProps {
   text: string;
   className?: string;
@@ -57,7 +65,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           scaleY: 1.26,
           scaleX: 0.88,
           rotation: randomTilt,
-          color: "#0795CF", // SIAM.AI Sky Blue pulse on hover
+          color: readToken("--brand-sky-blue") || undefined, // brand pulse on hover
           duration: 0.12,
           ease: "power2.out",
         })
@@ -84,7 +92,7 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
           y: -35,
           scale: 1.35,
           rotation: "+=360",
-          color: "#01A9B1", // SIAM.AI Turquoise accent on click
+          color: readToken("--brand-turquoise") || undefined, // turquoise accent on click
           duration: 0.35,
           ease: "power2.out",
         })

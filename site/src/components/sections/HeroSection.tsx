@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { InteractiveTitle } from "@/components/ui/InteractiveTitle";
+import { SmoothScrollLink } from "@/components/ui/SmoothScrollLink";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { TopModelsSwitcher } from "@/components/sections/TopModelsSwitcher";
 
@@ -22,20 +24,18 @@ export function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center lg:justify-start">
-            <a
+            <SmoothScrollLink
               href="#leaderboard"
               className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[var(--brand-cta)] hover:bg-[var(--brand-cta-hover)] text-white text-sm font-medium transition-all shadow-xs"
             >
               Explore Leaderboard
-            </a>
-            <a
-              href="https://siam.ai"
-              target="_blank"
-              rel="noopener noreferrer"
+            </SmoothScrollLink>
+            <Link
+              href="/request"
               className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center px-6 py-2.5 rounded-lg border border-[var(--border-default)] bg-[var(--background-primary)]/80 hover:bg-[var(--background-subtle)] text-[var(--text-primary)] text-sm font-medium transition-all shadow-xs"
             >
-              SIAM.AI Cloud
-            </a>
+              Request a Benchmark
+            </Link>
           </div>
         </div>
 

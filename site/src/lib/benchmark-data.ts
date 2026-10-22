@@ -33,15 +33,39 @@ const toPercent = (v: number | undefined | null): number => {
   return v <= 1 ? v * 100 : v;
 };
 
+/**
+ * Overall score: one ranked number built from the four metrics that measure
+ * correctness, weighted by how much each one tells us. Judge carries the most
+ * because it is the only score that accepts a correct paraphrase; EM carries the
+ * least because a correct answer in different words still scores 0. Weights sum
+ * to 1, and generation time stays out — speed is a separate axis, not a
+ * quality signal. Keep this in sync with the /metrics explainer.
+ */
+export const QUALITY_WEIGHTS = {
+  judgePct: 0.45,
+  mTh: 0.2,
+  f1Th: 0.2,
+  em: 0.15,
+} as const;
+
+export const qualityScore = (
+  row: Pick<BenchmarkRow, "judgePct" | "mTh" | "f1Th" | "em">
+): number =>
+  row.judgePct * QUALITY_WEIGHTS.judgePct +
+  row.mTh * QUALITY_WEIGHTS.mTh +
+  row.f1Th * QUALITY_WEIGHTS.f1Th +
+  row.em * QUALITY_WEIGHTS.em;
+
 const toRow = (exp: ExperimentRecord): BenchmarkRow | null => {
   const metrics = exp.metrics ?? {};
   const retriever = exp.retriever?.model_name;
   const generator = exp.generator?.model_name;
   const judgePct = metrics.LLMeval_judge_pct;
   if (!retriever || !generator || typeof judgePct !== "number") return null;
-  return {
+  const scored = {
     id: exp.experiment_id,
     rank: 0,
+    tieCount: 1,
     retriever,
     reranker: exp.reranker?.model_name ?? null,
     generator,
@@ -59,26 +83,52 @@ const toRow = (exp: ExperimentRecord): BenchmarkRow | null => {
     judgePct,
     genSeconds: exp.generation_time ? parseClock(exp.generation_time) : null,
   };
+  return { ...scored, q: qualityScore(scored) };
 };
 
-/** Valid experiments (junk/null records dropped), ranked by judge score desc. */
-export const BENCHMARK_ROWS: BenchmarkRow[] = (
-  rawExperiments as unknown as ExperimentRecord[]
-)
+/** Valid experiments (junk/null records dropped), ranked by overall score. */
+const sortedRows = (rawExperiments as unknown as ExperimentRecord[])
   .map(toRow)
   .filter((row): row is BenchmarkRow => row !== null)
-  .sort((a, b) => b.judgePct - a.judgePct || b.mTh - a.mTh)
-  .map((row, index) => ({ ...row, rank: index + 1 }));
+  .sort((a, b) => b.q - a.q || b.judgePct - a.judgePct);
+
+/** Competition ranking on the displayed (one-decimal) score, so visual ties
+ *  never receive different medals. */
+let lastDisplayedScore: number | null = null;
+let lastRank = 0;
+const rankedRows = sortedRows.map((row, index) => {
+  const displayed = Math.round(row.q * 10);
+  if (displayed !== lastDisplayedScore) {
+    lastRank = index + 1;
+    lastDisplayedScore = displayed;
+  }
+  return { ...row, rank: lastRank };
+});
+
+const tieCounts = new Map<number, number>();
+for (const row of rankedRows) {
+  tieCounts.set(row.rank, (tieCounts.get(row.rank) ?? 0) + 1);
+}
+
+export const BENCHMARK_ROWS: BenchmarkRow[] = rankedRows.map((row) => ({
+  ...row,
+  tieCount: tieCounts.get(row.rank) ?? 1,
+}));
 
 const firstWithJudge = BENCHMARK_ROWS.find((row) => row.judgeName);
 
 export const JUDGE_NAME = firstWithJudge?.judgeName ?? "KIMI-K3";
 export const JUDGE_N = firstWithJudge?.judgeN ?? 500;
 
+/** Observed overall-score range; drives the sequential tint so every band is used. */
+const qualityScores = BENCHMARK_ROWS.map((row) => row.q);
+export const QUALITY_MIN = qualityScores.length ? Math.min(...qualityScores) : 0;
+export const QUALITY_MAX = qualityScores.length ? Math.max(...qualityScores) : 100;
+
 const byBest = (pick: (row: BenchmarkRow) => number) =>
   [...BENCHMARK_ROWS].sort((a, b) => pick(b) - pick(a))[0];
 
-const judgeBest = byBest((row) => row.judgePct);
+const qualityBest = byBest((row) => row.q);
 const speedBest = byBest((row) =>
   row.genSeconds === null ? Number.NEGATIVE_INFINITY : -row.genSeconds
 );
@@ -87,29 +137,29 @@ const matchBest = byBest((row) => row.mTh);
 /** Category champions shown in the hero stacked card deck. */
 export const CHAMPION_PICKS: ChampionPick[] = [];
 
-if (judgeBest) {
+if (qualityBest) {
   CHAMPION_PICKS.push({
-    id: "judge",
-    tabLabel: "Highest score",
-    categoryTitle: "Highest Judge Approval",
+    id: "quality",
+    tabLabel: "Best overall",
+    categoryTitle: "Highest Overall Quality",
     badge: "#1 Overall",
-    storyTitle: `Top-rated Thai answers with ${judgeBest.judgePct.toFixed(1)}% judge approval.`,
-    storyText: `In this evaluation, ${judgeBest.generator} paired with ${judgeBest.retriever} achieved the highest response quality rated by ${judgeBest.judgeName ?? "Kimi-K3"}.`,
+    storyTitle: `Highest overall score: ${qualityBest.q.toFixed(1)} of 100.`,
+    storyText: `${qualityBest.generator} paired with ${qualityBest.retriever} balances judge approval with exactness and Thai word overlap better than any other pipeline on the board.`,
     icon: "trophy",
     accent: "var(--brand-text)",
     primaryMetric: {
-      label: "LLM Judge Score",
-      value: `${judgeBest.judgePct.toFixed(1)}%`,
-      detail: `Judged by ${judgeBest.judgeName ?? "Kimi-K3"}${
-        judgeBest.judgeN ? ` · n=${judgeBest.judgeN}` : ""
-      }`,
+      label: "Overall Score",
+      value: qualityBest.q.toFixed(1),
+      detail: "45% judge · 20% Match TH · 20% F1 · 15% EM",
     },
     secondaryMetric: {
-      label: "Thai Text Match",
-      value: judgeBest.mTh.toFixed(3),
-      detail: "M (TH) lexical overlap",
+      label: "LLM Judge Score",
+      value: `${qualityBest.judgePct.toFixed(1)}%`,
+      detail: `Judged by ${qualityBest.judgeName ?? "Kimi-K3"}${
+        qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
+      }`,
     },
-    row: judgeBest,
+    row: qualityBest,
   });
 }
 
@@ -117,10 +167,10 @@ if (speedBest) {
   CHAMPION_PICKS.push({
     id: "speed",
     tabLabel: "Fastest delivery",
-    categoryTitle: "Fastest Pipeline Throughput",
+    categoryTitle: "Fastest Generation",
     badge: "Top Speed",
-    storyTitle: "Sub-minute retrieval and generation throughput.",
-    storyText: `${speedBest.generator} finished the full Thai evaluation set in ${formatClock(
+    storyTitle: "Fastest model generation on the 500-question sample.",
+    storyText: `${speedBest.generator} generated all 500 answers in ${formatClock(
       speedBest.genSeconds
     )}, maintaining a competitive ${speedBest.judgePct.toFixed(1)}% judge score.`,
     icon: "bolt",
@@ -128,7 +178,7 @@ if (speedBest) {
     primaryMetric: {
       label: "Generation Time",
       value: formatClock(speedBest.genSeconds),
-      detail: "End-to-end pipeline latency",
+      detail: "Generation only · excludes retrieval and scoring",
     },
     secondaryMetric: {
       label: "Quality Retained",
@@ -144,9 +194,9 @@ if (matchBest) {
     id: "match",
     tabLabel: "Best Thai match",
     categoryTitle: "Best Ground-Truth Alignment",
-    badge: "Top Precision",
-    storyTitle: "Closest lexical alignment with Thai human answers.",
-    storyText: `Demonstrated the highest token agreement with reference texts, scoring ${matchBest.mTh.toFixed(
+    badge: "Top Match",
+    storyTitle: "Most human answers contained in full.",
+    storyText: `Demonstrated the highest gold-answer containment, scoring ${matchBest.mTh.toFixed(
       3
     )} M-score and ${matchBest.f1Th.toFixed(3)} F1.`,
     icon: "target",
@@ -154,7 +204,7 @@ if (matchBest) {
     primaryMetric: {
       label: "Thai M-Score",
       value: matchBest.mTh.toFixed(3),
-      detail: "Exact token & unigram match",
+      detail: "Gold answer contained in the response",
     },
     secondaryMetric: {
       label: "Thai F1-Score",

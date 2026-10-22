@@ -4,7 +4,7 @@ import { MethodologySection } from "@/components/sections/MethodologySection";
 export const metadata: Metadata = {
   title: "Methodology • SIAM.AI Benchmark",
   description:
-    "Learn about the standardized tri-component evaluation setup, Thai datasets, and KIMI-K3 automated scoring protocol.",
+    "How the benchmark is built: the three-part pipeline, how 5,355 Thai questions were generated from Thai Wikipedia and verified, why each run uses 500 of them, and how KIMI-K3 scores every answer.",
 };
 
 export default function MethodologyPage() {

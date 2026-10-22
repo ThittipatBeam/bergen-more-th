@@ -10,13 +10,14 @@ interface ColumnOption {
 }
 
 const COLUMN_OPTIONS: ColumnOption[] = [
+  { key: "q", label: "Overall Score", category: "metric" },
   { key: "judgePct", label: "Judge Score (%)", category: "metric" },
   { key: "mTh", label: "Thai M-Score (M_th)", category: "metric" },
   { key: "f1Th", label: "Thai F1-Score (F1_th)", category: "metric" },
   { key: "precisionTh", label: "Thai Precision (Precision_th)", category: "metric" },
   { key: "recallTh", label: "Thai Recall (Recall_th)", category: "metric" },
   { key: "em", label: "Exact Match (EM)", category: "metric" },
-  { key: "latency", label: "Latency (Gen Time)", category: "metric" },
+  { key: "latency", label: "Generation Time (m:ss)", category: "metric" },
   { key: "retriever", label: "Embedding (Retriever)", category: "pipeline" },
   { key: "reranker", label: "Reranker Model", category: "pipeline" },
 ];
@@ -75,7 +76,7 @@ export function BenchmarkColumnFilter({
         className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[var(--brand-sky-light)] text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
       >
         <svg
-          className="w-4 h-4 text-[#0795CF]"
+          className="w-4 h-4 text-[var(--brand-sky-blue)]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -128,7 +129,7 @@ export function BenchmarkColumnFilter({
                   type="checkbox"
                   checked={columns[opt.key]}
                   onChange={() => toggleColumn(opt.key)}
-                  className="rounded border-[var(--border-default)] text-[#0795CF] focus:ring-[#0795CF] cursor-pointer"
+                  className="rounded border-[var(--border-default)] text-[var(--brand-sky-blue)] focus:ring-[var(--border-focus)] cursor-pointer"
                 />
                 <span className="text-[var(--text-secondary)] font-medium">
                   {opt.label}

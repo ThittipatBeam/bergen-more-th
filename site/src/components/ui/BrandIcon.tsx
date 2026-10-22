@@ -21,7 +21,7 @@ const RULES: ReadonlyArray<{
   {
     test: (n) => n.includes("kimi") || n.includes("moonshot"),
     render: (s) => (
-      <span className="inline-flex items-center text-[#1783FF] dark:text-[#38bdf8]">
+      <span className="inline-flex items-center text-[var(--brand-text)]">
         <Kimi size={s} />
       </span>
     ),

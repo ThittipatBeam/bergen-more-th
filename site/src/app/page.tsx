@@ -58,7 +58,7 @@ export default function Home() {
       <div
         id="leaderboard"
         ref={leaderboardRef}
-        className="relative z-20 w-full bg-[var(--background-primary)] rounded-t-[32px] sm:rounded-t-[40px] shadow-[0_-20px_45px_rgba(16,42,58,0.06)] dark:shadow-[0_-20px_45px_rgba(0,0,0,0.6)] border-t border-[var(--border-default)] min-h-screen transition-colors duration-300"
+        className="relative z-20 w-full bg-[var(--background-primary)] rounded-t-[32px] sm:rounded-t-[40px] sheet-shadow border-t border-[var(--border-default)] min-h-screen transition-colors duration-300"
       >
         <LeaderboardSection />
       </div>

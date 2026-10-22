@@ -1,38 +1,66 @@
 interface RequestSuccessCardProps {
   generator: string;
-  retriever: string;
+  embedding: string;
   reranker: string;
+  email: string;
   onReset: () => void;
 }
 
 export function RequestSuccessCard({
   generator,
-  retriever,
+  embedding,
   reranker,
+  email,
   onReset,
 }: RequestSuccessCardProps) {
+  const parts: { label: string; value: string; fallback?: string }[] = [
+    { label: "Generator", value: generator.trim() },
+    { label: "Embedding", value: embedding.trim() },
+    { label: "Reranker", value: reranker.trim(), fallback: "None" },
+  ];
+
   return (
-    <div className="p-8 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-brand)]/60 flex flex-col items-center text-center gap-4 transition-all shadow-xs">
-      <div className="w-12 h-12 rounded-full bg-[var(--brand-cta)] text-white flex items-center justify-center text-xl shadow-xs">
+    <div className="flex flex-col items-center gap-5 rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-brand)]/60 p-6 text-center shadow-xs transition-colors sm:p-8">
+      <div className="grid size-12 place-items-center rounded-full bg-[var(--brand-cta)] text-xl text-white shadow-xs">
         ✓
       </div>
-      <div>
-        <h2 className="text-xl font-sans font-bold text-[var(--text-primary)]">
-          Benchmark Request Queued!
+
+      <div className="flex flex-col gap-2">
+        <h2 className="font-sans text-2xl font-bold text-[var(--text-primary)]">
+          Request received
         </h2>
-        <p className="text-sm text-[var(--text-secondary)] max-w-md mt-1.5 leading-relaxed">
-          Your requested combination (
-          <span className="font-mono font-bold text-[var(--brand-text)]">{generator}</span> +{" "}
-          <span className="font-mono font-bold text-[var(--brand-text)]">{retriever}</span>
-          {reranker !== "none" ? ` + ${reranker}` : ""}) will be scheduled for the next evaluation batch.
+        <p className="max-w-[52ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
+          We will reply to{" "}
+          <span className="font-mono text-[var(--brand-text)]">{email}</span>{" "}
+          before the run is scheduled.
         </p>
       </div>
+
+      <dl className="grid w-full max-w-xl grid-cols-1 gap-3 text-left sm:grid-cols-[1.4fr_1fr_1fr]">
+        {parts.map((part) => (
+          <div
+            key={part.label}
+            className="min-w-0 rounded-xl bg-[var(--background-primary)] px-4 py-3"
+          >
+            <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+              {part.label}
+            </dt>
+            <dd
+              className={`mt-1 break-words font-mono text-sm ${
+                part.value ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"
+              }`}
+            >
+              {part.value || part.fallback || "—"}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
       <button
         type="button"
         onClick={onReset}
-        className="min-h-[44px] px-6 rounded-xl bg-[var(--brand-cta)] hover:bg-[var(--brand-cta-hover)] text-white text-sm font-sans font-semibold transition-colors mt-2 cursor-pointer shadow-2xs"
-      >
-        Submit Another Combination
+        className="mt-1 min-h-[44px] cursor-pointer rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"      >
+        Submit another request
       </button>
     </div>
   );

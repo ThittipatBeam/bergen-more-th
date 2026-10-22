@@ -12,9 +12,11 @@ export function LeaderboardSection() {
 
   return (
     <section className="w-full px-4 sm:px-8 md:px-12 py-12 sm:py-16">
-      <div className="max-w-6xl mx-auto flex flex-col gap-6">
+      {/* Wider than the site's 6xl reading measure so all ten columns fit on
+          one line; the heading shares the same edge as the sheet. */}
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border-default)] transition-colors">
+        <div className="flex w-full flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border-default)] transition-colors">
           <div>
             <h2 className="text-2xl sm:text-3xl font-sans font-bold tracking-tight text-[var(--text-primary)] transition-colors">
               The measured sheet
@@ -33,15 +35,18 @@ export function LeaderboardSection() {
                 · {BENCHMARK_ROWS.length} experiments so far
               </span>
             </div>
-            <span className="text-xs text-[var(--text-muted)]">
-              Judge score leads — click a column to sort.{" "}
+            <p className="text-xs text-[var(--text-muted)]">
+              Overall score leads — click any column to sort.
+            </p>
+            <p className="text-xs font-mono text-[var(--text-muted)]">
+              Overall = 45% judge + 20% Match TH + 20% F1 + 15% EM ·{" "}
               <Link
-                href="/metrics"
+                href="/metrics#overall-score"
                 className="inline-flex items-center min-h-[44px] text-[var(--brand-text)] hover:underline"
               >
-                What the columns mean
+                How it&apos;s built
               </Link>
-            </span>
+            </p>
           </div>
         </div>
 

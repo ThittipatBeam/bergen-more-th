@@ -29,6 +29,8 @@ export interface ExperimentRecord {
 export interface BenchmarkRow {
   id: string;
   rank: number;
+  /** Rows sharing a rounded Q score share a rank; 1 when unique. */
+  tieCount: number;
   retriever: string;
   reranker: string | null;
   generator: string;
@@ -42,6 +44,8 @@ export interface BenchmarkRow {
   precisionTh: number;
   recallTh: number;
   judgePct: number;
+  /** Overall score — the weighted blend that ranks the board. */
+  q: number;
   genSeconds: number | null;
 }
 
@@ -54,6 +58,7 @@ export interface ChampionMetric {
 export type MetricColumnKey =
   | "retriever"
   | "reranker"
+  | "q"
   | "judgePct"
   | "mTh"
   | "f1Th"
@@ -70,7 +75,7 @@ export type RerankerFilter = "all" | "yes" | "no";
 
 /** A category-winning experiment surfaced in the hero stacked card deck. */
 export interface ChampionPick {
-  id: "judge" | "speed" | "match";
+  id: "quality" | "speed" | "match";
   tabLabel: string;
   categoryTitle: string;
   badge: string;

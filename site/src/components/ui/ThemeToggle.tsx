@@ -73,7 +73,7 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
     if (!buttonRef.current || reducedMotion) return;
     gsap.to(buttonRef.current, {
       y: -1.5,
-      boxShadow: "0 4px 12px rgba(7, 149, 207, 0.12)",
+      boxShadow: "0 4px 12px var(--shadow-glow)",
       borderColor: "var(--border-strong)",
       duration: 0.2,
       ease: "power2.out",
@@ -85,7 +85,7 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
     gsap.to(buttonRef.current, {
       y: 0,
       boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)",
-      borderColor: "var(--border-default, #DCEAF1)",
+      borderColor: "var(--border-default)",
       duration: 0.25,
       ease: "power2.out",
     });
@@ -114,7 +114,7 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
         {isDark ? (
           <span className="text-amber-400">☀️</span>
         ) : (
-          <span className="text-[#0795CF]">🌙</span>
+          <span className="text-[var(--brand-sky-blue)]">🌙</span>
         )}
       </span>
 

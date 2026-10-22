@@ -8,25 +8,28 @@ export function MobileMenuHeader({ onClose }: MobileMenuHeaderProps) {
   return (
     <div className="mobile-header-bar flex items-center justify-between w-full pb-4 border-b border-[var(--border-default)]">
       <div className="inline-flex items-center gap-2.5">
-        <Image
-          src="/logo.png"
-          alt="SIAM Logo"
-          width={32}
-          height={17}
-          className="object-contain"
-          priority
-        />
-        <div className="flex items-baseline gap-1">
-          <span className="font-sans font-bold text-base tracking-tight text-[var(--text-primary)]">
-            SIAM
-          </span>
-          <span className="font-sans font-bold text-base text-[var(--brand-text)]">
-            .AI
-          </span>
-          <span className="text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] border-l border-[var(--border-default)] pl-2 ml-1">
-            BENCHMARK
-          </span>
+        <div className="relative flex h-6 w-12 items-center justify-center">
+          <Image
+            src="/brand-mark.png"
+            alt="SIAM.AI"
+            width={279}
+            height={140}
+            unoptimized
+            className="h-full w-full object-contain dark:hidden"
+          />
+          <Image
+            src="/brand-mark-white.png"
+            alt=""
+            aria-hidden="true"
+            width={279}
+            height={140}
+            unoptimized
+            className="hidden h-full w-full object-contain dark:block"
+          />
         </div>
+        <span className="text-xs font-mono uppercase tracking-widest text-[var(--text-muted)] border-l border-[var(--border-default)] pl-2">
+          BENCHMARK
+        </span>
       </div>
 
       <button

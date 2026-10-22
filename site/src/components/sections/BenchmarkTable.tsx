@@ -16,20 +16,21 @@ import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
   reranker: true,
+  q: true,
   judgePct: true,
   mTh: true,
   f1Th: true,
   precisionTh: true,
   recallTh: true,
-  em: false,
-  latency: false,
+  em: true,
+  latency: true,
 };
 
 export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
   const [columns, setColumns] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
   const [generator, setGenerator] = useState("all");
   const [reranker, setReranker] = useState<RerankerFilter>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("judgePct");
+  const [sortKey, setSortKey] = useState<SortKey>("q");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const generators = useMemo(
@@ -61,6 +62,9 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
       if (sortKey === "rank") {
         aVal = a.rank;
         bVal = b.rank;
+      } else if (sortKey === "q") {
+        aVal = a.q;
+        bVal = b.q;
       } else if (sortKey === "judgePct") {
         aVal = a.judgePct;
         bVal = b.judgePct;
@@ -123,7 +127,7 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         <table className="w-full text-left border-collapse min-w-[800px]">
           <caption className="sr-only">
             Leaderboard of evaluated Thai RAG pipeline combinations, ranked by
-            LLM judge score. Column headers are sortable buttons.
+            overall score. Column headers are sortable buttons.
           </caption>
           <BenchmarkTableHeader
             columns={columns}

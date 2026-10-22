@@ -37,12 +37,50 @@
 
   /* Semantic color language — every hue has exactly one job:
      brand blue = the quality signal (Judge Score) + interactive affordances
-     amber      = speed / latency
+     amber      = speed / generation time
      medals     = rank 1–3 (always redundant with the rank number)
-     teal       = live/fresh status dots only
+     teal/cyan  = the two lexical families on /metrics (exactness, word overlap)
      Neutrals carry everything else. */
   --perf-text: #a05a00; /* white 5.31:1, canvas 5.10:1, subtle 4.94:1 */
+  --perf-bg: rgba(160, 90, 0, 0.08); /* decorative tint behind speed blocks */
   --status-live: #0d9488; /* non-text indicator, ≥3:1 */
+
+  /* /metrics accent families — measured on white, canvas and subtle surfaces.
+     #01a9b1 / #00a0be are display hues only and fail 3:1 as text. */
+  --metric-containment: #00747a; /* 5.56:1 on white */
+  --metric-containment-bg: rgba(0, 116, 122, 0.08);
+  --metric-overlap: #005f6b; /* 7.37:1 on white */
+  --metric-overlap-bg: rgba(0, 95, 107, 0.08);
+
+  /* Deltas and verification — reserved meaning, never decorative.
+     green = verified / positive delta, red = failed / negative delta. */
+  --positive: #0e7c66; /* 5.13:1 on white */
+  --negative: #b42318; /* 6.57:1 on white */
+  --positive-bg: rgba(14, 124, 102, 0.08);
+  --negative-bg: rgba(180, 35, 24, 0.08);
+
+  /* Metric micro-bars under each table value: green gradient fill */
+  --metric-bar-from: #0e7c66;
+  --metric-bar-to: #34d399;
+
+  /* Sequential judge-score tint: five steps across the observed 93.6–97.4
+     range. Darker = higher; text inside always uses --text-primary. */
+  --score-band-1: #f6fafd;
+  --score-band-2: #eaf5fa;
+  --score-band-3: #dceff7;
+  --score-band-4: #cbe7f2;
+  --score-band-5: #b8deec;
+
+  /* Top-3 row tints, always redundant with the medal numeral */
+  --rank-gold-bg: rgba(138, 109, 28, 0.07);
+  --rank-silver-bg: rgba(110, 120, 129, 0.06);
+  --rank-bronze-bg: rgba(150, 89, 31, 0.06);
+
+  /* Decorative hero grid + elevation */
+  --hero-grid: rgba(7, 149, 207, 0.08);
+  --shadow-sheet: rgba(16, 42, 58, 0.06);
+  --shadow-card: rgba(7, 149, 207, 0.18);
+  --shadow-glow: rgba(7, 149, 207, 0.15);
 
   /* Borders */
   --border-default: #dceaf1;
@@ -71,7 +109,37 @@
   --medal-bronze: #c98a5b;
 
   --perf-text: #f5b84c;
+  --perf-bg: rgba(245, 184, 76, 0.1);
   --status-live: #34d399;
+
+  --metric-containment: #5fd4d6; /* 9.14:1 on --background-primary */
+  --metric-containment-bg: rgba(95, 212, 214, 0.1);
+  --metric-overlap: #8adfe2; /* 10.57:1 on --background-primary */
+  --metric-overlap-bg: rgba(138, 223, 226, 0.1);
+
+  --positive: #34d399; /* 9.14:1 on --background-primary */
+  --negative: #f97066; /* 6.31:1 on --background-primary */
+  --positive-bg: rgba(52, 211, 153, 0.1);
+  --negative-bg: rgba(249, 112, 102, 0.1);
+
+  /* Metric micro-bars: brighter stops so the gradient reads on dark surfaces */
+  --metric-bar-from: #23a37c;
+  --metric-bar-to: #6ee7b7;
+
+  --score-band-1: #0f1b24;
+  --score-band-2: #112430;
+  --score-band-3: #142d3c;
+  --score-band-4: #173648;
+  --score-band-5: #1b4055;
+
+  --rank-gold-bg: rgba(232, 197, 71, 0.09);
+  --rank-silver-bg: rgba(180, 188, 196, 0.08);
+  --rank-bronze-bg: rgba(201, 138, 91, 0.08);
+
+  --hero-grid: rgba(115, 183, 220, 0.06);
+  --shadow-sheet: rgba(0, 0, 0, 0.6);
+  --shadow-card: rgba(0, 0, 0, 0.85);
+  --shadow-glow: rgba(115, 183, 220, 0.12);
 
   --border-default: #1e3344;
   --border-strong: #2a475e;
@@ -122,4 +190,37 @@ body {
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* Elevation stays token-driven so theme swaps do not leave stray rgba()s. */
+.sheet-shadow {
+  box-shadow: 0 -20px 45px var(--shadow-sheet);
+}
+
+.card-shadow {
+  box-shadow: 0 20px 48px -16px var(--shadow-card);
+}
+
+/* KaTeX display formulas live inside metric cards. The wrapper owns overflow,
+   so drop KaTeX's default centering and page-sized leading. KaTeX centres both
+   .katex-display and its child .katex, so both need resetting; the extra class
+   out-specifies katex.min.css, which is imported after this file. */
+.formula-surface .katex-display,
+.formula-surface .katex-display > .katex {
+  margin: 0;
+  text-align: left;
+}
+
+.formula-surface .katex {
+  font-size: 0.92em;
+}
+
+/* /about resource cards are hidden before GSAP takes over, so the reveal never
+   starts from an already-painted card. Scoped to scripting-on with motion
+   allowed; the component sets data-reveal-ready once the tween completes. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal-group]:not([data-reveal-ready]) [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+  }
 }

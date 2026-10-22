@@ -1,114 +1,115 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import { JUDGE_NAME } from "@/lib/benchmark-data";
+import {
+  DATASET_SIZE,
+  METHODOLOGY_CHAPTERS,
+  SCORING_PROTOCOL,
+  SYSTEM_DESIGN,
+} from "@/lib/methodology-data";
+import { MetricsWorkedExample } from "@/components/sections/MetricsWorkedExample";
+import { MethodologyChapter } from "@/components/sections/MethodologyChapter";
+import { MethodologyPillar } from "@/components/sections/MethodologyPillar";
+import { PipelineFlow } from "@/components/sections/PipelineFlow";
+import { DatasetStory } from "@/components/sections/DatasetStory";
+import { ScoringChips } from "@/components/sections/ScoringChips";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SmoothScrollLink } from "@/components/ui/SmoothScrollLink";
 
-const METHODOLOGY_PILLARS = [
-  {
-    step: "01",
-    title: "Tri-Component Architecture",
-    badge: "System Design",
-    description:
-      "Every Thai RAG pipeline under evaluation is decomposed into three strictly isolated components: dense embedding retriever, cross-encoder neural reranker, and generator LLM.",
-    details: [
-      "Dense vector search over segmented Thai text passages",
-      "Optional cross-encoder reranking pass for semantic precision",
-      "Context-grounded generative answer synthesis",
-    ],
-  },
-  {
-    step: "02",
-    title: "Curated Thai Datasets",
-    badge: "Evaluation Corpus",
-    description:
-      "Evaluations run on standardized Thai knowledge corpora including ThaiWikiV4 and MKQA/th, reflecting both general-knowledge and specialized inquiry contexts.",
-    details: [
-      "Target corpus passages formatted and tokenized with PyThaiNLP",
-      "Verified ground-truth answer spans and reference texts",
-      "Strict separation of dev, test, and evaluation splits",
-    ],
-  },
-  {
-    step: "03",
-    title: "Deterministic LLM-as-a-Judge",
-    badge: "Scoring Protocol",
-    description:
-      "Responses are evaluated by KIMI-K3 operating with zero-temperature sampling to eliminate variance and score semantic correctness objectively.",
-    details: [
-      "Checks for hallucination against retrieved context",
-      "Evaluates Thai language fluency and natural grammar",
-      "Compares output against multi-reference human answers",
-    ],
-  },
-];
+const { systemDesign, questionBank, scoring } = METHODOLOGY_CHAPTERS;
+
+function Payoff({ children }: { children: ReactNode }) {
+  return (
+    <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
+      {children}
+    </p>
+  );
+}
 
 export function MethodologySection() {
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 md:px-12 pt-28 pb-16 flex flex-col gap-10">
-      {/* Header */}
-      <div className="flex flex-col gap-2 pb-6 border-b border-[var(--border-default)]">
-        <h1 className="text-3xl sm:text-4xl font-sans font-bold tracking-tight text-[var(--text-primary)]">
-          Evaluation Methodology
-        </h1>
-        <p className="text-sm sm:text-base text-[var(--text-secondary)] font-sans max-w-2xl mt-1 leading-relaxed">
-          How we evaluate and rank Thai Retrieval-Augmented Generation systems using transparent, reproducible pipelines.
-        </p>
-      </div>
-
-      {/* Pillars Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {METHODOLOGY_PILLARS.map((pillar) => (
-          <div
-            key={pillar.step}
-            className="flex flex-col justify-between p-6 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[var(--brand-sky-light)] transition-all shadow-2xs"
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-12 px-4 pt-28 pb-20 sm:gap-16 sm:px-8 md:px-12">
+      <PageHeader
+        kicker="Methodology, told simply"
+        title="How the board gets its numbers"
+        lead="A pipeline answers a question. A judge decides if the answer is right. Here is how each part is made, in three short chapters."
+        meta={`${DATASET_SIZE.bank.toLocaleString("en-US")} questions on file · ${
+          DATASET_SIZE.perRun
+        } per run · judge ${JUDGE_NAME}`}
+        action={
+          <SmoothScrollLink
+            href="#worked-example"
+            className="inline-flex min-h-[44px] items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
-            <div>
-              <div className="flex items-center justify-between gap-2 pb-3">
-                <span className="font-mono text-xs font-bold text-[var(--brand-text)]">
-                  {pillar.step}
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-xs font-sans font-semibold bg-[var(--brand-sky-blue)]/15 text-[var(--brand-text)]">
-                  {pillar.badge}
-                </span>
-              </div>
+            See one answer score on every metric &rarr;
+          </SmoothScrollLink>
+        }
+      />
 
-              <h2 className="text-lg font-sans font-bold text-[var(--text-primary)]">
-                {pillar.title}
-              </h2>
+      <MethodologyChapter chapter={systemDesign}>
+        <MethodologyPillar
+          block={SYSTEM_DESIGN}
+          accent={systemDesign.accent}
+        />
+        <PipelineFlow accent={systemDesign.accent} />
+        <Payoff>
+          <span className="font-semibold text-[var(--text-primary)]">
+            The point.{" "}
+          </span>
+          Only the models change; the three-part path stays the same, so any two
+          rows can be compared.
+        </Payoff>
+      </MethodologyChapter>
 
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-sans mt-2.5 leading-relaxed">
-                {pillar.description}
-              </p>
-            </div>
+      <MethodologyChapter chapter={questionBank}>
+        <DatasetStory />
+      </MethodologyChapter>
 
-            <ul className="mt-5 pt-4 border-t border-[var(--border-default)]/60 flex flex-col gap-2">
-              {pillar.details.map((detail) => (
-                <li
-                  key={detail}
-                  className="text-xs font-sans text-[var(--text-muted)] flex items-start gap-2"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-sky-blue)] mt-1.5 shrink-0" />
-                  <span>{detail}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <MethodologyChapter chapter={scoring}>
+        <MethodologyPillar
+          block={SCORING_PROTOCOL}
+          accent={scoring.accent}
+        />
+        <ScoringChips />
+        <Payoff>
+          <span className="font-semibold text-[var(--text-primary)]">
+            The point.{" "}
+          </span>
+          Correctness is 45% of Overall, and the judge is how we measure it.{" "}
+          <Link
+            href="/metrics#overall-score"
+            className="font-semibold text-[var(--brand-text)] underline-offset-2 transition-colors hover:text-[var(--brand-cta-hover)] hover:underline"
+          >
+            See how the rest is built
+          </Link>
+          .
+        </Payoff>
+      </MethodologyChapter>
 
-      {/* Pipeline Flow Banner */}
-      <div className="p-6 rounded-2xl border border-[var(--border-default)] bg-[var(--background-subtle)] flex flex-col sm:flex-row items-center justify-between gap-6">
+      {/* One answer, every score: the worked example closes the story. */}
+      <MetricsWorkedExample />
+
+      <div className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-6 sm:flex-row sm:items-center sm:p-8">
         <div>
-          <h3 className="font-sans font-bold text-lg text-[var(--text-primary)]">
-            Open-Source Experiment Scripts
-          </h3>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mt-1">
-            All evaluation runs, prompt templates, and raw metric extraction scripts are maintained in the repository for auditability.
+          <h2 className="font-sans text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
+            Everything runs from the repo
+          </h2>
+          <p className="mt-2 max-w-[58ch] font-sans text-sm leading-relaxed text-[var(--text-secondary)] sm:text-base">
+            The dataset scripts live in{" "}
+            <code className="font-mono text-[0.95em] text-[var(--text-primary)]">
+              th_data_gen/
+            </code>{" "}
+            — generate,
+            verify, spot-check, build. Every evaluation run keeps its config and
+            raw outputs, so anyone can re-run it.
           </p>
         </div>
 
         <Link
           href="/request"
-          className="min-h-[44px] px-5 rounded-xl bg-[var(--brand-cta)] hover:bg-[var(--brand-cta-hover)] text-white text-xs font-sans font-semibold inline-flex items-center justify-center transition-colors shadow-2xs shrink-0 whitespace-nowrap"
+          className="inline-flex min-h-[44px] shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"
         >
-          Request Custom Run &rarr;
+          Request a custom run &rarr;
         </Link>
       </div>
     </div>

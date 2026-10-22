@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { RequestSection } from "@/components/sections/RequestSection";
 
 export const metadata: Metadata = {
-  title: "Request Benchmark • SIAM.AI",
+  title: "Request a Run • SIAM.AI Benchmark",
   description:
-    "Request custom Generator, Embedding, and Reranker model combinations to be evaluated on the Thai RAG benchmark.",
+    "Request Generator, Embedding, and optional Reranker models to be evaluated on the Thai RAG benchmark. Give us the model names, optional links, and an email to reply to.",
 };
 
 export default function RequestPage() {
