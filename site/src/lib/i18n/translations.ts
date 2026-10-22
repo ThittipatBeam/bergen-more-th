@@ -62,8 +62,9 @@ export const NAV_ITEMS_TH: NavItemTranslation[] = [
   },
 ];
 
-export function getNavItems(lang: Language): NavItemTranslation[] {
-  return lang === "TH" ? NAV_ITEMS_TH : NAV_ITEMS_EN;
+export function getNavItems(_lang?: Language): NavItemTranslation[] {
+  // Navigation bar is strictly English across all languages per design guidelines
+  return NAV_ITEMS_EN;
 }
 
 export const I18N = {
@@ -180,10 +181,10 @@ export const I18N = {
   },
   TH: {
     nav: {
-      menu: "เมนู",
-      close: "ปิด",
-      openMenuAria: "เปิดเมนูนำทาง",
-      closeMenuAria: "ปิดเมนูนำทาง",
+      menu: "MENU",
+      close: "CLOSE",
+      openMenuAria: "Open navigation menu",
+      closeMenuAria: "Close navigation menu",
       benchmarkTag: "SIAM.AI BENCHMARK",
       corpusTag: "THAI RAG CORPUS",
     },

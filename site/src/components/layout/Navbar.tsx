@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -10,8 +10,7 @@ import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { useLanguage } from "@/hooks/use-language";
-import { getNavItems, I18N, NAV_ITEMS_EN } from "@/lib/i18n/translations";
+import { NAV_ITEMS_EN } from "@/lib/i18n/translations";
 
 export interface NavItem {
   label: string;
@@ -27,9 +26,8 @@ export function Navbar() {
   const cloudIconRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
-  const { language } = useLanguage();
-  const t = I18N[language];
-  const navItems = useMemo(() => getNavItems(language), [language]);
+  // Nav bar remains strictly in English across all language toggles
+  const navItems = NAV_ITEMS_EN;
 
   // Playful spring hover on the cloud logo emblem
   const handleLogoHover = useCallback(() => {
@@ -159,17 +157,17 @@ export function Navbar() {
             {/* Theme Toggle with GSAP Animation */}
             <ThemeToggle />
 
-            {/* Mobile Menu Trigger (< md) */}
+            {/* Mobile Menu Trigger (< md) - Strictly English */}
             <button
               ref={menuButtonRef}
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label={t.nav.openMenuAria}
+              aria-label="Open navigation menu"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               className="md:hidden min-h-[44px] min-w-[44px] -mr-1 flex items-center justify-center text-xs font-semibold tracking-[0.18em] text-[var(--text-primary)] hover:text-[var(--brand-text)]"
             >
-              {t.nav.menu}
+              MENU
             </button>
           </div>
         </div>
