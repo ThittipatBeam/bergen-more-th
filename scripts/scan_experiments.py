@@ -170,7 +170,7 @@ def main(output: str = "experiments_data.json", split: str = "dev"):
     experiments = []
     subdirs = [
         d for d in exp_root.iterdir()
-        if d.is_dir() and not d.name.startswith("tmp_")
+        if d.is_dir() and not d.name.startswith("tmp_") and d.name != "old"
     ]
 
     print(f"Scanning {len(subdirs)} experiments...")

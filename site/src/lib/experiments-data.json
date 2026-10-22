@@ -1,5 +1,475 @@
 [
   {
+    "experiment_id": "12b29324792c9cd4",
+    "run_date": "2026-10-21T03:24:11.234962",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "BAAI/bge-m3",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": "BAAI/bge-reranker-v2-m3",
+      "provider": "openai_compatible",
+      "batch_size": 100
+    },
+    "generator": {
+      "model_name": "QWEN3.6-27B",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 10,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.686,
+      "EM": 0.306,
+      "F1": 0.5688720563082091,
+      "Precision": 0.5176776844552434,
+      "Recall": 0.7127952380952381,
+      "Recall_char3gram": 0.8599319415646662,
+      "Rouge-1": 0.5382566711854612,
+      "Rouge-2": 0.34928231630463497,
+      "Rouge-L": 0.5379233378521279,
+      "M_th": 0.746,
+      "F1_th": 0.6281669577973019,
+      "Precision_th": 0.5620457183036727,
+      "Recall_th": 0.8675761183261184,
+      "LLMeval_judge": 0.966,
+      "LLMeval_judge_pct": 96.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:33:05.65",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.966,
+      "LLMeval_judge_pct": 96.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/12b29324792c9cd4/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/12b29324792c9cd4/eval_dev_out.json",
+      "config_yaml": "experiments/12b29324792c9cd4/config.yaml",
+      "input_retrieval_run": "experiments/12b29324792c9cd4/runs"
+    }
+  },
+  {
+    "experiment_id": "14dba12466112e3f",
+    "run_date": "2026-10-21T04:52:43.004835",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "QWEN3-EMBED-8B",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": "BAAI/bge-reranker-v2-m3",
+      "provider": "openai_compatible",
+      "batch_size": 100
+    },
+    "generator": {
+      "model_name": "QWEN3.6-27B",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 10,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.688,
+      "EM": 0.292,
+      "F1": 0.557823466606719,
+      "Precision": 0.5060584983668124,
+      "Recall": 0.7077666666666667,
+      "Recall_char3gram": 0.863798685907198,
+      "Rouge-1": 0.522331106323001,
+      "Rouge-2": 0.3329145359590035,
+      "Rouge-L": 0.5214977729896676,
+      "M_th": 0.754,
+      "F1_th": 0.6254143878576701,
+      "Precision_th": 0.5586366016529559,
+      "Recall_th": 0.8716690476190476,
+      "LLMeval_judge": 0.974,
+      "LLMeval_judge_pct": 97.39999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:20:53.56",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.974,
+      "LLMeval_judge_pct": 97.39999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/14dba12466112e3f/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/14dba12466112e3f/eval_dev_out.json",
+      "config_yaml": "experiments/14dba12466112e3f/config.yaml",
+      "input_retrieval_run": "experiments/14dba12466112e3f/runs"
+    }
+  },
+  {
+    "experiment_id": "2cc6f4a627e7426e",
+    "run_date": "2026-10-21T07:16:51.315491",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "BAAI/bge-m3",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "generator": {
+      "model_name": "DEEPSEEK-V4.1F",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 50,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.694,
+      "EM": 0.18,
+      "F1": 0.5045285694054977,
+      "Precision": 0.4324277683101212,
+      "Recall": 0.6883333333333332,
+      "Recall_char3gram": 0.8568439554527565,
+      "Rouge-1": 0.4058876519241535,
+      "Rouge-2": 0.26013716794396136,
+      "Rouge-L": 0.40510987414637567,
+      "M_th": 0.77,
+      "F1_th": 0.5265290069483413,
+      "Precision_th": 0.43602170259516243,
+      "Recall_th": 0.8661404761904762,
+      "LLMeval_judge": 0.956,
+      "LLMeval_judge_pct": 95.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:10:11.36",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.956,
+      "LLMeval_judge_pct": 95.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/2cc6f4a627e7426e/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/2cc6f4a627e7426e/eval_dev_out.json",
+      "config_yaml": "experiments/2cc6f4a627e7426e/config.yaml",
+      "input_retrieval_run": "experiments/2cc6f4a627e7426e/runs"
+    }
+  },
+  {
+    "experiment_id": "2e5b353b3512114f",
+    "run_date": "2026-10-21T05:57:54.098876",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "BAAI/bge-m3",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": "BAAI/bge-reranker-v2-m3",
+      "provider": "openai_compatible",
+      "batch_size": 100
+    },
+    "generator": {
+      "model_name": "GPTOSS-120B",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 10,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.51,
+      "EM": 0.03,
+      "F1": 0.34253655286064405,
+      "Precision": 0.27070961073521926,
+      "Recall": 0.5304952380952381,
+      "Recall_char3gram": 0.7708756670593108,
+      "Rouge-1": 0.27421127057929656,
+      "Rouge-2": 0.18333629618363845,
+      "Rouge-L": 0.2738476342156602,
+      "M_th": 0.61,
+      "F1_th": 0.34672179345152393,
+      "Precision_th": 0.24279880740577817,
+      "Recall_th": 0.7977944444444444,
+      "LLMeval_judge": 0.9559118236472945,
+      "LLMeval_judge_pct": 95.59118236472945,
+      "LLMeval_judge_unknown_rate": 0.002,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:04:10.98",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.9559118236472945,
+      "LLMeval_judge_pct": 95.59118236472945,
+      "LLMeval_judge_unknown_rate": 0.002,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/2e5b353b3512114f/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/2e5b353b3512114f/eval_dev_out.json",
+      "config_yaml": "experiments/2e5b353b3512114f/config.yaml",
+      "input_retrieval_run": "experiments/2e5b353b3512114f/runs"
+    }
+  },
+  {
+    "experiment_id": "31386db6ca733d7a",
+    "run_date": "2026-10-21T05:24:55.383597",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "QWEN3-EMBED-8B",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "generator": {
+      "model_name": "QWEN3.6-27B",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 50,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.692,
+      "EM": 0.318,
+      "F1": 0.5835627033909122,
+      "Precision": 0.5353038224254786,
+      "Recall": 0.7118666666666665,
+      "Recall_char3gram": 0.8505498786164617,
+      "Rouge-1": 0.5580405872056843,
+      "Rouge-2": 0.35440977627305686,
+      "Rouge-L": 0.557707253872351,
+      "M_th": 0.76,
+      "F1_th": 0.6388580883226882,
+      "Precision_th": 0.5773682074155478,
+      "Recall_th": 0.8631253246753247,
+      "LLMeval_judge": 0.948,
+      "LLMeval_judge_pct": 94.8,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:22:04.04",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.948,
+      "LLMeval_judge_pct": 94.8,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/31386db6ca733d7a/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/31386db6ca733d7a/eval_dev_out.json",
+      "config_yaml": "experiments/31386db6ca733d7a/config.yaml",
+      "input_retrieval_run": "experiments/31386db6ca733d7a/runs"
+    }
+  },
+  {
     "experiment_id": "339bf4405410a0f2",
     "run_date": "2026-10-21T03:04:48.447639",
     "dataset": {
@@ -188,28 +658,218 @@
     }
   },
   {
-    "experiment_id": "old",
-    "run_date": "",
+    "experiment_id": "62c0337052977da7",
+    "run_date": "2026-10-21T06:26:58.895946",
     "dataset": {
       "doc": {
-        "target": null,
-        "split": null,
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
         "lang": null,
-        "sources": null,
-        "num_words": null
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
       },
       "query": {
-        "target": null,
-        "split": null,
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
         "lang": null,
         "sources": null,
         "num_words": null
       }
     },
     "retriever": {
-      "model_name": null,
+      "model_name": "QWEN3-EMBED-8B",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": "BAAI/bge-reranker-v2-m3",
+      "provider": "openai_compatible",
+      "batch_size": 100
+    },
+    "generator": {
+      "model_name": "GPTOSS-120B",
       "provider": null,
       "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 10,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.516,
+      "EM": 0.03,
+      "F1": 0.3418741480745822,
+      "Precision": 0.2664659090454638,
+      "Recall": 0.5515809523809524,
+      "Recall_char3gram": 0.77011130965024,
+      "Rouge-1": 0.2710643471434535,
+      "Rouge-2": 0.18894734487266002,
+      "Rouge-L": 0.2703370744161808,
+      "M_th": 0.618,
+      "F1_th": 0.3482295865488508,
+      "Precision_th": 0.24475311135290945,
+      "Recall_th": 0.8111015873015873,
+      "LLMeval_judge": 0.948,
+      "LLMeval_judge_pct": 94.8,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:03:56.79",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.948,
+      "LLMeval_judge_pct": 94.8,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/62c0337052977da7/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/62c0337052977da7/eval_dev_out.json",
+      "config_yaml": "experiments/62c0337052977da7/config.yaml",
+      "input_retrieval_run": "experiments/62c0337052977da7/runs"
+    }
+  },
+  {
+    "experiment_id": "8eb177009a47c08f",
+    "run_date": "2026-10-21T07:36:38.691402",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "QWEN3-EMBED-8B",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": "BAAI/bge-reranker-v2-m3",
+      "provider": "openai_compatible",
+      "batch_size": 100
+    },
+    "generator": {
+      "model_name": "DEEPSEEK-V4.1F",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 10,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.736,
+      "EM": 0.202,
+      "F1": 0.52050311404282,
+      "Precision": 0.44545078158556417,
+      "Recall": 0.7155999999999999,
+      "Recall_char3gram": 0.8706218044428272,
+      "Rouge-1": 0.42624963446086317,
+      "Rouge-2": 0.27027186239360573,
+      "Rouge-L": 0.42547185668308535,
+      "M_th": 0.81,
+      "F1_th": 0.5320739231698927,
+      "Precision_th": 0.4401435962343379,
+      "Recall_th": 0.8862095238095238,
+      "LLMeval_judge": 0.974,
+      "LLMeval_judge_pct": 97.39999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:08:30.42",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.974,
+      "LLMeval_judge_pct": 97.39999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/8eb177009a47c08f/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/8eb177009a47c08f/eval_dev_out.json",
+      "config_yaml": "experiments/8eb177009a47c08f/config.yaml",
+      "input_retrieval_run": "experiments/8eb177009a47c08f/runs"
+    }
+  },
+  {
+    "experiment_id": "91540a2b019068b2",
+    "run_date": "2026-10-21T06:41:55.631381",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "QWEN3-EMBED-8B",
+      "provider": "openai_compatible",
+      "batch_size": 256
     },
     "reranker": {
       "model_name": null,
@@ -217,27 +877,254 @@
       "batch_size": null
     },
     "generator": {
+      "model_name": "GPTOSS-120B",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 50,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.504,
+      "EM": 0.032,
+      "F1": 0.33288213342127426,
+      "Precision": 0.26212576857675696,
+      "Recall": 0.5163238095238095,
+      "Recall_char3gram": 0.7499643822526916,
+      "Rouge-1": 0.27291405960712745,
+      "Rouge-2": 0.18288324666553105,
+      "Rouge-L": 0.2719873196803875,
+      "M_th": 0.606,
+      "F1_th": 0.34908233408636036,
+      "Precision_th": 0.249871087150564,
+      "Recall_th": 0.7785587301587302,
+      "LLMeval_judge": 0.942,
+      "LLMeval_judge_pct": 94.19999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:03:42.25",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.942,
+      "LLMeval_judge_pct": 94.19999999999999,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/91540a2b019068b2/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/91540a2b019068b2/eval_dev_out.json",
+      "config_yaml": "experiments/91540a2b019068b2/config.yaml",
+      "input_retrieval_run": "experiments/91540a2b019068b2/runs"
+    }
+  },
+  {
+    "experiment_id": "a641849779165ee1",
+    "run_date": "2026-10-21T06:12:04.109465",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "BAAI/bge-m3",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
       "model_name": null,
       "provider": null,
       "batch_size": null
     },
-    "judge_candidates": [],
-    "retrieval": {
-      "retrieve_top_k": null,
-      "rerank_top_k": null,
-      "generation_top_k": null
+    "generator": {
+      "model_name": "GPTOSS-120B",
+      "provider": null,
+      "batch_size": null
     },
-    "metrics": {},
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 50,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.504,
+      "EM": 0.028,
+      "F1": 0.33089414808741874,
+      "Precision": 0.25747536815846145,
+      "Recall": 0.5315952380952381,
+      "Recall_char3gram": 0.7647155491223202,
+      "Rouge-1": 0.26857929246201867,
+      "Rouge-2": 0.1822217577487612,
+      "Rouge-L": 0.26730796379068994,
+      "M_th": 0.614,
+      "F1_th": 0.3412511527437214,
+      "Precision_th": 0.2389494687453126,
+      "Recall_th": 0.7977388888888888,
+      "LLMeval_judge": 0.935871743486974,
+      "LLMeval_judge_pct": 93.5871743486974,
+      "LLMeval_judge_unknown_rate": 0.002,
+      "LLMeval_judge_n": 500
+    },
     "metrics_scorable771": null,
     "ranking_metrics": {},
     "reranking_metrics": {},
-    "judge_cost": null,
-    "generation_time": null,
-    "generation_cost": null,
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:04:03.50",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.935871743486974,
+      "LLMeval_judge_pct": 93.5871743486974,
+      "LLMeval_judge_unknown_rate": 0.002,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/a641849779165ee1/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
     "file_paths": {
-      "eval_out": null,
-      "config_yaml": "experiments/old/config.yaml",
-      "input_retrieval_run": "experiments/old/runs"
+      "eval_out": "experiments/a641849779165ee1/eval_dev_out.json",
+      "config_yaml": "experiments/a641849779165ee1/config.yaml",
+      "input_retrieval_run": "experiments/a641849779165ee1/runs"
+    }
+  },
+  {
+    "experiment_id": "c65a4684924e512a",
+    "run_date": "2026-10-21T04:19:21.992856",
+    "dataset": {
+      "doc": {
+        "target": "modules.dataset_processor.ThaiWikiV4",
+        "split": "train",
+        "lang": null,
+        "sources": [
+          "thwiki"
+        ],
+        "num_words": 1000
+      },
+      "query": {
+        "target": "modules.processors.mrag_dataset_processor.ThaiWikiV4QA",
+        "split": "train",
+        "lang": null,
+        "sources": null,
+        "num_words": null
+      }
+    },
+    "retriever": {
+      "model_name": "BAAI/bge-m3",
+      "provider": "openai_compatible",
+      "batch_size": 256
+    },
+    "reranker": {
+      "model_name": null,
+      "provider": null,
+      "batch_size": null
+    },
+    "generator": {
+      "model_name": "QWEN3.6-27B",
+      "provider": null,
+      "batch_size": null
+    },
+    "judge_candidates": [
+      "KIMI-K3_500"
+    ],
+    "retrieval": {
+      "retrieve_top_k": 100,
+      "rerank_top_k": 50,
+      "generation_top_k": 5
+    },
+    "metrics": {
+      "M": 0.674,
+      "EM": 0.31,
+      "F1": 0.56944866538208,
+      "Precision": 0.5175801358383401,
+      "Recall": 0.7060952380952381,
+      "Recall_char3gram": 0.845971558649616,
+      "Rouge-1": 0.5419930211644884,
+      "Rouge-2": 0.3456441552882479,
+      "Rouge-L": 0.5416596878311553,
+      "M_th": 0.748,
+      "F1_th": 0.6300630668885586,
+      "Precision_th": 0.5669282185809893,
+      "Recall_th": 0.8557237373737373,
+      "LLMeval_judge": 0.956,
+      "LLMeval_judge_pct": 95.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "metrics_scorable771": null,
+    "ranking_metrics": {},
+    "reranking_metrics": {},
+    "judge_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "generation_time": "00:22:11.54",
+    "generation_cost": {
+      "total_cost": 0.0,
+      "prompt_cost": 0.0,
+      "completion_cost": 0.0
+    },
+    "judge_metrics": {
+      "LLMeval_judge": 0.956,
+      "LLMeval_judge_pct": 95.6,
+      "LLMeval_judge_unknown_rate": 0.0,
+      "LLMeval_judge_n": 500
+    },
+    "judge_files": {
+      "KIMI-K3_500": {
+        "checkpoint_file": "experiments/c65a4684924e512a/eval_dev_judge_KIMI-K3_500_partial.jsonl"
+      }
+    },
+    "file_paths": {
+      "eval_out": "experiments/c65a4684924e512a/eval_dev_out.json",
+      "config_yaml": "experiments/c65a4684924e512a/config.yaml",
+      "input_retrieval_run": "experiments/c65a4684924e512a/runs"
     }
   }
 ]
