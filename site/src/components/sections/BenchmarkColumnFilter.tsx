@@ -87,7 +87,7 @@ export function BenchmarkColumnFilter({
         >
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
         </svg>
-        <span>Customize Metrics</span>
+        <span className="whitespace-nowrap">Customize Metrics</span>
         <span className="px-1.5 py-0.5 rounded-full text-xs bg-[var(--brand-sky-blue)]/15 text-[var(--brand-text)] font-bold">
           {activeCount}/{COLUMN_OPTIONS.length}
         </span>

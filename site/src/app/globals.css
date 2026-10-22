@@ -30,10 +30,14 @@
   --brand-cta: #006b91; /* action background, white text: 5.98:1 */
   --brand-cta-hover: #055672;
 
-  /* Rank medals (light-theme values pass AA as text on white: ≥4.5:1) */
-  --medal-gold: #8a6d1c;
-  --medal-silver: #6e7881;
+  /* Rank medals. Measured against the podium row tint they sit on, not white:
+     gold 4.81:1, silver 4.70:1, bronze 5.08:1. */
+  --medal-gold: #866819;
+  --medal-silver: #667079;
   --medal-bronze: #96591f;
+
+  /* "Leader" sits on score band 5 (#b8deec): 5.70:1. */
+  --leader-label: #055672;
 
   /* Semantic color language — every hue has exactly one job:
      brand blue = the quality signal (Judge Score) + interactive affordances
@@ -75,6 +79,10 @@
   --rank-gold-bg: rgba(138, 109, 28, 0.07);
   --rank-silver-bg: rgba(110, 120, 129, 0.06);
   --rank-bronze-bg: rgba(150, 89, 31, 0.06);
+  /* Same tints composited on --background-primary, so sticky cells stay opaque. */
+  --rank-gold-solid: #f7f5ef;
+  --rank-silver-solid: #f6f7f7;
+  --rank-bronze-solid: #f9f5f2;
 
   /* Decorative hero grid + elevation */
   --hero-grid: rgba(7, 149, 207, 0.08);
@@ -107,6 +115,7 @@
   --medal-gold: #e8c547;
   --medal-silver: #b4bcc4;
   --medal-bronze: #c98a5b;
+  --leader-label: #73b7dc;
 
   --perf-text: #f5b84c;
   --perf-bg: rgba(245, 184, 76, 0.1);
@@ -135,6 +144,9 @@
   --rank-gold-bg: rgba(232, 197, 71, 0.09);
   --rank-silver-bg: rgba(180, 188, 196, 0.08);
   --rank-bronze-bg: rgba(201, 138, 91, 0.08);
+  --rank-gold-solid: #242925;
+  --rank-silver-solid: #1e272f;
+  --rank-bronze-solid: #202326;
 
   --hero-grid: rgba(115, 183, 220, 0.06);
   --shadow-sheet: rgba(0, 0, 0, 0.6);
@@ -185,11 +197,45 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Theme switch is a circular reveal from the toggle (View Transitions), so
+   the default cross-fade must be neutralised: both snapshots stay still and
+   the new one is clipped by the ripple animation. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* While the swap is captured, colour transitions would freeze the new frame
+   mid-fade. Muting them for those ~500ms lets the snapshot carry final values. */
+.theme-swap,
+.theme-swap *,
+.theme-swap *::before,
+.theme-swap *::after {
+  transition: none !important;
+}
+
+/* The leaderboard's swipe hint must never claim a scroll that isn't there.
+   Above this width the full column set fits, so drop it even before the
+   client has measured. Unlayered on purpose: Tailwind emits custom breakpoint
+   variants ahead of `md:block`, which would lose the cascade. */
+@media (width >= 1440px) {
+  [data-scroll-hint] {
+    display: none;
+  }
+}
+
 /* Keyboard focus is always visible; --border-focus passes 3:1 on every surface */
 :focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* The champion card's overlay button sits inside an overflow-clipped card, so
+   its ring is drawn inward; an outward ring would be cut to nothing. */
+.champion-hit-area:focus-visible {
+  outline-offset: -2px;
 }
 
 /* Elevation stays token-driven so theme swaps do not leave stray rgba()s. */

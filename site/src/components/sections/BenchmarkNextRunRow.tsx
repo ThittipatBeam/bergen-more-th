@@ -14,7 +14,7 @@ export function BenchmarkNextRunRow({
           <div className="w-8 h-8 rounded-lg border border-dashed border-[var(--border-strong)] flex items-center justify-center shrink-0" />
           <Link
             href="/request"
-            className="text-xs font-mono font-semibold text-[var(--brand-text)] hover:text-[var(--brand-cta-hover)] tracking-wider min-h-[44px] inline-flex items-center transition-colors"
+            className="inline-flex min-h-[44px] items-center whitespace-nowrap text-xs font-mono font-semibold tracking-wider text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
             Request a run &rarr;
           </Link>

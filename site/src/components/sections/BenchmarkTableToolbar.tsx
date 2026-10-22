@@ -70,7 +70,7 @@ export function BenchmarkTableToolbar({
       {/* Column Customizer with Filter Icon */}
       <div className="flex items-center justify-between sm:justify-end gap-3">
         <div
-          className="hidden md:flex items-center gap-1.5"
+          className="hidden lg:flex items-center gap-1.5 whitespace-nowrap"
           title={`Overall score tint: ${QUALITY_MIN.toFixed(1)} → ${QUALITY_MAX.toFixed(1)}`}
         >
           <span className="text-xs font-sans text-[var(--text-muted)]">
@@ -89,7 +89,7 @@ export function BenchmarkTableToolbar({
           </span>
         </div>
 
-        <span className="text-xs font-sans text-[var(--text-muted)]">
+        <span className="whitespace-nowrap text-xs font-sans text-[var(--text-muted)]">
           <span className="font-mono font-semibold text-[var(--text-secondary)]">{resultsCount}</span> runs
         </span>
         <BenchmarkColumnFilter columns={columns} onChange={onColumnsChange} />

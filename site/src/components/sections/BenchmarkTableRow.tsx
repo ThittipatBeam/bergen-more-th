@@ -1,10 +1,11 @@
+import type { CSSProperties } from "react";
 import type { BenchmarkRow, ColumnVisibility } from "@/types/benchmark";
 import {
   QUALITY_MAX,
   QUALITY_MIN,
   formatClock,
 } from "@/lib/benchmark-data";
-import { RANK_MEDAL_CLASSES, RANK_ROW_CLASSES } from "@/lib/rank-styles";
+import { RANK_MEDAL_CLASSES } from "@/lib/rank-styles";
 import { SCORE_BAND_CLASSES, scoreBand } from "@/lib/score-scale";
 import { BrandIcon } from "@/components/ui/BrandIcon";
 
@@ -19,7 +20,16 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
   const padRank = `${String(row.rank).padStart(2, "0")}${isTied ? "=" : ""}`;
   // Medals are redundant with the rank numeral itself (color is never the only cue)
   const rankColor = RANK_MEDAL_CLASSES[row.rank] ?? "text-[var(--text-muted)]";
-  const rowTint = RANK_ROW_CLASSES[row.rank] ?? "bg-transparent";
+  // Opaque so the sticky rank/model cells can inherit the podium wash instead
+  // of showing the columns scrolling underneath them.
+  const rowBg =
+    row.rank === 1
+      ? "var(--rank-gold-solid)"
+      : row.rank === 2
+        ? "var(--rank-silver-solid)"
+        : row.rank === 3
+          ? "var(--rank-bronze-solid)"
+          : "var(--background-primary)";
   const scoreTint =
     SCORE_BAND_CLASSES[scoreBand(row.q, QUALITY_MIN, QUALITY_MAX)];
 
@@ -49,10 +59,11 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
 
   return (
     <tr
-      className={`border-b border-[var(--border-default)]/70 transition-colors hover:bg-[var(--background-subtle)] ${rowTint}`}
+      style={{ "--row-bg": rowBg } as CSSProperties}
+      className="border-b border-[var(--border-default)]/70 bg-[var(--row-bg)] transition-colors hover:bg-[var(--background-subtle)]"
     >
       {/* Rank # */}
-      <td className="py-3 px-1.5 text-center">
+      <td className="sticky left-0 z-10 bg-inherit py-3 px-1.5 text-center">
         <span
           className={`font-mono font-extrabold text-sm sm:text-base ${rankColor}`}
         >
@@ -61,7 +72,7 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
       </td>
 
       {/* MODEL (Tile + Logo + Name + Leader badge) */}
-      <td className="py-3 px-2 sm:px-3">
+      <td className="sticky left-14 z-10 bg-inherit py-3 px-2 sm:px-3">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg border border-[var(--border-default)] bg-[var(--background-primary)] flex items-center justify-center shrink-0 shadow-2xs">
             <BrandIcon name={row.generator} size={18} />
@@ -116,7 +127,7 @@ export function BenchmarkTableRow({ row, columns }: BenchmarkTableRowProps) {
                 than widening the model column. The gold rank numeral and row
                 tint already carry the same message without it. */}
             {isLeader && (
-              <span className="font-sans text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-[var(--brand-text)]">
+              <span className="font-sans text-[11px] font-bold uppercase leading-none tracking-[0.12em] text-[var(--leader-label)]">
                 {isTied ? "Tied #1" : "Leader"}
               </span>
             )}

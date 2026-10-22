@@ -88,6 +88,7 @@ export function Navbar() {
           <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <Link
               href="/"
+              aria-label="SIAM.AI home"
               onMouseEnter={handleLogoHover}
               onMouseLeave={handleLogoLeave}
               className="group inline-flex shrink-0 items-center gap-2.5 min-h-[44px] cursor-pointer"

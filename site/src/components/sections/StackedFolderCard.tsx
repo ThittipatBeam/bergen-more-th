@@ -109,7 +109,7 @@ export function StackedFolderCard({
             type="button"
             onClick={onSelect}
             aria-label={`Show ${pick.categoryTitle}`}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            className="champion-hit-area absolute inset-0 z-10 h-full w-full cursor-pointer rounded-t-2xl bg-transparent"
           />
         )}
       </div>

@@ -21,6 +21,12 @@ export default function Home() {
         return;
       }
 
+      // Pin only where the hero fits the viewport. Below lg it is taller than
+      // the screen, so pinning would hold the card's lower half off-screen.
+      if (!window.matchMedia("(min-width: 1024px)").matches) {
+        return;
+      }
+
       // Pin the hero and let the leaderboard sheet slide up and over it
       // As the leaderboard covers it, the hero smoothly recedes and fades away
       const tl = gsap.timeline({
@@ -58,7 +64,7 @@ export default function Home() {
       <div
         id="leaderboard"
         ref={leaderboardRef}
-        className="relative z-20 w-full bg-[var(--background-primary)] rounded-t-[32px] sm:rounded-t-[40px] sheet-shadow border-t border-[var(--border-default)] min-h-screen transition-colors duration-300"
+        className="relative z-20 w-full scroll-mt-24 bg-[var(--background-primary)] rounded-t-[32px] sm:rounded-t-[40px] sheet-shadow border-t border-[var(--border-default)] min-h-screen transition-colors duration-300"
       >
         <LeaderboardSection />
       </div>

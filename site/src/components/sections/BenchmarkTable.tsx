@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   BenchmarkRow,
   ColumnVisibility,
@@ -12,6 +12,7 @@ import { BenchmarkTableHeader } from "@/components/sections/BenchmarkTableHeader
 import { BenchmarkTableRow } from "@/components/sections/BenchmarkTableRow";
 import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolbar";
 import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
+import { BenchmarkMobileList } from "@/components/sections/BenchmarkMobileList";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
@@ -32,6 +33,11 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
   const [reranker, setReranker] = useState<RerankerFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("q");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  // The swipe hint is chrome, so it only appears while the table really
+  // overflows. Starts false so the CSS baseline (md and up) can paint it
+  // on the first frame; the measurement below only ever hides it.
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [fitsWithoutScroll, setFitsWithoutScroll] = useState(false);
 
   const generators = useMemo(
     () => [...new Set(rows.map((r) => r.generator))],
@@ -47,15 +53,23 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
     }
   };
 
-  const processedRows = useMemo(() => {
-    const filtered = rows.filter((r) => {
+  const filteredRows = useMemo(() => {
+    return rows.filter((r) => {
       if (generator !== "all" && r.generator !== generator) return false;
       if (reranker === "yes" && !r.reranker) return false;
       if (reranker === "no" && r.reranker) return false;
       return true;
     });
+  }, [rows, generator, reranker]);
 
-    return [...filtered].sort((a, b) => {
+  // Phones read the board in rank order; sorting is a table affordance.
+  const mobileRows = useMemo(
+    () => [...filteredRows].sort((a, b) => a.rank - b.rank),
+    [filteredRows]
+  );
+
+  const processedRows = useMemo(() => {
+    return [...filteredRows].sort((a, b) => {
       let aVal: number | string | null = null;
       let bVal: number | string | null = null;
 
@@ -106,7 +120,18 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
       }
       return sortDirection === "asc" ? res : -res;
     });
-  }, [rows, generator, reranker, sortKey, sortDirection]);
+  }, [filteredRows, sortKey, sortDirection]);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const measure = () =>
+      setFitsWithoutScroll(el.scrollWidth <= el.clientWidth + 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [columns]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -122,45 +147,92 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         resultsCount={processedRows.length}
       />
 
-      {/* Measured Sheet Table Container */}
-      <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors">
-        <table className="w-full text-left border-collapse min-w-[800px]">
-          <caption className="sr-only">
-            Leaderboard of evaluated Thai RAG pipeline combinations, ranked by
-            overall score. Column headers are sortable buttons.
-          </caption>
-          <BenchmarkTableHeader
-            columns={columns}
-            sortKey={sortKey}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-          />
-          <tbody>
-            {processedRows.map((row) => (
-              <BenchmarkTableRow key={row.id} row={row} columns={columns} />
-            ))}
-            <BenchmarkNextRunRow columns={columns} />
-          </tbody>
-        </table>
+      {/* Definitions at the point of use, not only in title tooltips. */}
+      <p className="text-xs leading-5 text-[var(--text-muted)]">
+        <span className="font-mono font-semibold text-[var(--text-secondary)]">
+          Judge
+        </span>{" "}
+        = answers the judge marked correct ·{" "}
+        <span className="font-mono font-semibold text-[var(--text-secondary)]">
+          Match TH
+        </span>{" "}
+        = gold answer found in the answer ·{" "}
+        <span className="font-mono font-semibold text-[var(--text-secondary)]">
+          F1 TH
+        </span>{" "}
+        = harmonic mean of Thai precision and recall ·{" "}
+        <span className="font-mono font-semibold text-[var(--text-secondary)]">
+          EM
+        </span>{" "}
+        = normalized exact match ·{" "}
+        <span className="font-mono font-semibold text-[var(--text-secondary)]">
+          Gen Time
+        </span>{" "}
+        = generation only
+      </p>
 
-        {processedRows.length === 0 && (
-          <div className="py-12 text-center font-mono">
-            <p className="text-xs text-[var(--text-muted)]">
-              No benchmark runs match the current filters.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setGenerator("all");
-                setReranker("all");
-              }}
-              className="mt-3 min-h-[44px] px-4 rounded-xl border border-[var(--border-default)] text-xs font-semibold text-[var(--brand-text)] hover:border-[var(--border-focus)] transition-colors cursor-pointer"
+      {processedRows.length === 0 ? (
+        <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] py-12 text-center font-mono">
+          <p className="text-xs text-[var(--text-muted)]">
+            No benchmark runs match the current filters.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setGenerator("all");
+              setReranker("all");
+            }}
+            className="mt-3 min-h-[44px] rounded-xl border border-[var(--border-default)] px-4 text-xs font-semibold text-[var(--brand-text)] transition-colors hover:border-[var(--border-focus)] cursor-pointer"
+          >
+            Reset filters
+          </button>
+        </div>
+      ) : (
+        <>
+          <BenchmarkMobileList rows={mobileRows} />
+
+          <div className="flex flex-col gap-2">
+            <p
+              data-scroll-hint
+              className={`text-xs text-[var(--text-muted)] ${
+                fitsWithoutScroll ? "hidden" : "hidden md:block"
+              }`}
             >
-              Reset filters
-            </button>
+              Scroll sideways for Judge, Match TH, F1, EM and Gen Time →
+            </p>
+
+            {/* Measured Sheet Table Container */}
+            <div
+              ref={scrollerRef}
+              className="hidden overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors md:block"
+            >
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <caption className="sr-only">
+                  Leaderboard of evaluated Thai RAG pipeline combinations,
+                  ranked by overall score. Metric column headers are sortable
+                  buttons; the Model column is not sortable.
+                </caption>
+                <BenchmarkTableHeader
+                  columns={columns}
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+                <tbody>
+                  {processedRows.map((row) => (
+                    <BenchmarkTableRow
+                      key={row.id}
+                      row={row}
+                      columns={columns}
+                    />
+                  ))}
+                  <BenchmarkNextRunRow columns={columns} />
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }

@@ -77,11 +77,20 @@ export function BenchmarkTableHeader({
   return (
     <thead>
       <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-secondary)] transition-colors select-none">
-        <th scope="col" aria-sort={ariaSort("rank")} className="py-3.5 px-1.5 w-10 text-center">
+        <th
+          scope="col"
+          aria-sort={ariaSort("rank")}
+          className="sticky left-0 z-20 w-10 bg-[var(--background-subtle)] py-3.5 px-1.5 text-center"
+        >
           {sortBtn("rank", "#", "center")}
         </th>
 
-        <th scope="col" className="py-3.5 px-2 sm:px-3 text-left">Model</th>
+        <th
+          scope="col"
+          className="sticky left-14 z-20 bg-[var(--background-subtle)] py-3.5 px-2 text-left sm:px-3"
+        >
+          Model
+        </th>
 
         {columns.retriever && (
           <th scope="col" aria-sort={ariaSort("retriever")} className="py-3.5 px-3 text-left">

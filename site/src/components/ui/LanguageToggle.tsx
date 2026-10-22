@@ -13,26 +13,15 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
   const { language, setLanguage } = useLanguage();
   const reducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
-  const thTextRef = useRef<HTMLSpanElement>(null);
-  const enTextRef = useRef<HTMLSpanElement>(null);
 
   const handleToggle = useCallback(
     (targetLang: Language) => {
       if (targetLang === language) return;
-
+      // The sliding pill is the feedback. A bounce on the label as well reads
+      // as jitter on a control this small, so the switch stays calm.
       setLanguage(targetLang);
-
-      // Playful GSAP spring bounce on the selected text label
-      const activeText = targetLang === "EN" ? enTextRef.current : thTextRef.current;
-      if (activeText && !reducedMotion) {
-        gsap.fromTo(
-          activeText,
-          { scale: 0.82, y: 1 },
-          { scale: 1, y: 0, duration: 0.3, ease: "back.out(2.2)" }
-        );
-      }
     },
-    [language, setLanguage, reducedMotion]
+    [language, setLanguage]
   );
 
   const handleHoverIn = useCallback(() => {
@@ -71,7 +60,7 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
       {/* Sliding Active Background Indicator Pill */}
       <span
         aria-hidden="true"
-        className={`absolute top-[2px] bottom-[2px] left-[2px] w-[48px] rounded-full bg-[var(--brand-sky-blue)] shadow-xs transition-transform duration-200 ease-out pointer-events-none ${
+        className={`absolute top-[2px] bottom-[2px] left-[2px] w-[48px] rounded-full bg-[var(--brand-cta)] shadow-xs transition-transform duration-200 ease-out pointer-events-none ${
           isEn ? "translate-x-[50px]" : "translate-x-0"
         }`}
       />
@@ -85,7 +74,6 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         className="relative z-10 w-full h-full flex items-center justify-center text-xs font-semibold rounded-full cursor-pointer"
       >
         <span
-          ref={thTextRef}
           className={`inline-block transition-colors duration-150 ${
             !isEn
               ? "text-white font-bold"
@@ -105,7 +93,6 @@ export function LanguageToggle({ className = "" }: LanguageToggleProps) {
         className="relative z-10 w-full h-full flex items-center justify-center text-xs font-semibold rounded-full cursor-pointer"
       >
         <span
-          ref={enTextRef}
           className={`inline-block font-sans font-bold transition-colors duration-150 ${
             isEn
               ? "text-white font-bold"
