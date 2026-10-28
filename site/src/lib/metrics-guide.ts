@@ -11,32 +11,32 @@ export const WHICH_SCORE_ROWS_EN: WhichScoreRow[] = [
   {
     need: "One number to rank pipelines on",
     use: "Overall",
-    why: "Blends all four correctness scores, weighted to the judge.",
+    why: "Combines all four correctness metrics, weighted toward the judge score.",
   },
   {
-    need: "Answers I can trust",
+    need: "Check factual correctness",
     use: "Judge",
-    why: "Reads meaning, not spelling.",
+    why: "Evaluates meaning rather than surface phrasing.",
   },
   {
-    need: "Proof the source's words were used",
+    need: "Verify answer key coverage",
     use: "Recall · F1",
-    why: "Measures how much of the answer key was covered.",
+    why: "Measures what share of reference words appeared in the answer.",
   },
   {
-    need: "To catch waffle",
+    need: "Penalize wordy responses",
     use: "Precision",
-    why: "Every extra word lowers it.",
+    why: "Extra words not present in the reference lower this score.",
   },
   {
-    need: "An exact string match",
+    need: "Require exact text match",
     use: "EM",
-    why: "All or nothing, after a light cleanup.",
+    why: "Pass or fail after standard text normalization.",
   },
   {
-    need: "Speed",
+    need: "Compare model latency",
     use: "Generation time",
-    why: "Model writing time only.",
+    why: "Measures generator writing time only, excluding retrieval.",
   },
 ];
 
@@ -44,32 +44,32 @@ export const WHICH_SCORE_ROWS_TH: WhichScoreRow[] = [
   {
     need: "ต้องการตัวเลขเดียวสำหรับจัดอันดับ",
     use: "Overall",
-    why: "ถ่วงน้ำหนักรวม 4 มิติวัดความถูกต้อง โดยให้ความสำคัญกับ Judge สูงสุด",
+    why: "รวมคะแนนความถูกต้อง 4 ด้านเข้าด้วยกัน โดยให้น้ำหนักกับ judge มากที่สุด",
   },
   {
-    need: "ต้องการรู้ว่าคำตอบถูกต้องและไว้ใจได้ไหม",
+    need: "ต้องการตรวจความถูกต้องของเนื้อหา",
     use: "Judge",
-    why: "ตัดสินจากความหมายของเนื้อหา ไม่ยึดติดกับการสะกดหรือ Paraphrase",
+    why: "ตรวจจากความหมายของคำตอบ ไม่ยึดติดกับการสะกดคำหรือการเรียบเรียงใหม่",
   },
   {
-    need: "ต้องการตรวจสอบว่าเนื้อหาเฉลยถูกครอบคลุมครบ",
+    need: "ต้องการตรวจว่าตอบเนื้อหาเฉลยครบไหม",
     use: "Recall · F1",
-    why: "วัดสัดส่วนคำตอบเฉลยที่โมเดลตอบได้ครอบคลุม",
+    why: "วัดว่าคำตอบของโมเดลครอบคลุมคำในเฉลยมากน้อยเพียงใด",
   },
   {
-    need: "ต้องการดักจับโมเดลที่ตอบเวิ่นเว้อหรือน้ำท่วมทุ่ง",
+    need: "ต้องการตรวจว่าโมเดลตอบคำเกินหรือไม่",
     use: "Precision",
-    why: "ทุกคำที่ไม่จำเป็นที่โมเดลใส่เข้ามาจะทำให้คะแนนลดลง",
+    why: "คำที่โมเดลตอบเกินและไม่มีในเฉลยจะทำให้คะแนนลดลง",
   },
   {
-    need: "ต้องการข้อความที่ตรงกับเฉลยแบบ 100%",
+    need: "ต้องการข้อความที่ตรงกับเฉลยทุกตัวอักษร",
     use: "EM",
-    why: "ข้อความต้องตรงกันทุกประการ (วัดแบบผ่านหรือไม่ผ่าน)",
+    why: "ข้อความต้องตรงกับเฉลยทุกประการหลังปรับรูปแบบมาตรฐาน",
   },
   {
-    need: "ต้องการความเร็วและต้นทุนต่ำในระบบจริง",
+    need: "ต้องการดูความเร็วในการสร้างคำตอบ",
     use: "Generation time",
-    why: "วัดเวลาสร้างคำตอบจริงของโมเดลเท่านั้น",
+    why: "จับเวลาเฉพาะช่วงที่โมเดลเขียนคำตอบ ไม่รวมเวลาค้นหาเอกสาร",
   },
 ];
 

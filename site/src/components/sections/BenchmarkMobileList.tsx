@@ -112,7 +112,7 @@ export function BenchmarkMobileList({ rows }: BenchmarkMobileListProps) {
         className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-dashed border-[var(--border-strong)] px-4 font-mono text-xs font-semibold tracking-wide text-[var(--brand-text)] transition-colors hover:border-[var(--brand-sky-light)] hover:text-[var(--brand-cta-hover)]"
       >
         {isTh
-          ? "ไม่พบไปป์ไลน์ที่คุณต้องการ? ส่งคำขอทดสอบ →"
+          ? "ต้องการทดสอบโมเดลอื่น? ส่งคำขอทดสอบที่นี่ →"
           : "Missing a combination? Request a run →"}
       </Link>
     </div>

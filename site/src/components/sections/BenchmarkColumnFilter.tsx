@@ -19,7 +19,7 @@ const COLUMN_OPTIONS: ColumnOption[] = [
   { key: "precisionTh", labelEn: "Thai Precision (Precision_th)", labelTh: "Thai Precision (Precision_th)", category: "metric" },
   { key: "recallTh", labelEn: "Thai Recall (Recall_th)", labelTh: "Thai Recall (Recall_th)", category: "metric" },
   { key: "em", labelEn: "Exact Match (EM)", labelTh: "Exact Match (EM)", category: "metric" },
-  { key: "latency", labelEn: "Generation Time (m:ss)", labelTh: "เวลา Generation (m:ss)", category: "metric" },
+  { key: "latency", labelEn: "Generation Time (m:ss)", labelTh: "เวลาสร้างคำตอบ (m:ss)", category: "metric" },
   { key: "retriever", labelEn: "Embedding (Retriever)", labelTh: "โมเดล Embedding", category: "pipeline" },
   { key: "reranker", labelEn: "Reranker Model", labelTh: "โมเดล Reranker", category: "pipeline" },
 ];

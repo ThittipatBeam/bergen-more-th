@@ -41,27 +41,27 @@ export const METHODOLOGY_CHAPTERS_TH = {
   systemDesign: {
     id: "system-design",
     number: "01",
-    title: "สถาปัตยกรรมระบบที่ใช้ทดสอบ",
+    title: "ไปป์ไลน์ที่ใช้ทดสอบ",
     intro:
-      "ทุกโมเดลบนลีดเดอร์บอร์ดถูกทดสอบบนไปป์ไลน์มาตรฐาน 3 ขั้นตอนเดียวกัน โดยเปลี่ยนเฉพาะตัวโมเดลที่นำมาทดสอบ",
+      "ทุกระบบบนตารางใช้โครงสร้าง 3 ขั้นตอนเรียงต่อกันเหมือนกันทั้งหมด สิ่งที่เปลี่ยนมีเพียงโมเดลที่อยู่ข้างใน",
     icon: "compare_arrows",
     accent: { fg: "var(--brand-text)", bg: "var(--surface-brand)" },
   },
   questionBank: {
     id: "question-bank",
     number: "02",
-    title: "ที่มาของชุดคำถาม Benchmark",
+    title: "ที่มาของชุดคำถาม",
     intro:
-      "เราไม่ใช้ชุดข้อมูลแปลจากภาษาอังกฤษ แต่สร้างชุดคำถามภาษาไทยแท้จาก Thai Wikipedia ตรวจสอบซ้ำด้วยโมเดลอิสระ และสุ่มตรวจคุณภาพด้วยมนุษย์",
+      "เราไม่ใช้คำถามแปลจากภาษาอังกฤษ แต่สร้างคำถามภาษาไทยจากบทความบน Thai Wikipedia ตรวจทานความถูกต้องด้วยโมเดลอีกตัว แล้วสุ่มตรวจซ้ำด้วยคน",
     icon: "fact_check",
     accent: { fg: "var(--metric-containment)", bg: "var(--metric-containment-bg)" },
   },
   scoring: {
     id: "scoring",
     number: "03",
-    title: "เกณฑ์การให้คะแนนและการตัดสิน",
+    title: "วิธีให้คะแนนและตรวจคำตอบ",
     intro:
-      "ใช้โมเดลอิสระตรวจความถูกต้องของคำตอบแบบ Deterministic เพื่อให้คำถามและคำตอบคู่เดียวกันได้ผลการตัดสินคงที่เสมอ",
+      "เราใช้โมเดลแยกอีกตัวมาอ่านคำตอบและให้คะแนน โดยปิดความสุ่มทั้งหมด เพื่อให้คู่คำถามและคำตอบเดิมได้ผลลัพธ์ตรงกันเสมอ",
     icon: "gavel",
     accent: { fg: "var(--metric-overlap)", bg: "var(--metric-overlap-bg)" },
   },
@@ -75,25 +75,25 @@ export const METHODOLOGY_CHAPTERS = METHODOLOGY_CHAPTERS_EN;
 
 export const SYSTEM_DESIGN_EN: MethodologyBlock = {
   badge: "System Design",
-  title: "Tri-Component Architecture",
+  title: "Three-Stage Architecture",
   description:
-    "Every Thai RAG pipeline under evaluation is decomposed into three strictly isolated components: dense embedding retriever, cross-encoder neural reranker, and generator LLM.",
+    "Each Thai RAG pipeline runs in three separate stages: a dense embedding retriever, an optional cross-encoder reranker, and a generator LLM.",
   details: [
-    "Dense vector search over segmented Thai text passages",
-    "Optional cross-encoder reranking pass for semantic precision",
-    "Context-grounded generative answer synthesis",
+    "Dense vector search across segmented Thai text passages",
+    "Optional cross-encoder reranker to refine top candidate passages",
+    "Generative answer written strictly from retrieved context",
   ],
 };
 
 export const SYSTEM_DESIGN_TH: MethodologyBlock = {
   badge: "การออกแบบระบบ",
-  title: "สถาปัตยกรรม RAG 3 องค์ประกอบ",
+  title: "ไปป์ไลน์ 3 ขั้นตอน",
   description:
-    "ทุกไปป์ไลน์ Thai RAG ถูกแยกองค์ประกอบอย่างอิสระ 3 ส่วน: Dense Embedding Retriever, Cross-Encoder Neural Reranker และ Generator LLM",
+    "ระบบ RAG ที่นำมาทดสอบจะแบ่งการทำงานเป็น 3 ขั้นตอนแยกจากกัน: โมเดล dense embedding สำหรับค้นหา, reranker แบบ cross-encoder สำหรับจัดอันดับซ้ำ และโมเดล generator สำหรับสร้างคำตอบ",
   details: [
-    "ค้นหาด้วย Dense Vector Search บนคอร์ปัสภาษาไทยที่ตัดคำแล้ว",
-    "เพิ่มความแม่นยำเชิงความหมายด้วย Cross-Encoder Reranker (เปิด/ปิดได้)",
-    "สร้างคำตอบโดยอิงตามบริบทเอกสารจริง (Context-grounded synthesis)",
+    "ค้นหาข้อความด้วย dense vector บนบทความภาษาไทยที่ตัดคำแล้ว",
+    "จัดอันดับเอกสารซ้ำด้วย cross-encoder เพื่อคัดเฉพาะพาสเสจที่ตรงจุด (เปิดหรือปิดได้)",
+    "สร้างคำตอบโดยอ้างอิงจากเนื้อหาในเอกสารที่ค้นเจอเท่านั้น",
   ],
 };
 
@@ -128,24 +128,24 @@ export const PIPELINE_STAGES_EN: readonly PipelineStage[] = [
 
 export const PIPELINE_STAGES_TH: readonly PipelineStage[] = [
   {
-    label: "คำถาม (Question)",
+    label: "คำถาม",
     value: "1 ใน 500 ข้อ",
-    note: "คำถามภาษาไทยจากชุดข้อสอบ",
+    note: "สุ่มคำถามจากคลังข้อสอบ",
   },
   {
-    label: "ค้นคืน (Retrieve)",
+    label: "ค้นหา",
     value: "Top 100",
-    note: "ค้นหาด้วย Embedding จาก 179,000 พาสเสจ",
+    note: "ค้นหาด้วย embedding จาก 179,000 พาสเสจ",
   },
   {
-    label: "จัดอันดับซ้ำ (Rerank)",
+    label: "จัดอันดับซ้ำ",
     value: "Top 10",
-    note: "สเต็ปเสริมเพื่อคัดกรองความหมาย (ข้ามได้)",
+    note: "คัดกรองรอบสองด้วย reranker (ไม่บังคับ)",
   },
   {
-    label: "สร้างคำตอบ (Answer)",
+    label: "สร้างคำตอบ",
     value: "Top 5",
-    note: "โมเดลเขียนคำตอบจากพาสเสจที่ดีที่สุด",
+    note: "โมเดลเขียนคำตอบจากพาสเสจ 5 ชิ้นที่ดีที่สุด",
   },
 ] as const;
 
@@ -159,7 +159,7 @@ export const DATASET_STEPS_EN: readonly DatasetStep[] = [
   {
     title: "Start from Thai Wikipedia",
     body:
-      "We take PyThaiNLP's thai-wiki-dataset-v4 — the Thai Wikipedia text released by the PyThaiNLP project. We keep main articles only, so quotes and books are filtered out.",
+      "We use thai-wiki-dataset-v4 from PyThaiNLP, keeping only main encyclopedia articles and filtering out Wikiquote and Wikibooks entries.",
     meta: "source: thwiki",
     source: {
       href: "https://huggingface.co/datasets/pythainlp/thai-wiki-dataset-v4",
@@ -167,36 +167,36 @@ export const DATASET_STEPS_EN: readonly DatasetStep[] = [
     },
   },
   {
-    title: "Keep the articles with something to ask about",
+    title: "Keep substantive articles",
     body:
-      "Each article is split into words with PyThaiNLP. Anything under 200 words is dropped, so every question has real content behind it. A fixed random seed keeps the sample reproducible.",
+      "We segment each article into words with PyThaiNLP and drop anything under 200 words. That gives each question enough background context. A fixed random seed keeps the sample reproducible.",
     meta: "at least 200 words · seed 42",
   },
   {
-    title: "A model writes the first draft",
+    title: "Draft question-answer pairs",
     body:
-      "DeepSeek-V4.1F writes two question and answer pairs per article. Answers are kept short (2–10 words) and must appear word-for-word in the article, so they cannot be invented.",
-    meta: "2 pairs per article · answer checked against the text",
+      "DeepSeek-V4.1F writes two question-answer pairs per article. Answers must be short (between 2 and 10 words) and appear word-for-word in the source article so the model cannot invent facts.",
+    meta: "2 pairs per article · answer checked against text",
   },
   {
-    title: "A second model checks every pair",
+    title: "Check each pair with a separate model",
     body:
-      "KIMI-K3 — not the model that wrote them — reads the article, the question and the answer, and replies YES or NO. A writer that grades its own work tends to say yes.",
+      "KIMI-K3, rather than the model that wrote the draft, reads the article, question, and candidate answer, then outputs YES or NO. Having the authoring model grade its own work introduces obvious bias.",
     meta: "judge KIMI-K3 · temperature 0",
   },
   {
-    title: "A person reads a sample",
+    title: "Spot-check with human review",
     body:
-      "A small internal tool shows 50 random pairs. A person marks each pass, fail or skip — a human check on whether the model judge is being too generous.",
+      "We review 50 randomly sampled pairs by hand, marking each as pass, fail, or skip. This confirms whether the automated judge is being too lenient.",
     meta: "50 random pairs · human pass / fail",
   },
 ] as const;
 
 export const DATASET_STEPS_TH: readonly DatasetStep[] = [
   {
-    title: "เริ่มต้นจากคลังบทความ Thai Wikipedia",
+    title: "คัดเลือกบทความจาก Thai Wikipedia",
     body:
-      "ใช้ thai-wiki-dataset-v4 จากโครงการ PyThaiNLP โดยคัดเลือกเฉพาะบทความหลัก ตัดเนื้อหาหมวดคำคมและรายการหนังสือออกเพื่อรักษาคุณภาพของเนื้อหา",
+      "เริ่มต้นจาก thai-wiki-dataset-v4 ของ PyThaiNLP โดยเลือกเฉพาะบทความหลักในสารานุกรม และตัดหน้าคำคมกับหน้ารายชื่อหนังสือออก",
     meta: "แหล่งที่มา: thwiki",
     source: {
       href: "https://huggingface.co/datasets/pythainlp/thai-wiki-dataset-v4",
@@ -204,27 +204,27 @@ export const DATASET_STEPS_TH: readonly DatasetStep[] = [
     },
   },
   {
-    title: "คัดกรองเฉพาะบทความที่มีสาระสำคัญชัดเจน",
+    title: "กรองเฉพาะบทความที่มีเนื้อหาเพียงพอ",
     body:
-      "ตัดคำด้วย PyThaiNLP และคัดออกบทความที่สั้นกว่า 200 คำ เพื่อให้ทุกคำถามมีข้อมูลอ้างอิงเพียงพอ พร้อมกำหนด Random Seed คงที่เพื่อความโปร่งใสและทำซ้ำได้",
+      "ตัดคำภาษาไทยด้วย PyThaiNLP และคัดบทความที่สั้นกว่า 200 คำออก เพื่อให้แน่ใจว่าแต่ละบทความมีบริบทพอสำหรับสร้างคำถาม พร้อมล็อก seed สุ่มไว้ที่ 42 เพื่อให้ทำซ้ำได้",
     meta: "อย่างน้อย 200 คำ · seed 42",
   },
   {
-    title: "สร้างคำถาม-คำตอบตั้งต้นด้วยโมเดลภาษา",
+    title: "สร้างคู่คำถามและคำตอบ",
     body:
-      "ให้ DeepSeek-V4.1F สร้างชุดคำถาม-คำตอบ 2 คู่ต่อบทความ กำหนดคำตอบให้กระชับ (2–10 คำ) และต้องมีข้อความปรากฏตรงในบทความจริงเพื่อป้องกันอาการ Hallucination",
+      "ให้ DeepSeek-V4.1F สร้างคำถามและคำตอบ 2 คู่ต่อบทความ กำหนดให้คำตอบสั้น (ระหว่าง 2 ถึง 10 คำ) และต้องมีข้อความปรากฏตรงในบทความจริงเพื่อไม่ให้โมเดลแต่งข้อมูลขึ้นมาเอง",
     meta: "2 คู่ต่อบทความ · ตรวจสอบคำตอบตรงกับข้อความจริง",
   },
   {
-    title: "ตรวจทานความถูกต้องด้วยโมเดลภายนอก",
+    title: "ตรวจซ้ำด้วยโมเดลอีกตัว",
     body:
-      "ใช้ KIMI-K3 (โมเดลคนละตัวกับที่สร้างคำถาม) มาตรวจสอบบทความ คำถาม และคำตอบ ตอบ YES หรือ NO เพื่อหลีกเลี่ยงอคติจากการประเมินผลตัวเอง",
+      "ให้ KIMI-K3 ซึ่งเป็นคนละตัวกับที่สร้างคำถาม มาอ่านบทความ คำถาม และคำตอบ แล้วตัดสินว่า YES หรือ NO เพราะการให้โมเดลตรวจข้อสอบของตัวเองมักให้คะแนนเข้าข้างตัวเอง",
     meta: "judge KIMI-K3 · Temperature 0.0",
   },
   {
-    title: "สุ่มตรวจสอบมาตรฐานโดยผู้เชี่ยวชาญ (Human Check)",
+    title: "สุ่มตรวจความถูกต้องด้วยคน",
     body:
-      "สุ่มตรวจ 50 คู่คำถาม-คำตอบด้วยสายตาคน เพื่อตรวจสอบว่าโมเดล Judge ไม่ได้ให้คะแนนแบบหละหลวมเกินไป",
+      "สุ่มตรวจ 50 คู่คำถาม-คำตอบด้วยคน เพื่อยืนยันว่าเกณฑ์การตัดสินของโมเดล judge ไม่ได้หละหลวมเกินไป",
     meta: "สุ่ม 50 คู่ · มนุษย์ตรวจผ่าน / ไม่ผ่าน",
   },
 ] as const;
@@ -245,7 +245,7 @@ export const DATASET_RESULT_EN =
   "5,355 pairs passed the generation and judge checks. Each one is still linked to the article it came from, so every score on the board can be traced back to a source.";
 
 export const DATASET_RESULT_TH =
-  "มี 5,355 คู่คำถาม-คำตอบที่ผ่านการตรวจสอบทั้งสองชั้น ทุกข้อเชื่อมโยงกลับไปยังบทความต้นฉบับ ทุกคะแนนบนลีดเดอร์บอร์ดจึงสามารถตรวจสอบย้อนกลับได้เสมอ";
+  "มีคำถามและคำตอบ 5,355 คู่ที่ผ่านการตรวจสอบครบทุกขั้นตอน ทุกข้อผูกโยงกลับไปยังบทความต้นฉบับ ทำให้ตรวจสอบที่มาของคะแนนได้เสมอ";
 
 export function getDatasetResult(lang: Language = "EN"): string {
   return lang === "TH" ? DATASET_RESULT_TH : DATASET_RESULT_EN;
@@ -273,19 +273,19 @@ export const SAMPLE_REASONS_EN = [
 
 export const SAMPLE_REASONS_TH = [
   {
-    title: "ใช้ 500 ข้อเดียวกันในทุกไปป์ไลน์",
+    title: "ใช้คำถาม 500 ข้อเดียวกันในทุกระบบ",
     body:
-      "ทุกโมเดลตอบคำถามชุดเดียวกันเป๊ะ เพื่อให้การเปรียบเทียบเป็นธรรมและวัดผลได้ตรงจุด",
+      "ทุกไปป์ไลน์ตอบคำถามชุดเดียวกันทั้งหมด เพื่อให้เปรียบเทียบคะแนนกันได้โดยตรง",
   },
   {
-    title: "ขนาดกลุ่มตัวอย่างเพียงพอที่จะแยกความต่าง",
+    title: "ขนาดกลุ่มตัวอย่างชัดเจนพอที่จะแยกความต่าง",
     body:
-      "ความต่างของคะแนนในกลุ่มหัวตารางกว้างกว่า Noise ของกลุ่มตัวอย่าง 500 ข้ออย่างมีนัยสำคัญ",
+      "ผลต่างคะแนนของโมเดลกลุ่มหัวตารางกว้างกว่าค่าความแปรปรวน (noise) ของกลุ่มตัวอย่าง 500 ข้อ",
   },
   {
-    title: "คำถามส่วนที่เหลือเก็บไว้ทดสอบเชิงลึก",
+    title: "เก็บคำถามที่เหลือไว้ทดสอบเพิ่มเติม",
     body:
-      "เก็บคำถามที่เหลือไว้สำหรับการทดสอบระดับลึก และใช้ตรวจเช็คว่ากลุ่มตัวอย่างไม่ได้เอื้อประโยชน์ให้โมเดลใดโมเดลหนึ่ง",
+      "คำถามส่วนที่เหลือถูกเก็บไว้สำหรับการทดสอบละเอียด และใช้ตรวจสอบว่าคำถาม 500 ข้อนี้ไม่ได้เอื้อประโยชน์ให้โมเดลใดเป็นพิเศษ",
   },
 ] as const;
 
@@ -297,25 +297,25 @@ export const SAMPLE_REASONS = SAMPLE_REASONS_EN;
 
 export const SCORING_PROTOCOL_EN: MethodologyBlock = {
   badge: "Scoring Protocol",
-  title: "Deterministic LLM-as-a-Judge",
+  title: "Deterministic LLM Judging",
   description:
-    "Responses are evaluated by KIMI-K3 operating with zero-temperature sampling to eliminate variance and score semantic correctness objectively.",
+    "KIMI-K3 evaluates each answer at temperature 0, which removes randomness and gives consistent verdicts for the same input.",
   details: [
-    "Checks for hallucination against retrieved context",
-    "Evaluates Thai language fluency and natural grammar",
-    "Compares output against multi-reference human answers",
+    "Verifies the answer against retrieved passages",
+    "Checks Thai phrasing and grammatical coherence",
+    "Compares model output with reference answers",
   ],
 };
 
 export const SCORING_PROTOCOL_TH: MethodologyBlock = {
-  badge: "เกณฑ์การตัดสิน (Scoring Protocol)",
-  title: "Deterministic LLM-as-a-Judge",
+  badge: "เกณฑ์การตัดสิน",
+  title: "การตรวจคำตอบด้วย LLM Judge",
   description:
-    "ประเมินคำตอบด้วย KIMI-K3 โดยตั้งค่า Temperature เป็น 0.0 เพื่อตัดความแปรปรวน และให้คะแนนความถูกต้องเชิงความหมายอย่างเที่ยงตรง",
+    "เราใช้ KIMI-K3 ตรวจคำตอบโดยตั้งค่า temperature เป็น 0 เพื่อตัดความสุ่ม และทำให้การตัดสินคำตอบเดิมคงที่ทุกครั้ง",
   details: [
-    "ตรวจจับอาการ Hallucination เทียบกับ Context ที่ค้นคืนมา",
-    "ประเมินความสละสลวยและความถูกต้องตามไวยากรณ์ไทย",
-    "เปรียบเทียบผลลัพธ์กับคำตอบเฉลย (Ground Truth Reference)",
+    "ตรวจว่าคำตอบตรงกับเนื้อหาในพาสเสจที่ค้นเจอหรือไม่",
+    "ตรวจความถูกต้องของรูปประโยคและการใช้ภาษาไทย",
+    "เปรียบเทียบผลลัพธ์กับคำตอบเฉลยอ้างอิง",
   ],
 };
 
@@ -328,11 +328,11 @@ export const SCORING_PROTOCOL = SCORING_PROTOCOL_EN;
 export const SCORING_CHIPS_EN: readonly ScoringChip[] = [
   {
     label: "Temperature 0.0",
-    body: "The judge is not allowed to improvise, so the same pair always gets the same verdict.",
+    body: "The judge runs without random sampling, so the same question and answer pair always receives the same score.",
   },
   {
     label: "YES or NO",
-    body: "One word, not a score out of ten — there is no scale to calibrate.",
+    body: "The judge answers with a single word instead of a score out of 10, avoiding arbitrary grading scales.",
   },
   {
     label: "A different model",
@@ -343,15 +343,15 @@ export const SCORING_CHIPS_EN: readonly ScoringChip[] = [
 export const SCORING_CHIPS_TH: readonly ScoringChip[] = [
   {
     label: "Temperature 0.0",
-    body: "ไม่อนุญาตให้โมเดลสุ่มคำตอบ เพื่อให้คู่คำถาม-คำตอบเดิมได้ผลลัพธ์เดิมเสมอ",
+    body: "ปิดความสุ่มทั้งหมด เพื่อให้คำถามและคำตอบเดิมได้ผลลัพธ์ตรงกันทุกครั้ง",
   },
   {
-    label: "YES หรือ NO",
-    body: "ตัดสินด้วยคำเดียว ไม่ใช้คะแนนเต็ม 10 จึงไม่มีปัญหาเรื่องสเกลคะแนนแกว่ง",
+    label: "ตอบ YES หรือ NO",
+    body: "ตัดสินด้วยคำตอบชัดเจนเพียงคำเดียว ไม่ใช้คะแนนเต็ม 10 ซึ่งมักมีปัญหาเรื่องมาตรฐานคะแนนแกว่ง",
   },
   {
     label: "ใช้โมเดลคนละตัว",
-    body: "โมเดล Judge จะไม่ตรวจงานที่ตัวเองเป็นคนเขียน เพื่อความยุติธรรม",
+    body: "โมเดลที่ทำหน้าที่ judge จะไม่ตรวจคำตอบที่ตัวเองเป็นผู้เขียน เพื่อป้องกันอคติ",
   },
 ] as const;
 

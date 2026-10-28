@@ -32,12 +32,12 @@ function buildInsights(isTh: boolean) {
 
   if (precision && recall) {
     insights["word-overlap"] = isTh
-      ? `Recall อยู่ที่ ${recall.min.toFixed(0)}–${recall.max.toFixed(0)}%, ` +
-        `ขณะที่ Precision อยู่ที่ ${precision.min.toFixed(0)}–${precision.max.toFixed(0)}% ` +
-        "โมเดลค้นหาคำที่ถูกต้องเจอ แต่มีแนวโน้มจะเขียนขยายความเพิ่ม"
-      : `recall sits at ${recall.min.toFixed(0)}–${recall.max.toFixed(0)}%, ` +
-        `while precision sits at ${precision.min.toFixed(0)}–${precision.max.toFixed(0)}%. ` +
-        "Models find the right words, then keep writing.";
+      ? `Recall อยู่ที่ ${recall.min.toFixed(0)}% ถึง ${recall.max.toFixed(0)}%, ` +
+        `ขณะที่ Precision อยู่ที่ ${precision.min.toFixed(0)}% ถึง ${precision.max.toFixed(0)}% ` +
+        "โมเดลส่วนใหญ่ตอบคำสำคัญถูก แต่เขียนขยายความเพิ่มจนทำให้ precision ลดลง"
+      : `Recall ranges from ${recall.min.toFixed(0)}% to ${recall.max.toFixed(0)}%, ` +
+        `while precision ranges from ${precision.min.toFixed(0)}% to ${precision.max.toFixed(0)}%. ` +
+        "Most models locate the right words, then add extra phrasing that reduces precision.";
   }
 
   const examples: Partial<Record<MetricId, string>> = generation
@@ -45,10 +45,10 @@ function buildInsights(isTh: boolean) {
         generation: isTh
           ? `ตารางปัจจุบันครอบคลุมช่วงเวลา ${formatClock(
               generation.min
-            )}–${formatClock(generation.max)} สำหรับคำตอบทั้ง ${JUDGE_N} ข้อ`
-          : `Today's board spans ${formatClock(
+            )} ถึง ${formatClock(generation.max)} สำหรับคำตอบทั้ง ${JUDGE_N} ข้อ`
+          : `Current runs span ${formatClock(
               generation.min
-            )}–${formatClock(generation.max)} for all ${JUDGE_N} answers.`,
+            )} to ${formatClock(generation.max)} across all ${JUDGE_N} answers.`,
       }
     : {};
 
@@ -64,17 +64,17 @@ export function MetricsSection() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-12 px-4 pt-28 pb-20 sm:gap-16 sm:px-8 md:px-12">
       <PageHeader
-        kicker={isTh ? "คำอธิบายเมทริกซ์การวัดผล" : "Metrics, explained"}
-        title={isTh ? "1 คำถาม 7 มิติการวัดผล" : "One question, seven scores"}
+        kicker={isTh ? "คำอธิบายเมทริกซ์การวัดผล" : "Metrics guide"}
+        title={isTh ? "1 คำถาม 7 มิติการวัดผล" : "One question, seven metrics"}
         lead={
           isTh
-            ? "เราส่งคำถามภาษาไทย 1 ข้อ แล้ววัดผลคำตอบเดียวกันใน 3 มิติ: ตอบถูกไหม, คำตรงกับเฉลยแค่ไหน และตอบเร็วเท่าใด"
-            : "We ask one Thai question, then grade the same answer three ways: is it right, how close are the words, how fast."
+            ? "เราส่งคำถามภาษาไทย 1 ข้อ แล้วตรวจคำตอบเดียวกันใน 3 ด้าน: ความถูกต้องตามความหมาย, ความตรงกับเฉลยคำต่อคำ และความเร็วในการเขียน"
+            : "We run each Thai question through the pipeline and evaluate the answer across three areas: factual correctness, word overlap against the reference, and generation speed."
         }
         meta={
           isTh
-            ? `${JUDGE_N} คำถาม · ThaiWikiV4 · ตัดสินโดย ${JUDGE_NAME}`
-            : `${JUDGE_N} questions · ThaiWikiV4 · judge ${JUDGE_NAME}`
+            ? `${JUDGE_N} คำถาม · ThaiWikiV4 · ตรวจโดย ${JUDGE_NAME}`
+            : `${JUDGE_N} questions · ThaiWikiV4 · judged by ${JUDGE_NAME}`
         }
         action={
           <Link
@@ -82,8 +82,8 @@ export function MetricsSection() {
             className="inline-flex min-h-[44px] items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
             {isTh
-              ? "ดูตัวอย่างการให้คะแนนจริงในทุกเมทริกซ์ →"
-              : "See how one answer scores on every metric →"}
+              ? "ดูตัวอย่างการคำนวณคะแนนจริงทุกเมทริกซ์ →"
+              : "See how one answer scores across every metric →"}
           </Link>
         }
       />

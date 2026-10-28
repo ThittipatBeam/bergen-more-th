@@ -21,14 +21,14 @@ export const TECHNICAL_DETAILS = {
     },
     notes: [
       "Kimi-K3 grades at temperature 0, so the same answer gets the same verdict twice.",
-      "Verdicts the judge cannot parse leave the denominator — they are not scored 0.",
+      "Verdicts the judge cannot parse leave the denominator; they are not scored 0.",
       "The gold answer is a hint for the judge, not the only accepted wording.",
     ],
   },
 
   em: {
     reading: "All or nothing. A perfect paraphrase still scores 0.",
-    key: "EM (stored 0–1, displayed ×100)",
+    key: "EM (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\begin{aligned}
 \mathrm{EM} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
@@ -47,14 +47,14 @@ export const TECHNICAL_DETAILS = {
     },
     notes: [
       "Normalization lowercases, removes English a/an/the, deletes ASCII punctuation and collapses whitespace.",
-      "Whitespace is collapsed, not removed — Thai word boundaries still count for EM.",
+      "Whitespace is collapsed, not removed; Thai word boundaries still count for EM.",
       "With several references, the closest one counts toward that question.",
     ],
   },
 
   mth: {
-    reading: "All or nothing per question. One changed word means no.",
-    key: "M_th (stored 0–1, displayed ×100)",
+    reading: "All or nothing per question. One changed word scores zero.",
+    key: "M_th (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\begin{aligned}
 M_{th} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
@@ -69,14 +69,14 @@ M_{th} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
     },
     notes: [
       "Containment, not overlap: the whole normalized gold answer must appear in the prediction.",
-      "All-or-nothing per question — one changed word scores 0, even if every other word matches.",
+      "All or nothing per question: one changed word scores 0, even if every other word matches.",
       "Thai marks such as ฯ survive normalization because they are not ASCII punctuation.",
     ],
   },
 
   precision: {
     reading: "40 means 40% of the model's words also appear in the answer key.",
-    key: "Precision_th (stored 0–1, displayed ×100)",
+    key: "Precision_th (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\mathrm{Precision}_{th} = \frac{100}{N} \sum_{i=1}^{N} \frac{m_i}{|\hat{Y}_i|}`,
       symbols: [
@@ -87,14 +87,14 @@ M_{th} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
     },
     notes: [
       "Pieces come from PyThaiNLP newmm after normalize(); whitespace is dropped.",
-      "Matched is a multiset intersection — a repeated word counts only as often as it appears on both sides.",
+      "Matching uses multiset intersection: a repeated word counts only as often as it appears on both sides.",
       "Each reference is scored separately, the best counts, then values are averaged over questions.",
     ],
   },
 
   recall: {
     reading: "83 means the model covered 83% of the answer key's words.",
-    key: "Recall_th (stored 0–1, displayed ×100)",
+    key: "Recall_th (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\mathrm{Recall}_{th} = \frac{100}{N} \sum_{i=1}^{N} \frac{m_i}{|Y_i|}`,
       symbols: [
@@ -112,7 +112,7 @@ M_{th} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
 
   f1: {
     reading: "If either side is 0, F1 is 0.",
-    key: "F1_th (stored 0–1, displayed ×100)",
+    key: "F1_th (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\mathrm{F1}_{th} = \frac{100}{N} \sum_{i=1}^{N} \frac{2 P_i R_i}{P_i + R_i}`,
       symbols: [
@@ -140,7 +140,7 @@ M_{th} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
       ],
     },
     notes: [
-      "The stopwatch wraps the generation call only — retrieval and reranking happen before it starts.",
+      "The stopwatch wraps the generation call only. Retrieval and reranking happen before it starts.",
       "Includes prompt assembly, every model call, checkpoint writes and resume replay.",
       "Wall-clock on the run machine: compare runs with each other, not with a stopwatch.",
     ],

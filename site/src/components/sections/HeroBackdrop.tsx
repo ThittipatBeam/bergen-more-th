@@ -1,10 +1,10 @@
 export function HeroBackdrop() {
   return (
     <>
-      {/* Cloudy sky gradient & soft grid */}
+      {/* Canvas backdrop & soft grid */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-br from-[var(--background-canvas)] via-[var(--background-subtle)] to-[var(--surface-brand)] transition-colors duration-300"
+        className="pointer-events-none absolute inset-0 z-0 bg-[var(--background-canvas)] dark:bg-gradient-to-br dark:from-[var(--background-canvas)] dark:via-[var(--background-subtle)] dark:to-[var(--surface-brand)] transition-colors duration-300"
       >
         <div
           className="absolute inset-0 opacity-40"
@@ -22,7 +22,7 @@ export function HeroBackdrop() {
       {/* Architectural sky rings */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06] dark:opacity-[0.08] overflow-hidden"
+        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.04] dark:opacity-[0.08] overflow-hidden"
       >
         <div className="relative w-[900px] h-[900px]">
           <div className="absolute inset-10 border border-[var(--brand-sky-blue)] rotate-1 rounded-3xl" />

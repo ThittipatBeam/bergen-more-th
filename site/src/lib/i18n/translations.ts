@@ -41,7 +41,7 @@ export const NAV_ITEMS_TH: NavItemTranslation[] = [
   {
     label: "ระเบียบวิธีวิจัย",
     href: "/methodology",
-    description: "คลังข้อมูล ไปป์ไลน์ และเกณฑ์ทดสอบ",
+    description: "วิธีสร้างชุดข้อมูลและขั้นตอนทดสอบ",
   },
   {
     label: "เมทริกซ์การวัดผล",
@@ -56,7 +56,7 @@ export const NAV_ITEMS_TH: NavItemTranslation[] = [
   {
     label: "เกี่ยวกับโครงการ",
     href: "/about",
-    description: "ที่มาและทีมงานผู้อยู่เบื้องหลัง",
+    description: "ที่มาและทีมงานผู้ดูแลโครงการ",
   },
 ];
 
@@ -77,7 +77,7 @@ export const I18N = {
     },
     footer: {
       tagline:
-        "SIAM.AI Thai RAG Benchmark — open evaluation of Thai retrieval-augmented generation pipelines. New runs are published as they complete.",
+        "SIAM.AI Thai RAG Benchmark: open evaluation of Thai retrieval-augmented generation pipelines. New runs are published as they complete.",
       leaderboard: "Leaderboard",
       metrics: "Metrics",
       methodology: "Methodology",
@@ -87,7 +87,7 @@ export const I18N = {
     hero: {
       title: "Thai RAG Benchmark",
       subtitle:
-        "Open benchmark for Thai retrieval-augmented generation — embedding, reranking, and generation pipelines scored by an LLM judge on Thai Wikipedia QA.",
+        "Open benchmark for Thai retrieval-augmented generation. Evaluates retriever, reranker, and generator combinations against Thai Wikipedia QA, with answers scored by an LLM judge.",
       exploreBtn: "Explore Leaderboard",
       requestBtn: "Request a Benchmark",
       scrollCue: "Scroll to explore models",
@@ -95,7 +95,7 @@ export const I18N = {
       qaPairs: "QA pairs",
     },
     champions: {
-      ragPipelineArch: "RAG Pipeline Architecture",
+      ragPipelineArch: "RAG Pipeline",
       rankPrefix: "Rank #",
       stageRetrieval: "1. Retrieval",
       stageReranker: "2. Reranker",
@@ -105,15 +105,15 @@ export const I18N = {
       fullResults: "Full results ↓",
     },
     leaderboard: {
-      title: "The measured sheet",
+      title: "Benchmark results",
       subtitle: (dataset: string, count: number, judge: string) =>
-        `${dataset} dev split · ${count.toLocaleString()} QA pairs per pipeline · answers scored by judge ${judge}`,
+        `${dataset} dev split · ${count.toLocaleString()} QA pairs · scored by ${judge}`,
       latestRun: (date: string) => `Latest run ${date}`,
       noRuns: "No runs yet",
       experimentsSoFar: (n: number) => `${n} experiments so far`,
-      sortHint: "Overall score leads — sort any metric column.",
+      sortHint: "The table sorts by overall score by default. Select any metric column to re-sort.",
       overallFormula: "Overall = 45% judge + 20% Match TH + 20% F1 + 15% EM",
-      howBuilt: "How it's built",
+      howBuilt: "How we score",
       filterGeneratorPlaceholder: "Filter by generator model…",
       allModels: "All models",
       modelLabel: "Model:",
@@ -129,7 +129,7 @@ export const I18N = {
       noMatch: "No benchmark runs match your filters",
       requestRunRow: "Request a run →",
       mobileLead:
-        "Ranked by overall score. Generation time excludes retrieval and scoring.",
+        "Ranked by overall score. Generation time reflects model output writing only.",
       genPrefix: "Gen",
       colRank: "#",
       colModel: "Model",
@@ -147,7 +147,7 @@ export const I18N = {
     request: {
       kicker: "Custom evaluation",
       title: "Request a benchmark run",
-      lead: "Tell us which generator, embedding and reranker to put in the pipeline. We will reply by email before the run is scheduled.",
+      lead: "Tell us which generator, embedding model, and reranker to evaluate. We will email you before scheduling the run.",
       meta: (n: number, judge: string) =>
         `ThaiWikiV4 · ${n} questions · judge ${judge}`,
       pipelineGroup: "Pipeline components",
@@ -164,17 +164,17 @@ export const I18N = {
       notesLabel: "Additional Notes or API Endpoint instructions",
       submitBtn: "Request this run →",
       disclaimer: (n: number) =>
-        `Every run uses ThaiWikiV4 · ${n} questions, and results are published openly.`,
+        `Every run evaluates against the same ${n} ThaiWikiV4 questions, and all results are public.`,
       successTitle: "Request received",
       successLead: (email: string) =>
-        `We will reply to ${email} before the run is scheduled.`,
+        `We will email ${email} before scheduling the run.`,
       submitAnother: "Submit another request",
       noneFallback: "None",
     },
     about: {
       kicker: "About · SIAM.AI Cloud",
       title: "About the benchmark",
-      lead: "Why we run it, what we publish, and who is behind it.",
+      lead: "Why we run this benchmark, what we publish, and who maintains it.",
     },
   },
   TH: {
@@ -188,7 +188,7 @@ export const I18N = {
     },
     footer: {
       tagline:
-        "SIAM.AI Thai RAG Benchmark — ระบบประเมินผลมาตรฐานสำหรับ Thai Retrieval-Augmented Generation แบบเปิด เผยแพร่ผลการทดสอบใหม่ทันทีที่รันเสร็จสิ้น",
+        "SIAM.AI Thai RAG Benchmark: โครงการประเมินผล Thai Retrieval-Augmented Generation แบบเปิด เผยแพร่ผลการทดสอบทันทีที่รันเสร็จสิ้น",
       leaderboard: "ลีดเดอร์บอร์ด",
       metrics: "เมทริกซ์การวัดผล",
       methodology: "ระเบียบวิธีวิจัย",
@@ -198,7 +198,7 @@ export const I18N = {
     hero: {
       title: "Thai RAG Benchmark",
       subtitle:
-        "เกณฑ์ประเมินมาตรฐานสำหรับ Thai RAG — ทดสอบทั้ง Embedding, Reranking และ Generator Model ประเมินผลด้วย LLM Judge บนชุดข้อมูล Thai Wikipedia QA",
+        "เบนช์มาร์กสำหรับ Thai RAG: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์คำถาม-คำตอบจาก Thai Wikipedia โดยมี LLM judge เป็นผู้ตรวจคำตอบ",
       exploreBtn: "ดูผลการทดสอบ",
       requestBtn: "ส่งโมเดลเข้าทดสอบ",
       scrollCue: "เลื่อนลงเพื่อดูโมเดลทั้งหมด",
@@ -206,26 +206,26 @@ export const I18N = {
       qaPairs: "คู่คำถาม-คำตอบ",
     },
     champions: {
-      ragPipelineArch: "สถาปัตยกรรม RAG Pipeline",
+      ragPipelineArch: "ไปป์ไลน์ 3 ส่วน",
       rankPrefix: "อันดับ #",
-      stageRetrieval: "1. ค้นคืน (Retrieval)",
-      stageReranker: "2. จัดอันดับซ้ำ (Reranker)",
+      stageRetrieval: "1. ค้นหาเอกสาร (Retrieval)",
+      stageReranker: "2. คัดกรองซ้ำ (Reranker)",
       stageGenerator: "3. สร้างคำตอบ (Generator)",
-      noneDirectDense: "ไม่มี (Direct Dense)",
+      noneDirectDense: "ไม่มี (Dense เท่านั้น)",
       corpusLabel: "ชุดข้อมูล: Thai Wikipedia QA",
       fullResults: "ดูตารางทั้งหมด ↓",
     },
     leaderboard: {
-      title: "ตารางผลการประเมิน Benchmark",
+      title: "ตารางอันดับการทดสอบ",
       subtitle: (dataset: string, count: number, judge: string) =>
-        `ชุดข้อมูล ${dataset} · ${count.toLocaleString()} คู่คำถาม-คำตอบต่อไปป์ไลน์ · ประเมินผลด้วย ${judge}`,
+        `ชุดข้อมูล ${dataset} · ${count.toLocaleString()} คู่คำถาม-คำตอบ · ตรวจโดย ${judge}`,
       latestRun: (date: string) => `รันล่าสุดเมื่อ ${date}`,
       noRuns: "ยังไม่มีผลการทดสอบ",
       experimentsSoFar: (n: number) => `ทดสอบแล้ว ${n} การทดลอง`,
       sortHint:
-        "เรียงตาม Overall Score เป็นหลัก — คลิกหัวตารางเพื่อเรียงตามเมทริกซ์อื่นได้",
+        "ตารางเรียงตามคะแนนรวมเป็นค่าเริ่มต้น คุณสามารถคลิกหัวตารางเพื่อเรียงตามคะแนนอื่นได้",
       overallFormula: "Overall = 45% Judge + 20% Match TH + 20% F1 + 15% EM",
-      howBuilt: "ดูวิธีคำนวณคะแนน",
+      howBuilt: "ดูวิธีคิดคะแนนรวม",
       filterGeneratorPlaceholder: "ค้นหาโมเดล Generator…",
       allModels: "โมเดลทั้งหมด",
       modelLabel: "โมเดล:",
@@ -241,8 +241,8 @@ export const I18N = {
       noMatch: "ไม่พบผลการทดลองที่ตรงกับตัวกรอง",
       requestRunRow: "ส่งไปป์ไลน์เข้าทดสอบ →",
       mobileLead:
-        "จัดอันดับตาม Overall Score · เวลา Generation ไม่รวมช่วงค้นคืนและให้คะแนน",
-      genPrefix: "เวลา Gen",
+        "จัดอันดับตามคะแนนรวม เวลาสร้างคำตอบไม่รวมช่วงค้นหาและตรวจข้อสอบ",
+      genPrefix: "เวลาสร้างคำตอบ",
       colRank: "#",
       colModel: "โมเดล",
       colRetriever: "Embedding",
@@ -254,15 +254,15 @@ export const I18N = {
       colPrecisionTh: "Precision TH",
       colRecallTh: "Recall TH",
       colEm: "EM",
-      colLatency: "เวลา Gen",
+      colLatency: "เวลาสร้างคำตอบ",
     },
     request: {
       kicker: "ส่งโมเดลเข้าทดสอบ",
       title: "ส่งโมเดลหรือไปป์ไลน์เข้าทดสอบ",
-      lead: "ระบุโมเดล Generator, Embedding และ Reranker ที่ต้องการทดสอบในไปป์ไลน์ ทีมงานจะติดต่อกลับทางอีเมลก่อนเริ่มรันการทดสอบ",
+      lead: "ระบุโมเดล generator, embedding และ reranker ที่ต้องการให้ทดสอบ เราจะตอบกลับทางอีเมลก่อนเริ่มรัน",
       meta: (n: number, judge: string) =>
-        `ThaiWikiV4 · ${n} คำถาม · ตัดสินโดย ${judge}`,
-      pipelineGroup: "องค์ประกอบของไปป์ไลน์",
+        `ThaiWikiV4 · ${n} คำถาม · ตรวจโดย ${judge}`,
+      pipelineGroup: "โมเดลที่ต้องการทดสอบ",
       generatorLabel: "โมเดล Generator",
       generatorPlaceholder: "เช่น Qwen/Qwen2.5-7B-Instruct หรือ gpt-4o-mini",
       embeddingLabel: "โมเดล Embedding",
@@ -270,23 +270,23 @@ export const I18N = {
       rerankerLabel: "โมเดล Reranker (ไม่บังคับ)",
       rerankerPlaceholder:
         "เช่น BAAI/bge-reranker-v2-m3 หรือเว้นว่างหากใช้เฉพาะ Dense",
-      contactGroup: "ข้อมูลผู้ติดต่อและรายละเอียดเพิ่มเติม",
+      contactGroup: "ข้อมูลสำหรับติดต่อกลับ",
       emailLabel: "อีเมลของคุณ",
       nameLabel: "ชื่อของคุณหรือทีม",
-      notesLabel: "หมายเหตุเพิ่มเติม หรือรายละเอียด API Endpoint",
+      notesLabel: "หมายเหตุเพิ่มเติม หรือรายละเอียด endpoint",
       submitBtn: "ส่งคำขอทดสอบนี้ →",
       disclaimer: (n: number) =>
-        `ทุกการทดสอบใช้ชุดข้อสอบ ThaiWikiV4 ${n} ข้อ และผลลัพธ์จะเผยแพร่แบบเปิด`,
+        `ทุกการทดสอบใช้ชุดข้อสอบ ThaiWikiV4 ${n} ข้อชุดเดียวกัน และเปิดเผยผลลัพธ์สู่สาธารณะ`,
       successTitle: "ได้รับคำขอทดสอบเรียบร้อยแล้ว",
       successLead: (email: string) =>
-        `ทีมงานจะติดต่อกลับไปยัง ${email} ก่อนกำหนดการรันการทดสอบ`,
+        `เราจะติดต่อกลับไปที่ ${email} ก่อนจัดคิวรันการทดสอบ`,
       submitAnother: "ส่งคำขอรายการอื่นเพิ่มเติม",
       noneFallback: "ไม่มี",
     },
     about: {
       kicker: "เกี่ยวกับโครงการ · SIAM.AI Cloud",
-      title: "เกี่ยวกับ Thai RAG Benchmark",
-      lead: "เหตุผลที่เราจัดทำ สิ่งที่เราเผยแพร่ และทีมงานผู้อยู่เบื้องหลัง",
+      title: "เกี่ยวกับโครงการ",
+      lead: "ที่มาของเบนช์มาร์ก ข้อมูลที่เราเปิดเผย และทีมงานผู้ดูแลโครงการ",
     },
   },
 } as const;

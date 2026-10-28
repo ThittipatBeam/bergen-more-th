@@ -25,12 +25,12 @@ export function RequestPipelineFields({
           id="pipeline-title"
           className="font-sans text-xl font-bold text-[var(--text-primary)] sm:text-2xl"
         >
-          {isTh ? "องค์ประกอบของไปป์ไลน์" : "The pipeline"}
+          {isTh ? "โมเดลที่ต้องการทดสอบ" : "The pipeline"}
         </h2>
         <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
           {isTh
-            ? "ระบุชื่อของแต่ละโมเดล สามารถใส่ลิงก์โมเดลเพิ่มเติมเพื่อช่วยให้เราโหลด Checkpoint ได้ถูกต้อง"
-            : "Name each part. A link is optional, but it helps us find the exact checkpoint."}
+            ? "ระบุชื่อโมเดลแต่ละส่วน การใส่ลิงก์โมเดลจะช่วยให้เราโหลด checkpoint ได้ถูกต้องตรงรุ่น"
+            : "Name each model. Adding a link is optional, but helps us load the exact checkpoint."}
         </p>
       </div>
 
@@ -91,8 +91,8 @@ export function RequestPipelineFields({
           title={isTh ? "โมเดล Reranker" : "Reranker model"}
           hint={
             isTh
-              ? "เว้นว่างไว้หากต้องการทดสอบเฉพาะ Dense Retrieval แบบไม่มี Reranker"
-              : "Leave both blank to run dense retrieval only."
+              ? "เว้นว่างไว้หากต้องการทดสอบเฉพาะ dense retrieval โดยไม่ใช้ reranker"
+              : "Leave blank to run dense retrieval only."
           }
         >
           <TextField

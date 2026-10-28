@@ -17,13 +17,13 @@ export function MetricsWhichScore() {
     >
       <header className="flex flex-col gap-2">
         <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
-          {isTh ? "คู่มือสรุป" : "Cheat sheet"}
+          {isTh ? "สรุปวิธีเลือกใช้" : "Cheat sheet"}
         </span>
         <h2
           id="which-score-title"
           className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
-          {isTh ? "ควรดูคะแนนตัวไหนดี?" : "Which score should I use?"}
+          {isTh ? "ควรดูคะแนนตัวไหนดี" : "Which score should I use?"}
         </h2>
       </header>
 
