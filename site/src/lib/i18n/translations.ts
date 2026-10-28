@@ -1,4 +1,3 @@
-
 export interface NavItemTranslation {
   label: string;
   href: string;

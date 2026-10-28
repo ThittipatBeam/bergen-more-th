@@ -55,8 +55,12 @@ export function PageTransitionProvider({
   const laserRef = useRef<HTMLDivElement>(null);
   const ambientRef = useRef<HTMLDivElement>(null);
 
-  const isTransitioningRef = useRef(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const isTransitioningRef = useRef(false);
+  const setTransitioning = useCallback((val: boolean) => {
+    isTransitioningRef.current = val;
+    setIsTransitioning(val);
+  }, []);
   const lastPathnameRef = useRef(pathname);
   const isInitialMountRef = useRef(true);
 
@@ -91,8 +95,7 @@ export function PageTransitionProvider({
 
       // Debounce: prevent duplicate triggers while already animating
       if (isTransitioningRef.current) return;
-      isTransitioningRef.current = true;
-      setIsTransitioning(true);
+      setTransitioning(true);
 
       // If caller handles its own exit choreography (e.g. mobile drawer exit)
       if (options?.skipExit) {
@@ -141,7 +144,7 @@ export function PageTransitionProvider({
         );
       }
     },
-    [reducedMotion, router]
+    [reducedMotion, router, setTransitioning]
   );
 
   // Entrance animation whenever pathname changes
@@ -176,8 +179,7 @@ export function PageTransitionProvider({
         window.scrollTo(0, 0);
 
         if (reducedMotion) {
-          isTransitioningRef.current = false;
-          setIsTransitioning(false);
+          setTransitioning(false);
           if (contentRef.current) {
             gsap.set(contentRef.current, {
               opacity: 1,
@@ -192,8 +194,7 @@ export function PageTransitionProvider({
         // GSAP Entrance Timeline
         const enterTl = gsap.timeline({
           onComplete: () => {
-            isTransitioningRef.current = false;
-            setIsTransitioning(false);
+            setTransitioning(false);
             if (contentRef.current) {
               gsap.set(contentRef.current, { clearProps: "transform,filter" });
             }
@@ -315,8 +316,7 @@ export function PageTransitionProvider({
     if (!isTransitioningRef.current) return;
     const timer = setTimeout(() => {
       if (isTransitioningRef.current) {
-        isTransitioningRef.current = false;
-        setIsTransitioning(false);
+        setTransitioning(false);
         if (contentRef.current) {
           gsap.set(contentRef.current, {
             opacity: 1,
@@ -334,7 +334,7 @@ export function PageTransitionProvider({
       }
     }, 1500);
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, setTransitioning]);
 
   return (
     <PageTransitionContext.Provider
