@@ -90,7 +90,7 @@ export function BenchmarkTableToolbar({
             ))}
           </span>
           <span className="text-xs font-mono text-[var(--text-muted)]">
-            {QUALITY_MIN.toFixed(1)}–{QUALITY_MAX.toFixed(1)}
+            {QUALITY_MIN.toFixed(1)} - {QUALITY_MAX.toFixed(1)}
           </span>
         </div>
 

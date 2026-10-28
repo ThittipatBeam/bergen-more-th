@@ -77,7 +77,7 @@ export function DatasetStory() {
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "ผลลัพธ์. " : "The result. "}
+          {isTh ? "ผลลัพธ์: " : "Result: "}
         </span>
         {resultText}
       </p>
@@ -88,27 +88,27 @@ export function DatasetStory() {
       >
         <header className="flex flex-col gap-2">
           <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
-            {isTh ? "คลังข้อสอบและขนาดกลุ่มตัวอย่าง" : "The bank and the run"}
+            {isTh ? "คลังข้อสอบและขนาดกลุ่มตัวอย่าง" : "Question bank and sample size"}
           </span>
           <h3
             id="bank-and-run-title"
             className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
           >
             {isTh
-              ? `${format(DATASET_SIZE.bank)} คำถามในคลัง, ใช้ ${format(DATASET_SIZE.perRun)} ข้อต่อหนึ่งรัน`
-              : `${format(DATASET_SIZE.bank)} questions on file, ${format(DATASET_SIZE.perRun)} per run`}
+              ? `มีคำถามในคลัง ${format(DATASET_SIZE.bank)} ข้อ, ใช้ ${format(DATASET_SIZE.perRun)} ข้อต่อหนึ่งรัน`
+              : `${format(DATASET_SIZE.bank)} questions in bank, ${format(DATASET_SIZE.perRun)} used per run`}
           </h3>
           <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
             {isTh
-              ? `การรันทุกไปป์ไลน์บนคำถามทั้งหมด ${format(DATASET_SIZE.bank)} ข้อต้องใช้เวลาหลายชั่วโมงและค่าใช้จ่ายสูง ลีดเดอร์บอร์ดจึงสุ่มกลุ่มตัวอย่างคงที่ขนาด ${format(DATASET_SIZE.perRun)} ข้อมาใช้วัดผลมาตรฐาน`
-              : `Running every pipeline over all ${format(DATASET_SIZE.bank)} questions would take hours and cost real money. So a leaderboard run uses a fixed sample of ${format(DATASET_SIZE.perRun)} instead.`}
+              ? `การทดสอบทุกไปป์ไลน์บนคำถามทั้งหมด ${format(DATASET_SIZE.bank)} ข้อต้องใช้เวลาและทรัพยากรคำนวณสูง ตารางลีดเดอร์บอร์ดจึงใช้กลุ่มตัวอย่างคงที่ขนาด ${format(DATASET_SIZE.perRun)} ข้อสำหรับการวัดผลมาตรฐาน`
+              : `Running every pipeline across all ${format(DATASET_SIZE.bank)} questions would require significant compute time and cost. The leaderboard uses a fixed sample of ${format(DATASET_SIZE.perRun)} questions for standard comparisons.`}
           </p>
         </header>
 
         <dl className="grid grid-cols-3 gap-4 border-t border-[var(--border-default)] pt-6 sm:gap-8">
           <div className="flex flex-col gap-1">
             <dt className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              {isTh ? "ในคลัง" : "On file"}
+              {isTh ? "ในคลัง" : "In bank"}
             </dt>
             <dd className="font-mono text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
               {format(DATASET_SIZE.bank)}
@@ -149,7 +149,7 @@ export function DatasetStory() {
           </div>
           <div className="flex justify-between font-mono text-xs text-[var(--text-muted)]">
             <span>{isTh ? `ใช้ ${format(DATASET_SIZE.perRun)} ข้อ` : `${format(DATASET_SIZE.perRun)} used`}</span>
-            <span>{isTh ? `ทั้งหมด ${format(DATASET_SIZE.bank)} ข้อ` : `${format(DATASET_SIZE.bank)} on file`}</span>
+            <span>{isTh ? `ทั้งหมด ${format(DATASET_SIZE.bank)} ข้อ` : `${format(DATASET_SIZE.bank)} in bank`}</span>
           </div>
         </div>
 

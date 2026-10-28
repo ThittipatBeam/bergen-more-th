@@ -41,15 +41,15 @@ export function RequestSuccessCard({
         <p className="max-w-[52ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
           {isTh ? (
             <>
-              ทีมงานจะติดต่อกลับไปยัง{" "}
+              เราจะส่งอีเมลไปที่{" "}
               <span className="font-mono text-[var(--brand-text)]">{email}</span>{" "}
-              ก่อนกำหนดการเริ่มรันการทดสอบ
+              ก่อนจัดคิวรันการทดสอบ
             </>
           ) : (
             <>
-              We will reply to{" "}
+              We will email{" "}
               <span className="font-mono text-[var(--brand-text)]">{email}</span>{" "}
-              before the run is scheduled.
+              before scheduling the run.
             </>
           )}
         </p>

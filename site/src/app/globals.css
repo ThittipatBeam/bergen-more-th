@@ -14,9 +14,9 @@
   --brand-deep-cyan: #009cc5;
 
   /* Semantic UI surfaces */
-  --background-canvas: #f7fbfd;
+  --background-canvas: #ffffff;
   --background-primary: #ffffff;
-  --background-subtle: #f0f8fc;
+  --background-subtle: #f8fafc;
   --surface-brand: #eaf6fb;
 
   /* Typography */
@@ -85,7 +85,7 @@
   --rank-bronze-solid: #f9f5f2;
 
   /* Decorative hero grid + elevation */
-  --hero-grid: rgba(7, 149, 207, 0.08);
+  --hero-grid: rgba(16, 42, 58, 0.04);
   --shadow-sheet: rgba(16, 42, 58, 0.06);
   --shadow-card: rgba(7, 149, 207, 0.18);
   --shadow-glow: rgba(7, 149, 207, 0.15);

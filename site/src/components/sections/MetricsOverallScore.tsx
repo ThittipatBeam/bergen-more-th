@@ -14,29 +14,29 @@ export function MetricsOverallScore() {
       key: "judgePct" as const,
       metric: "Judge",
       why: isTh
-        ? "เป็นคะแนนเดียวที่ยอมรับการตอบถูกด้วยการ Paraphrase (เขียนเรียบเรียงใหม่)"
-        : "the only score that accepts a correct paraphrase",
+        ? "เป็นเกณฑ์เดียวที่ยอมรับคำตอบที่ถูกต้องแม้จะเขียนเรียบเรียงใหม่ด้วยคำอื่น"
+        : "the only metric that accepts correct answers phrased in different words",
     },
     {
       key: "mTh" as const,
       metric: "Match TH",
       why: isTh
-        ? "คำตอบเฉลยทั้งหมดปรากฏครบถ้วนในข้อความ"
-        : "the whole gold answer is present",
+        ? "ตรวจว่ามีข้อความเฉลยครบทุกคำในคำตอบ"
+        : "verifies that the entire gold answer appears in the text",
     },
     {
       key: "f1Th" as const,
       metric: "F1 TH",
       why: isTh
-        ? "คำนวณ Word Overlap ให้คะแนนตามสัดส่วนคำที่ถูกต้อง"
-        : "graded word overlap, so partial credit counts",
+        ? "วัดสัดส่วนคำที่ตรงกับเฉลย ให้คะแนนตามสัดส่วนคำที่ตอบถูก"
+        : "measures word overlap, awarding partial credit for matched words",
     },
     {
       key: "em" as const,
       metric: "Exact Match",
       why: isTh
-        ? "ข้อความตรงกันแบบคำต่อคำ — เกณฑ์ขั้นต่ำที่เข้มงวดที่สุด"
-        : "an exact string — the strict floor",
+        ? "ข้อความต้องตรงกับเฉลยทุกตัวอักษร เป็นเกณฑ์ที่เข้มงวดที่สุด"
+        : "requires an exact string match, providing the strictest baseline",
     },
   ];
 
@@ -54,12 +54,12 @@ export function MetricsOverallScore() {
           id="overall-score-title"
           className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
-          {isTh ? "วิธีคำนวณคะแนนรวม" : "How we combine them"}
+          {isTh ? "วิธีคำนวณคะแนนรวม" : "How we combine scores"}
         </h2>
         <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
           {isTh
-            ? "ลีดเดอร์บอร์ดจัดอันดับด้วยคะแนน Overall Score ซึ่งถ่วงน้ำหนักจาก 4 มิติวัดความถูกต้องด้านบน"
-            : "The leaderboard ranks by one overall score — a weighted blend of the four correctness scores above."}
+            ? "ตารางจัดอันดับด้วยคะแนนรวม Overall Score ซึ่งถ่วงน้ำหนักจากเกณฑ์วัดความถูกต้องทั้ง 4 ด้าน"
+            : "The leaderboard ranks pipelines by one overall score, combining the four correctness metrics above with specific weights."}
         </p>
       </header>
 
@@ -99,27 +99,27 @@ export function MetricsOverallScore() {
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "เหตุผลของการถ่วงน้ำหนัก. " : "Why these weights. "}
+          {isTh ? "ที่มาของน้ำหนักคะแนน: " : "Why these weights: "}
         </span>
         {isTh
-          ? "Judge ได้สัดส่วนสูงสุดเพราะยอมรับคำตอบที่ถูกแต่ใช้คำต่างจากเฉลย ส่วน EM ได้สัดส่วนน้อยที่สุดเพราะคำตอบที่ถูกแต่เรียบเรียงต่างไปจะได้ 0 คะแนน"
-          : "Judge gets the largest share because a correct answer in different words still earns it; EM gets the smallest because the same answer scores 0."}
+          ? "Judge ได้สัดส่วนสูงสุดเพราะยอมรับคำตอบที่ถูกแต่ใช้คำต่างจากเฉลย ส่วน EM ได้สัดส่วนน้อยที่สุดเพราะคำตอบที่ตอบถูกแต่เรียบเรียงต่างไปจะได้ 0 ทันที"
+          : "The judge score receives the largest share because it recognizes correct answers that use different phrasing. EM receives the smallest share because paraphrased answers score zero."}
       </p>
 
       <p className="max-w-[62ch] border-l-2 border-[var(--perf-text)] pl-4 font-sans text-base leading-7 text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "ไม่นำความเร็วมาคิดใน Overall score. " : "Speed is not in the overall score. "}
+          {isTh ? "ไม่นำความเร็วมาคิดในคะแนนรวม: " : "Speed is not part of the overall score: "}
         </span>
         {isTh
-          ? "ไปป์ไลน์ที่เร็วกว่าไม่ได้แปลว่าตอบถูกกว่าเสมอไป เวลา Generation จึงแยกเป็นคอลัมน์ของตัวเองเพื่อให้คุณเลือกจัดอันดับตามสิ่งที่สำคัญต่อโปรเจกต์ของคุณได้"
-          : "A faster pipeline is not more correct. Generation time stays its own axis, and the board keeps every column so you can re-rank on the one you care about."}
+          ? "ไปป์ไลน์ที่เร็วกว่าไม่ได้แปลว่าตอบถูกกว่า เวลาสร้างคำตอบจึงแยกเป็นคอลัมน์ต่างหาก เพื่อให้คุณเลือกจัดอันดับตามความสำคัญของระบบที่คุณใช้งาน"
+          : "Faster generation does not mean higher accuracy. Generation time stays in its own column so you can sort by speed when latency matters for your use case."}
       </p>
 
       <Link
         href="/#leaderboard"
         className="inline-flex min-h-[44px] w-fit items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
       >
-        {isTh ? "ดูคะแนน Overall Score บนลีดเดอร์บอร์ด →" : "See the overall score on the leaderboard →"}
+        {isTh ? "ดูคะแนนรวมบนลีดเดอร์บอร์ด →" : "See the overall score on the leaderboard →"}
       </Link>
     </section>
   );

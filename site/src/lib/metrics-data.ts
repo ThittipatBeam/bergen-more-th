@@ -19,9 +19,9 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       simple: {
         question: isTh ? "ถ้าคนอ่าน จะบอกว่าคำตอบนี้ถูกต้องไหม?" : "Would a reader say it's right?",
         explanation: isTh
-          ? "LLM อีกโมเดลหนึ่งอ่านคำตอบ แล้วตัดสินว่าถูก (YES) หรือผิด (NO)"
+          ? "โมเดล AI อีกตัวจะอ่านคำตอบ แล้วตัดสินว่าถูก (YES) หรือผิด (NO)"
           : "A second AI reads each answer and says yes or no.",
-        example: isTh ? "ความหมายถูก แต่ใช้คำต่าง → 1" : "Right meaning, different spelling → 1",
+        example: isTh ? "ความหมายถูก แต่ใช้คำต่าง: ได้ 1" : "Right meaning, different spelling: 1",
       },
       technical: {
         ...TECHNICAL_DETAILS.judge,
@@ -38,11 +38,11 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       family: "containment",
       direction: "higher",
       simple: {
-        question: isTh ? "คำตอบตรงกับเฉลยแบบคำต่อคำหรือไม่?" : "Same words as the answer key?",
+        question: isTh ? "คำตอบตรงกับเฉลยทุกตัวอักษรหรือไม่?" : "Same words as the answer key?",
         explanation: isTh
-          ? "ทำความสะอาดข้อความทั้งสองฝั่ง แล้วต้องเหมือนกันทุกประการ"
+          ? "ปรับรูปแบบข้อความทั้งสองฝั่งให้เป็นมาตรฐาน แล้วตรวจว่าตรงกันทั้งหมด"
           : "Both sides are cleaned up, then must be identical.",
-        example: isTh ? "ความหมายเหมือนกัน แต่สะกดต่าง → 0" : "Same meaning, different spelling → 0",
+        example: isTh ? "ความหมายเหมือนกัน แต่สะกดต่าง: ได้ 0" : "Same meaning, different spelling: 0",
       },
       technical: {
         ...TECHNICAL_DETAILS.em,
@@ -59,11 +59,11 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       family: "containment",
       direction: "higher",
       simple: {
-        question: isTh ? "คำตอบเฉลยทั้งหมดปรากฏในข้อความหรือไม่?" : "Is the whole key inside the answer?",
+        question: isTh ? "คำตอบมีข้อความเฉลยครบทุกคำหรือไม่?" : "Is the whole key inside the answer?",
         explanation: isTh
-          ? "ไม่สนใจช่องว่าง หากคำเฉลยหายไปแม้แต่คำเดียวจะได้ 0"
+          ? "ไม่นับช่องว่าง หากคำในเฉลยหายไปแม้แต่คำเดียวจะได้ 0"
           : "Spaces ignored. One changed word means no.",
-        example: isTh ? "คำเฉลยเปลี่ยนไปหนึ่งคำ → 0" : "One changed word → 0",
+        example: isTh ? "คำในเฉลยตกหล่นไปหนึ่งคำ: ได้ 0" : "One changed word: 0",
       },
       technical: {
         ...TECHNICAL_DETAILS.mth,
@@ -80,11 +80,11 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       family: "overlap",
       direction: "higher",
       simple: {
-        question: isTh ? "มีคำที่ไม่จำเป็นหรือตอบเวิ่นเว้อหรือไม่?" : "Any extra words?",
+        question: isTh ? "โมเดลตอบคำเกินจากเฉลยหรือไม่?" : "Any extra words?",
         explanation: isTh
-          ? "ทุกคำที่โมเดลตอบเพิ่มมาแล้วไม่มีในเฉลย จะทำให้คะแนนลดลง"
+          ? "คำที่โมเดลตอบเพิ่มเข้ามาโดยไม่มีอยู่ในเฉลย จะทำให้คะแนนลดลง"
           : "Every word the model adds lowers it.",
-        example: isTh ? "ใช้ตรง 5 จาก 6 คำ → 83.3" : "5 of 6 words used → 83.3",
+        example: isTh ? "ใช้ตรง 5 จาก 6 คำ: ได้ 83.3" : "5 of 6 words used: 83.3",
       },
       technical: {
         ...TECHNICAL_DETAILS.precision,
@@ -101,11 +101,11 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       family: "overlap",
       direction: "higher",
       simple: {
-        question: isTh ? "มีเนื้อหาในเฉลยที่ตอบตกหล่นหรือไม่?" : "Any missing words?",
+        question: isTh ? "โมเดลตอบตกหล่นคำสำคัญในเฉลยหรือไม่?" : "Any missing words?",
         explanation: isTh
-          ? "ทุกคำในเฉลยที่โมเดลไม่ได้ตอบ จะทำให้คะแนนลดลง"
+          ? "คำในเฉลยที่โมเดลไม่ได้ตอบ จะทำให้คะแนนลดลง"
           : "Every word the model drops lowers it.",
-        example: isTh ? "ครอบคลุม 5 จาก 6 คำในเฉลย → 83.3" : "5 of 6 words covered → 83.3",
+        example: isTh ? "ครอบคลุม 5 จาก 6 คำในเฉลย: ได้ 83.3" : "5 of 6 words covered: 83.3",
       },
       technical: {
         ...TECHNICAL_DETAILS.recall,
@@ -122,11 +122,11 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       family: "overlap",
       direction: "higher",
       simple: {
-        question: isTh ? "คะแนนรวมที่ชั่งน้ำหนักระหว่างตอบเกินกับตอบตกหล่น?" : "Extra and missing, in one number?",
+        question: isTh ? "ความสมดุลระหว่างตอบครบกับไม่ตอบเกิน" : "Extra and missing, in one number?",
         explanation: isTh
-          ? "คะแนนจะสูงก็ต่อเมื่อทั้ง Precision และ Recall สูงทั้งคู่"
+          ? "คะแนนจะสูงก็ต่อเมื่อโมเดลตอบได้ครอบคลุมและกระชับไปพร้อมกัน"
           : "High only when both sides are high.",
-        example: isTh ? "ทั้งสองฝั่งได้ 83.3 → F1 83.3" : "Both 83.3 → F1 83.3",
+        example: isTh ? "ทั้งสองฝั่งได้ 83.3: F1 83.3" : "Both 83.3: F1 83.3",
       },
       technical: {
         ...TECHNICAL_DETAILS.f1,
@@ -145,8 +145,8 @@ export function getMetrics(lang: Language = "EN"): Record<MetricId, MetricDefini
       simple: {
         question: isTh ? "ใช้เวลาสร้างคำตอบครบ 500 ข้อนานเท่าใด?" : "How long to write all 500?",
         explanation: isTh
-          ? "จับเวลาเฉพาะช่วงโมเดลเขียน — ไม่รวมขั้นตอนค้นคืนและ Rerank"
-          : "Writing only — search and ranking ran before.",
+          ? "จับเวลาเฉพาะตอนโมเดลเขียนคำตอบ ไม่รวมขั้นตอนการค้นหาและจัดอันดับเอกสาร"
+          : "Writing only. Search and reranking run before the clock starts.",
         example: isTh ? "เวลารวมทั้ง 500 คำถาม ไม่ใช่เวลาของข้อเดียว" : "Total for all 500 answers, not one answer.",
       },
       technical: {
@@ -168,10 +168,10 @@ export function getMetricChapters(lang: Language = "EN"): MetricChapter[] {
     {
       id: "is-it-right",
       number: "01",
-      title: isTh ? "1. โมเดลตอบถูกหรือไม่?" : "Is it right?",
+      title: isTh ? "1. โมเดลตอบถูกหรือไม่" : "Is it right?",
       icon: "fact_check",
       intro: isTh
-        ? "การประเมินความถูกต้อง 3 รูปแบบ ตั้งแต่การตัดสินของ LLM Judge ไปจนถึงข้อความที่ตรงกัน 100%"
+        ? "วิธีตรวจความถูกต้อง 3 รูปแบบ ตั้งแต่การพิจารณาความหมายโดย LLM judge ไปจนถึงการตรวจข้อความตรงกันแบบ 100%"
         : "Three tests of correctness, from a reader's judgement to an exact string.",
       payoff: isTh
         ? "ความหมายตรงกันแต่สะกดต่าง: Judge ให้ 1 แต่ EM และ Match TH ให้ 0"
@@ -182,28 +182,28 @@ export function getMetricChapters(lang: Language = "EN"): MetricChapter[] {
     {
       id: "word-overlap",
       number: "02",
-      title: isTh ? "2. คำตอบตรงกันกี่คำ (Word Overlap)?" : "How close are the words?",
+      title: isTh ? "2. คำตอบตรงกันกี่คำ (Word Overlap)" : "How close are the words?",
       icon: "compare_arrows",
       intro: isTh
         ? "ภาษาไทยเขียนติดกันโดยไม่มีช่องว่าง จึงต้องตัดคำด้วย PyThaiNLP ก่อนวัดผล"
         : "Thai has no spaces, so answers are split into word pieces first.",
       payoff: isTh
-        ? "Match TH ได้ 0 แต่ F1 ได้ 83.3 — การตอบถูกบางส่วนยังคงได้รับคะแนน"
-        : "Match TH says 0, yet F1 says 83.3 — partial word matches still count.",
+        ? "แม้ Match TH จะได้ 0 แต่ F1 ยังได้ 83.3 เพราะยังคงให้คะแนนคำที่ตอบถูกบางส่วน"
+        : "Match TH gives 0, but F1 gives 83.3 because partial word matches still count.",
       family: "overlap",
       metrics: ["precision", "recall", "f1"],
     },
     {
       id: "speed",
       number: "03",
-      title: isTh ? "3. โมเดลสร้างคำตอบเร็วแค่ไหน?" : "How fast?",
+      title: isTh ? "3. โมเดลสร้างคำตอบเร็วแค่ไหน" : "How fast?",
       icon: "speed",
       intro: isTh
         ? "จับเวลาเฉพาะช่วงที่โมเดลสร้างคำตอบ (Generation time)"
         : "One stopwatch: how long did the model spend writing?",
       payoff: isTh
-        ? "ความเร็วจะเปรียบเทียบได้อย่างเที่ยงธรรมเมื่อวัดเฉพาะเวลาสร้างคำตอบของโมเดล"
-        : "Speed only compares when you know what the clock excludes.",
+        ? "การเทียบความเร็วจะตรงไปตรงมาเมื่อแยกเวลาเขียนคำตอบออกจากเวลาค้นหาเอกสาร"
+        : "Speed comparisons are meaningful because the timer isolates generation from retrieval.",
       family: "speed",
       metrics: ["generation"],
     },

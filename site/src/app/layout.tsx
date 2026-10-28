@@ -29,7 +29,7 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "Thai RAG Benchmark",
   description:
-    "Standardized evaluation benchmark and leaderboard for Thai retrieval-augmented generation and embedding models.",
+    "Open evaluation benchmark and leaderboard for Thai retrieval-augmented generation and embedding models.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
