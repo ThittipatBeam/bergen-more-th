@@ -14,7 +14,6 @@ import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolb
 import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
 import { BenchmarkMobileList } from "@/components/sections/BenchmarkMobileList";
 import { useLanguage } from "@/hooks/use-language";
-import { I18N } from "@/lib/i18n/translations";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,

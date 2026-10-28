@@ -1,5 +1,3 @@
-import type { Language } from "@/hooks/use-language";
-
 export interface NavItemTranslation {
   label: string;
   href: string;
@@ -62,7 +60,7 @@ export const NAV_ITEMS_TH: NavItemTranslation[] = [
   },
 ];
 
-export function getNavItems(_lang?: Language): NavItemTranslation[] {
+export function getNavItems(): NavItemTranslation[] {
   // Navigation bar is strictly English across all languages per design guidelines
   return NAV_ITEMS_EN;
 }
