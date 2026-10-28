@@ -144,14 +144,14 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
     picks.push({
       id: "quality",
       tabLabel: isTh ? "คะแนนรวมสูงสุด" : "Best overall",
-      categoryTitle: isTh ? "คุณภาพในภาพรวมสูงสุด" : "Highest Overall Quality",
-      badge: isTh ? "อันดับ 1 ในภาพรวม" : "#1 Overall",
+      categoryTitle: isTh ? "คะแนนรวมสูงสุด" : "Top overall score",
+      badge: isTh ? "อันดับ 1 รวม" : "#1 Overall",
       storyTitle: isTh
-        ? `คะแนนรวมสูงสุดบนลีดเดอร์บอร์ด: ${qualityBest.q.toFixed(1)} จาก 100`
-        : `Highest overall score: ${qualityBest.q.toFixed(1)} of 100.`,
+        ? `คะแนนรวมสูงสุดบนตาราง: ${qualityBest.q.toFixed(1)} จาก 100`
+        : `Top overall score: ${qualityBest.q.toFixed(1)} of 100.`,
       storyText: isTh
-        ? `${qualityBest.generator} ร่วมกับ ${qualityBest.retriever} ทำคะแนนจาก Judge, ความตรงกับคำตอบเฉลย และ Word Overlap ภาษาไทยได้สมดุลที่สุดบนบอร์ด`
-        : `${qualityBest.generator} paired with ${qualityBest.retriever} balances judge approval with exactness and Thai word overlap better than any other pipeline on the board.`,
+        ? `${qualityBest.generator} ร่วมกับ ${qualityBest.retriever} ทำคะแนนรวมได้สมดุลที่สุด ทั้งคะแนนจาก judge ความตรงกับเฉลย และสัดส่วนคำไทยที่ตรงกัน`
+        : `${qualityBest.generator} paired with ${qualityBest.retriever} achieved the most balanced scores across the judge, exact match, and Thai word overlap.`,
       icon: "trophy",
       accent: "var(--brand-text)",
       primaryMetric: {
@@ -168,7 +168,7 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
           ? `ตัดสินโดย ${qualityBest.judgeName ?? "Kimi-K3"}${
               qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
             }`
-          : `Judged by ${qualityBest.judgeName ?? "Kimi-K3"}${
+          : `Scored by ${qualityBest.judgeName ?? "Kimi-K3"}${
               qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
             }`,
       },
@@ -179,32 +179,32 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
   if (speedBest) {
     picks.push({
       id: "speed",
-      tabLabel: isTh ? "ประมวลผลเร็วที่สุด" : "Fastest delivery",
-      categoryTitle: isTh ? "ความเร็ว Generate สูงสุด" : "Fastest Generation",
+      tabLabel: isTh ? "สร้างคำตอบเร็วที่สุด" : "Fastest generation",
+      categoryTitle: isTh ? "สร้างคำตอบเร็วที่สุด" : "Fastest generation",
       badge: isTh ? "เร็วที่สุด" : "Top Speed",
       storyTitle: isTh
-        ? "Generate คำตอบครบ 500 ข้อได้เร็วที่สุด"
-        : "Fastest model generation on the 500-question sample.",
+        ? "สร้างคำตอบครบ 500 ข้อได้เร็วที่สุด"
+        : "Fastest writing time on the 500-question sample.",
       storyText: isTh
-        ? `${speedBest.generator} สร้างคำตอบครบ 500 ข้อในเวลาเพียง ${formatClock(
+        ? `${speedBest.generator} สร้างคำตอบครบ 500 ข้อในเวลา ${formatClock(
             speedBest.genSeconds
-          )} โดยยังคงคะแนน Judge สูงถึง ${speedBest.judgePct.toFixed(1)}%`
+          )} โดยได้คะแนนจาก judge อยู่ที่ ${speedBest.judgePct.toFixed(1)}%`
         : `${speedBest.generator} generated all 500 answers in ${formatClock(
             speedBest.genSeconds
-          )}, maintaining a competitive ${speedBest.judgePct.toFixed(1)}% judge score.`,
+          )}, while scoring ${speedBest.judgePct.toFixed(1)}% on the judge metric.`,
       icon: "bolt",
       accent: "var(--perf-text)",
       primaryMetric: {
-        label: isTh ? "เวลา Generate" : "Generation Time",
+        label: isTh ? "เวลาสร้างคำตอบ" : "Generation Time",
         value: formatClock(speedBest.genSeconds),
         detail: isTh
-          ? "เฉพาะเวลาสร้างคำตอบ · ไม่รวมค้นคืนและให้คะแนน"
+          ? "เฉพาะเวลาเขียนข้อความ · ไม่รวมค้นหาเอกสารและตรวจคะแนน"
           : "Generation only · excludes retrieval and scoring",
       },
       secondaryMetric: {
-        label: isTh ? "คุณภาพที่รักษาได้" : "Quality Retained",
+        label: isTh ? "คะแนน Judge" : "Judge Score",
         value: `${speedBest.judgePct.toFixed(1)}%`,
-        detail: isTh ? "สัดส่วนคำตอบที่ Judge รับรอง" : "Judge approval maintained",
+        detail: isTh ? "สัดส่วนคำตอบที่ judge ตรวจว่าถูก" : "Answers marked correct by judge",
       },
       row: speedBest,
     });
@@ -213,26 +213,26 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
   if (matchBest) {
     picks.push({
       id: "match",
-      tabLabel: isTh ? "ตรงกับคำตอบเฉลยสูงสุด" : "Best Thai match",
-      categoryTitle: isTh ? "ตรงกับ Ground Truth สูงสุด" : "Best Ground-Truth Alignment",
-      badge: isTh ? "ความตรงสูงสุด" : "Top Match",
+      tabLabel: isTh ? "ตรงคำตอบเฉลยสูงสุด" : "Best reference match",
+      categoryTitle: isTh ? "ตรงกับคำตอบเฉลยสูงสุด" : "Best reference match",
+      badge: isTh ? "ตรงเฉลยสูงสุด" : "Top Match",
       storyTitle: isTh
-        ? "มีคำตอบเฉลยปรากฏครบถ้วนที่สุด"
-        : "Most human answers contained in full.",
+        ? "มีข้อความเฉลยปรากฏในคำตอบครบถ้วนที่สุด"
+        : "Most complete reference answers contained in output.",
       storyText: isTh
-        ? `คำตอบเฉลยปรากฏในผลลัพธ์สูงที่สุด โดยทำคะแนน M-score ได้ ${matchBest.mTh.toFixed(
+        ? `มีข้อความเฉลยปรากฏครบถ้วนในคำตอบมากที่สุด โดยทำคะแนน Match TH ได้ ${matchBest.mTh.toFixed(
             3
           )} และ F1 ได้ ${matchBest.f1Th.toFixed(3)}`
-        : `Demonstrated the highest gold-answer containment, scoring ${matchBest.mTh.toFixed(
+        : `Included the highest share of complete reference answers, scoring ${matchBest.mTh.toFixed(
             3
-          )} M-score and ${matchBest.f1Th.toFixed(3)} F1.`,
+          )} on Match TH and ${matchBest.f1Th.toFixed(3)} on F1.`,
       icon: "target",
       accent: "var(--brand-text)",
       primaryMetric: {
         label: isTh ? "Thai M-Score" : "Thai M-Score",
         value: matchBest.mTh.toFixed(3),
         detail: isTh
-          ? "มีคำตอบเฉลย (Gold Answer) ครบถ้วนในคำตอบ"
+          ? "มีข้อความเฉลยครบถ้วนในคำตอบ"
           : "Gold answer contained in the response",
       },
       secondaryMetric: {
@@ -240,7 +240,7 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
         value: matchBest.f1Th.toFixed(3),
         detail: isTh
           ? "ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall"
-          : "Precision & recall harmonic",
+          : "Harmonic mean of precision and recall",
       },
       row: matchBest,
     });

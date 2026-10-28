@@ -85,8 +85,8 @@ export function MetricsWorkedExample() {
           className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
           {isTh
-            ? "ไล่ดูผลคะแนนจริงของคำตอบตัวอย่างในทุกเมทริกซ์"
-            : "Follow one answer through every score"}
+            ? "ตัวอย่างการให้คะแนนคำตอบจริงในทุกเมทริกซ์"
+            : "Scoring one sample answer across all metrics"}
         </h2>
       </header>
 
@@ -112,7 +112,7 @@ export function MetricsWorkedExample() {
 
           <div>
             <span className="font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              {isTh ? "คำตอบเฉลย (Ground Truth)" : "Answer key"}
+              {isTh ? "คำตอบเฉลย (Reference)" : "Answer key"}
             </span>
             <p
               lang="th"
@@ -149,8 +149,8 @@ export function MetricsWorkedExample() {
           </div>
           <p className="font-sans text-base leading-relaxed text-[var(--text-secondary)]">
             {isTh
-              ? "ความหมายเหมือนกัน แต่สะกดด้วยชื่อย่อ — ทุกผลคะแนนด้านล่างสะท้อนจากจุดนี้"
-              : "Same meaning, shorter name — every score below follows from it."}
+              ? "ความหมายเหมือนกัน แต่สะกดด้วยชื่อย่อ (กรุงเทพฯ แทนที่จะเป็น กรุงเทพมหานคร) คะแนนด้านล่างจะแสดงให้เห็นว่าแต่ละเมทริกซ์ตัดสินจุดนี้ต่างกันอย่างไร"
+              : "Both answers have the same meaning, but the model used the abbreviated name (กรุงเทพฯ instead of กรุงเทพมหานคร). The scores below show how each metric treats this difference."}
           </p>
         </div>
       </div>
@@ -168,8 +168,8 @@ export function MetricsWorkedExample() {
         />
         <p className="font-sans text-sm leading-relaxed text-[var(--text-muted)]">
           {isTh
-            ? `PyThaiNLP ตัดคำ "ประเทศไทย" ออกเป็น "ประเทศ" + "ไทย" ดังนั้นคำตอบจึงมีทั้งหมด ${WORKED_EXAMPLE.tokenCount} หน่วยคำ (Token)`
-            : `PyThaiNLP split ประเทศไทย into ประเทศ + ไทย, so each answer is ${WORKED_EXAMPLE.tokenCount} word pieces long — not five.`}
+            ? `PyThaiNLP ตัดคำว่า "ประเทศไทย" ออกเป็น "ประเทศ" และ "ไทย" ดังนั้นคำตอบจึงมีทั้งหมด ${WORKED_EXAMPLE.tokenCount} หน่วยคำ (token)`
+            : `PyThaiNLP splits ประเทศไทย into ประเทศ and ไทย, so each answer contains ${WORKED_EXAMPLE.tokenCount} word tokens rather than five.`}
         </p>
       </div>
 
@@ -216,8 +216,8 @@ export function MetricsWorkedExample() {
 
       <p className="font-sans text-sm text-[var(--text-muted)]">
         {isTh
-          ? "คำตอบตัวอย่างเพื่อสาธิตวิธีการคำนวณ — ผลคะแนนบนลีดเดอร์บอร์ดมาจากการทดสอบจริง"
-          : "Illustrative verdict — leaderboard scores come from real runs."}
+          ? "ตัวอย่างนี้จัดทำขึ้นเพื่อสาธิตวิธีการคำนวณ ส่วนผลคะแนนบนลีดเดอร์บอร์ดมาจากการทดสอบจริง"
+          : "This example illustrates the formulas. Leaderboard scores come from actual pipeline runs."}
       </p>
     </section>
   );

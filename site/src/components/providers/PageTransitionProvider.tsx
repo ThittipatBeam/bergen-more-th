@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useRef,
+  useState,
   useCallback,
   useEffect,
   type ReactNode,
@@ -55,6 +56,7 @@ export function PageTransitionProvider({
   const ambientRef = useRef<HTMLDivElement>(null);
 
   const isTransitioningRef = useRef(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const lastPathnameRef = useRef(pathname);
   const isInitialMountRef = useRef(true);
 
@@ -90,6 +92,7 @@ export function PageTransitionProvider({
       // Debounce: prevent duplicate triggers while already animating
       if (isTransitioningRef.current) return;
       isTransitioningRef.current = true;
+      setIsTransitioning(true);
 
       // If caller handles its own exit choreography (e.g. mobile drawer exit)
       if (options?.skipExit) {
@@ -174,6 +177,7 @@ export function PageTransitionProvider({
 
         if (reducedMotion) {
           isTransitioningRef.current = false;
+          setIsTransitioning(false);
           if (contentRef.current) {
             gsap.set(contentRef.current, {
               opacity: 1,
@@ -189,6 +193,7 @@ export function PageTransitionProvider({
         const enterTl = gsap.timeline({
           onComplete: () => {
             isTransitioningRef.current = false;
+            setIsTransitioning(false);
             if (contentRef.current) {
               gsap.set(contentRef.current, { clearProps: "transform,filter" });
             }
@@ -311,6 +316,7 @@ export function PageTransitionProvider({
     const timer = setTimeout(() => {
       if (isTransitioningRef.current) {
         isTransitioningRef.current = false;
+        setIsTransitioning(false);
         if (contentRef.current) {
           gsap.set(contentRef.current, {
             opacity: 1,
@@ -334,7 +340,7 @@ export function PageTransitionProvider({
     <PageTransitionContext.Provider
       value={{
         navigateTo,
-        isTransitioning: isTransitioningRef.current,
+        isTransitioning,
         laserRef,
         contentRef,
         ambientRef,

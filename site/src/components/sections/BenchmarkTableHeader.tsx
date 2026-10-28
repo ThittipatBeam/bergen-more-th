@@ -17,39 +17,39 @@ interface BenchmarkTableHeaderProps {
 
 /** One-line meaning per column, surfaced as tooltip + accessible name. */
 const COLUMN_DEFS_EN: Record<SortKey, string> = {
-  rank: "Rank — position by overall score",
-  retriever: "Embedding — the dense retrieval model",
-  reranker: "Reranker — optional second-pass scoring model",
-  q: "Overall score — 45% judge + 20% Match TH + 20% F1 TH + 15% Exact Match (0–100). This is the ranking score; generation time is not part of it. Cell tint is scaled to the observed Q range.",
+  rank: "Rank: position by overall score",
+  retriever: "Embedding: dense retrieval model",
+  reranker: "Reranker: optional second-pass model",
+  q: "Overall score: 45% judge, 20% Match TH, 20% F1 TH, and 15% Exact Match (0 to 100). Determines leaderboard rank. Excludes generation time.",
   judgePct:
-    "Judge Score — share of answers the LLM judge marked correct (0–100).",
-  mTh: "Match TH — share of questions whose full gold answer appears inside the model answer (M_th, whitespace-insensitive containment)",
-  f1Th: "F1 TH — harmonic mean of Thai precision and recall (F1_th)",
+    "Judge Score: percentage of answers marked correct by the LLM judge (0 to 100).",
+  mTh: "Match TH: percentage of questions where the full gold answer appears inside the model answer, ignoring whitespace.",
+  f1Th: "F1 TH: harmonic mean of Thai precision and recall.",
   precisionTh:
-    "Precision TH — share of the model's Thai word pieces that also appear in the reference (Precision_th)",
+    "Precision TH: percentage of model Thai word tokens that appear in the reference.",
   recallTh:
-    "Recall TH — share of the reference's Thai word pieces the model included (Recall_th)",
-  em: "Exact Match — share of questions whose normalized answer equals a reference (EM)",
+    "Recall TH: percentage of reference Thai word tokens included in the model answer.",
+  em: "Exact Match: percentage of questions where the normalized answer equals a reference.",
   latency:
-    "Generation time — model generation only (m:ss); excludes retrieval, reranking and scoring",
+    "Generation time: time spent generating text across all 500 answers (m:ss), excluding retrieval and scoring.",
 };
 
 const COLUMN_DEFS_TH: Record<SortKey, string> = {
-  rank: "อันดับ — จัดอันดับตามคะแนน Overall Score",
-  retriever: "Embedding — โมเดล Dense Retrieval",
-  reranker: "Reranker — โมเดลจัดอันดับซ้ำรอบสอง (ไม่บังคับ)",
-  q: "Overall score — 45% Judge + 20% Match TH + 20% F1 TH + 15% Exact Match (0–100) ไม่รวมเวลาสร้างคำตอบ",
+  rank: "อันดับ: จัดอันดับตามคะแนนรวม Overall Score",
+  retriever: "Embedding: โมเดล dense retrieval สำหรับค้นหาเอกสาร",
+  reranker: "Reranker: โมเดลจัดอันดับซ้ำรอบสอง (ไม่บังคับ)",
+  q: "คะแนนรวม: 45% Judge + 20% Match TH + 20% F1 TH + 15% Exact Match (เต็ม 100) ไม่รวมเวลาสร้างคำตอบ",
   judgePct:
-    "Judge Score — สัดส่วนคำตอบที่ LLM Judge ตัดสินว่าถูกต้อง (0–100)",
-  mTh: "Match TH — สัดส่วนคำถามที่มีคำตอบเฉลยครบถ้วนในข้อความ (M_th, ไม่สนใจช่องว่าง)",
-  f1Th: "F1 TH — ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall ภาษาไทย (F1_th)",
+    "คะแนน Judge: สัดส่วนคำตอบที่ LLM judge ตัดสินว่าถูกต้อง (เต็ม 100)",
+  mTh: "Match TH: สัดส่วนคำถามที่มีข้อความเฉลยครบถ้วนในคำตอบ โดยไม่นับช่องว่าง",
+  f1Th: "F1 TH: ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall ภาษาไทย",
   precisionTh:
-    "Precision TH — สัดส่วนคำภาษาไทยของโมเดลที่ตรงกับคำตอบเฉลย (Precision_th)",
+    "Precision TH: สัดส่วนคำในคำตอบของโมเดลที่ปรากฏในเฉลย",
   recallTh:
-    "Recall TH — สัดส่วนคำภาษาไทยในเฉลยที่โมเดลตอบได้ครอบคลุม (Recall_th)",
-  em: "Exact Match — สัดส่วนคำตอบที่ตรงกับเฉลยแบบ 100% (EM)",
+    "Recall TH: สัดส่วนคำในเฉลยที่โมเดลตอบได้ครอบคลุม",
+  em: "Exact Match: สัดส่วนคำตอบที่ตรงกับเฉลยทุกตัวอักษรหลังปรับมาตรฐานข้อความ",
   latency:
-    "เวลา Generation — เฉพาะเวลาที่โมเดลสร้างคำตอบ (นาที:วินาที) ไม่รวมการค้นคืนและให้คะแนน",
+    "เวลาสร้างคำตอบ: เวลาที่โมเดลใช้เขียนคำตอบครบ 500 ข้อ (นาที:วินาที) ไม่รวมการค้นหาและตรวจข้อสอบ",
 };
 
 export function BenchmarkTableHeader({

@@ -38,17 +38,17 @@ export function MethodologySection() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-12 px-4 pt-28 pb-20 sm:gap-16 sm:px-8 md:px-12">
       <PageHeader
-        kicker={isTh ? "ระเบียบวิธีวิจัยและขั้นตอนการทดสอบ" : "Methodology, told simply"}
-        title={isTh ? "ที่มาของตัวเลขและคะแนนบนลีดเดอร์บอร์ด" : "How the board gets its numbers"}
+        kicker={isTh ? "ระเบียบวิธีวิจัยและขั้นตอนทดสอบ" : "Methodology overview"}
+        title={isTh ? "ที่มาของชุดข้อมูลและวิธีตรวจคะแนน" : "How the benchmark is built and scored"}
         lead={
           isTh
-            ? "RAG Pipeline ค้นหาข้อมูลและตอบคำถาม จากนั้น LLM Judge จะตรวจว่าคำตอบถูกต้องหรือไม่ อธิบายอย่างกระชับใน 3 ขั้นตอนหลัก"
-            : "A pipeline answers a question. A judge decides if the answer is right. Here is how each part is made, in three short chapters."
+            ? "ไปป์ไลน์ RAG ค้นหาเอกสารและตอบคำถาม จากนั้น LLM judge จะตรวจว่าคำตอบถูกต้องหรือไม่ อธิบายสั้นๆ ใน 3 ขั้นตอน"
+            : "A pipeline answers a question, and an LLM judge decides whether the answer is correct. Here is how each part works across three sections."
         }
         meta={
           isTh
-            ? `${DATASET_SIZE.bank.toLocaleString("th-TH")} คำถามในคลัง · ${DATASET_SIZE.perRun} ข้อต่อการทดสอบ · ตัดสินโดย ${JUDGE_NAME}`
-            : `${DATASET_SIZE.bank.toLocaleString("en-US")} questions on file · ${DATASET_SIZE.perRun} per run · judge ${JUDGE_NAME}`
+            ? `${DATASET_SIZE.bank.toLocaleString("th-TH")} คำถามในคลัง · ${DATASET_SIZE.perRun} ข้อต่อหนึ่งรัน · ตรวจด้วย ${JUDGE_NAME}`
+            : `${DATASET_SIZE.bank.toLocaleString("en-US")} questions in the bank · ${DATASET_SIZE.perRun} per run · judged by ${JUDGE_NAME}`
         }
         action={
           <SmoothScrollLink
@@ -56,8 +56,8 @@ export function MethodologySection() {
             className="inline-flex min-h-[44px] items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
             {isTh
-              ? "ดูตัวอย่างการให้คะแนนจริงในทุกเมทริกซ์ →"
-              : "See one answer score on every metric →"}
+              ? "ดูตัวอย่างการคำนวณคะแนนทุกเมทริกซ์ →"
+              : "See one sample answer scored across all metrics →"}
           </SmoothScrollLink>
         }
       />
@@ -70,11 +70,11 @@ export function MethodologySection() {
         <PipelineFlow accent={systemDesign.accent} />
         <Payoff>
           <span className="font-semibold text-[var(--text-primary)]">
-            {isTh ? "ใจความสำคัญ. " : "The point. "}
+            {isTh ? "สรุปใจความสำคัญ: " : "Takeaway: "}
           </span>
           {isTh
-            ? "โครงสร้างไปป์ไลน์ 3 ขั้นตอนคงที่เหมือนกันทุกประการ เปลี่ยนเฉพาะโมเดลข้างใน จึงสามารถเปรียบเทียบข้ามรุ่นได้อย่างเป็นธรรม"
-            : "Only the models change; the three-part path stays the same, so any two rows can be compared."}
+            ? "โครงสร้างไปป์ไลน์ 3 ขั้นตอนคงที่เหมือนกันทุกรัน เปลี่ยนเฉพาะโมเดลข้างใน จึงเปรียบเทียบผลลัพธ์ระหว่างโมเดลได้อย่างเป็นธรรม"
+            : "The three-stage pipeline remains identical across runs, changing only the models inside. This keeps comparisons consistent."}
         </Payoff>
       </MethodologyChapter>
 
@@ -90,16 +90,16 @@ export function MethodologySection() {
         <ScoringChips />
         <Payoff>
           <span className="font-semibold text-[var(--text-primary)]">
-            {isTh ? "ใจความสำคัญ. " : "The point. "}
+            {isTh ? "สรุปใจความสำคัญ: " : "Takeaway: "}
           </span>
           {isTh
-            ? "ความถูกต้องมีน้ำหนัก 45% ของ Overall Score และ LLM Judge คือเครื่องมือที่เราใช้วัดผลส่วนนี้ "
-            : "Correctness is 45% of Overall, and the judge is how we measure it. "}
+            ? "คะแนนจาก judge มีสัดส่วน 45% ของคะแนนรวม เพื่อประเมินความถูกต้องตามความหมายจริง "
+            : "The judge score makes up 45% of the overall score, measuring factual correctness in natural language. "}
           <Link
             href="/metrics#overall-score"
             className="font-semibold text-[var(--brand-text)] underline-offset-2 transition-colors hover:text-[var(--brand-cta-hover)] hover:underline"
           >
-            {isTh ? "ดูวิธีคำนวณคะแนนทั้งหมด" : "See how the rest is built"}
+            {isTh ? "ดูวิธีคำนวณคะแนนทั้งหมด" : "See how the rest is scored"}
           </Link>
           .
         </Payoff>
@@ -111,16 +111,16 @@ export function MethodologySection() {
       <div className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-6 sm:flex-row sm:items-center sm:p-8">
         <div>
           <h2 className="font-sans text-xl font-bold text-[var(--text-primary)] sm:text-2xl">
-            {isTh ? "รันการทดสอบและโค้ดทั้งหมดได้จาก Repo" : "Everything runs from the repo"}
+            {isTh ? "รันการทดสอบและโค้ดทั้งหมดได้จาก repo" : "Everything runs from the repo"}
           </h2>
           <p className="mt-2 max-w-[58ch] font-sans text-sm leading-relaxed text-[var(--text-secondary)] sm:text-base">
             {isTh ? (
               <>
-                สคริปต์สร้างชุดข้อมูลอยู่ในโฟลเดอร์{" "}
+                สคริปต์สำหรับสร้างชุดข้อมูลอยู่ในโฟลเดอร์{" "}
                 <code className="font-mono text-[0.95em] text-[var(--text-primary)]">
                   th_data_gen/
                 </code>{" "}
-                และระบบรันประเมินผลครอบด้วย Bergen ทุกคนจึงสามารถทำซ้ำการทดลองได้จริง
+                และระบบรันประเมินผลใช้เฟรมเวิร์ก Bergen แต่ละรอบจะบันทึกการตั้งค่าและผลลัพธ์ดิบไว้ทั้งหมด ทุกคนจึงสามารถนำไปรันซ้ำได้
               </>
             ) : (
               <>
@@ -128,8 +128,8 @@ export function MethodologySection() {
                 <code className="font-mono text-[0.95em] text-[var(--text-primary)]">
                   th_data_gen/
                 </code>{" "}
-                — generate, verify, spot-check, build. Every evaluation run keeps
-                its config and raw outputs, so anyone can re-run it.
+                for generation, verification, and sampling. Every evaluation run saves
+                its configuration and raw outputs so anyone can reproduce the results.
               </>
             )}
           </p>

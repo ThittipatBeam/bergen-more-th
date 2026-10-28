@@ -14,7 +14,6 @@ import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolb
 import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
 import { BenchmarkMobileList } from "@/components/sections/BenchmarkMobileList";
 import { useLanguage } from "@/hooks/use-language";
-import { I18N } from "@/lib/i18n/translations";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
@@ -156,11 +155,11 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           Judge
         </span>{" "}
-        = {isTh ? "สัดส่วนคำตอบที่ Judge รับรอง" : "answers the judge marked correct"} ·{" "}
+        = {isTh ? "สัดส่วนคำตอบที่ Judge รับรอง" : "answers marked correct by judge"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           Match TH
         </span>{" "}
-        = {isTh ? "คำตอบเฉลยปรากฏครบถ้วนในข้อความ" : "gold answer found in the answer"} ·{" "}
+        = {isTh ? "มีคำตอบเฉลยครบทุกคำในข้อความ" : "full gold answer found in text"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           F1 TH
         </span>{" "}
@@ -168,11 +167,11 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
           EM
         </span>{" "}
-        = {isTh ? "ข้อความตรงกับเฉลย 100%" : "normalized exact match"} ·{" "}
+        = {isTh ? "ตรงกับเฉลยทุกตัวอักษรหลังปรับมาตรฐาน" : "normalized exact match"} ·{" "}
         <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          {isTh ? "เวลา Gen" : "Gen Time"}
+          {isTh ? "เวลาสร้างคำตอบ" : "Gen Time"}
         </span>{" "}
-        = {isTh ? "เฉพาะเวลาสร้างคำตอบ" : "generation only"}
+        = {isTh ? "เวลาสร้างข้อความเท่านั้น" : "generation time only"}
       </p>
 
       {processedRows.length === 0 ? (

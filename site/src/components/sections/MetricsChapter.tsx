@@ -55,7 +55,7 @@ export function MetricsChapter({
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
         <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "ใจความสำคัญ. " : "The point. "}
+          {isTh ? "สรุปใจความสำคัญ: " : "Takeaway: "}
         </span>
         {chapter.payoff}
       </p>

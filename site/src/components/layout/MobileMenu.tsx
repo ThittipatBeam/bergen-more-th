@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect, useCallback, type RefObject } from "react";
-import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
@@ -22,7 +21,6 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ isOpen, onClose, items, returnFocusRef }: MobileMenuProps) {
-  const router = useRouter();
   const { navigateTo } = usePageTransition();
   const drawerRef = useRef<HTMLDivElement>(null);
   const isClosingRef = useRef(false);

@@ -28,18 +28,18 @@ export function RequestContactFields({
             id="contact-title"
             className="font-sans text-xl font-bold text-[var(--text-primary)] sm:text-2xl"
           >
-            {isTh ? "ข้อมูลผู้ติดต่อ" : "Who should we reply to?"}
+            {isTh ? "ข้อมูลสำหรับติดต่อกลับ" : "Who should we reply to?"}
           </h2>
           <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
             {isTh
-              ? "โปรดระบุชื่อผู้ติดต่อและอีเมลเพื่อให้ทีมงานติดต่อยืนยันก่อนเริ่มรันการทดสอบ"
-              : "We need a contact and an email address to confirm the run with you."}
+              ? "เราต้องการชื่อและอีเมลเพื่อติดต่อยืนยันก่อนเริ่มรันการทดสอบ"
+              : "We need a contact name and email address to confirm the run before scheduling."}
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <TextField
             id="contact"
-            label={isTh ? "ชื่อผู้ติดต่อ หรือ องค์กร / ทีม" : "Contact or organization name"}
+            label={isTh ? "ชื่อผู้ติดต่อ หรือชื่อทีม" : "Contact or team name"}
             required
             value={form.contact}
             onChange={(value) => onFieldChange("contact", value)}
@@ -47,7 +47,7 @@ export function RequestContactFields({
           />
           <TextField
             id="email"
-            label={isTh ? "อีเมลสำหรับติดต่อ" : "Email"}
+            label={isTh ? "อีเมล" : "Email"}
             type="email"
             inputMode="email"
             required
@@ -71,15 +71,15 @@ export function RequestContactFields({
           </h2>
           <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
             {isTh
-              ? "ไม่บังคับ สามารถระบุพารามิเตอร์เฉพาะ, Prompt template หรือเปเปอร์งานวิจัยที่ต้องการให้เราทดสอบซ้ำ"
-              : "Optional. Tell us about parameters, prompts or a paper you want us to reproduce."}
+              ? "ระบุได้ตามต้องการ เช่น พารามิเตอร์เฉพาะ รูปแบบพรอมต์ หรือลิงก์เปเปอร์ที่ต้องการให้เราทดสอบซ้ำ"
+              : "Optional. Share specific parameters, prompt templates, or a paper you would like us to reproduce."}
           </p>
         </div>
         <label
           htmlFor="notes"
           className="font-sans text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]"
         >
-          {isTh ? "หมายเหตุเพิ่มเติมหรือพารามิเตอร์การทดสอบ" : "Additional notes or evaluation parameters"}
+          {isTh ? "หมายเหตุเพิ่มเติมหรือพารามิเตอร์การทดสอบ" : "Additional notes or parameters"}
         </label>
         <textarea
           id="notes"
@@ -88,8 +88,8 @@ export function RequestContactFields({
           onChange={(event) => onFieldChange("notes", event.target.value)}
           placeholder={
             isTh
-              ? "เช่น ต้องการทดสอบ Context window ขนาด 8k หรือใช้ Prompt พิเศษ..."
-              : "e.g. prompt template, custom context window, paper link..."
+              ? "เช่น ต้องการทดสอบ context window ขนาด 8k หรือใช้พรอมต์เฉพาะ..."
+              : "e.g. custom prompt template, context window, or paper link..."
           }
           className="min-h-[132px] resize-y rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-4 font-sans text-base leading-relaxed text-[var(--text-primary)] transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--border-focus)] focus:outline-none"
         />
