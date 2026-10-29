@@ -212,8 +212,8 @@ export function getAboutSponsors(lang: Language = "EN"): readonly AboutSponsor[]
       label: "Model APIs by",
       name: "Cohere",
       description: isTh
-        ? "ทีม Cohere ให้คีย์ API สำหรับประเมินโมเดลของ Cohere ทุกตัวที่เราทดสอบ ส่วนโมเดลอื่น ๆ อย่าง DeepSeek และ Qwen ทำงานบนโครงสร้างพื้นฐานของ SIAM.AI เอง"
-        : "Cohere model runs use evaluation API keys provided by the Cohere team. Every other model — DeepSeek, Qwen, the rest — runs on SIAM.AI infrastructure.",
+        ? "ขอบคุณทีม Cohere ที่ให้คีย์ API สำหรับประเมินผล จนเรารันโมเดล Cohere ทุกตัวในเบนช์มาร์กนี้ได้"
+        : "Thanks to the Cohere team for the evaluation API keys that made every Cohere model run in this benchmark possible.",
       href: ABOUT_LINKS.cohere,
       hrefLabel: "cohere.com",
       tone: "positive",
