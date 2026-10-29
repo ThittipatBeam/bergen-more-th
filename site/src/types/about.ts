@@ -32,3 +32,18 @@ export interface AboutCredit {
   href: string;
   brand: "github" | "huggingface";
 }
+
+/** An organization whose resources made the benchmark runs possible. */
+export interface AboutSponsor {
+  /** Short mono label, always English: "Powered by", "Model APIs by". */
+  label: string;
+  name: string;
+  description: string;
+  href: string;
+  /** Short link label, without the arrow: "siam.ai", "cohere.com". */
+  hrefLabel: string;
+  /** Token family for the card: brand blue or verified green. */
+  tone: "brand" | "positive";
+  /** Which mark to render. */
+  icon: "brandmark" | "cohere";
+}

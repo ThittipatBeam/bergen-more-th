@@ -3,6 +3,7 @@ import type {
   AboutChapterMeta,
   AboutCredit,
   AboutResource,
+  AboutSponsor,
 } from "@/types/about";
 
 /** Every external place the About page points to. */
@@ -12,6 +13,7 @@ export const ABOUT_LINKS = {
   bergen: "https://github.com/naver/bergen",
   pythainlp: "https://huggingface.co/datasets/pythainlp/thai-wiki-dataset-v4",
   cloud: "https://siam.ai/",
+  cohere: "https://cohere.com/",
 } as const;
 
 export const ABOUT_CHAPTERS_EN = {
@@ -192,19 +194,35 @@ export function getAboutCredits(lang: Language = "EN"): readonly AboutCredit[] {
 
 export const ABOUT_CREDITS: readonly AboutCredit[] = getAboutCredits("EN");
 
-export function getAboutPoweredBy(lang: Language = "EN") {
+export function getAboutSponsors(lang: Language = "EN"): readonly AboutSponsor[] {
   const isTh = lang === "TH";
-  return {
-    label: isTh ? "โครงสร้างพื้นฐานโดย" : "Powered by",
-    name: "SIAM.AI Cloud",
-    description: isTh
-      ? "การรันโมเดลและการตรวจคำตอบทั้งหมดทำงานบนคลัสเตอร์ GPU ของ SIAM.AI Cloud"
-      : "Every run is served and scored on SIAM.AI Cloud GPUs.",
-    href: ABOUT_LINKS.cloud,
-  };
+  return [
+    {
+      label: "Powered by",
+      name: "SIAM.AI Cloud",
+      description: isTh
+        ? "การรันโมเดลและการตรวจคำตอบทั้งหมดทำงานบนคลัสเตอร์ GPU ของ SIAM.AI Cloud"
+        : "Every run is served and scored on SIAM.AI Cloud GPUs.",
+      href: ABOUT_LINKS.cloud,
+      hrefLabel: "siam.ai",
+      tone: "brand",
+      icon: "brandmark",
+    },
+    {
+      label: "Model APIs by",
+      name: "Cohere",
+      description: isTh
+        ? "ทีม Cohere ให้คีย์ API สำหรับประเมินโมเดลของ Cohere ทุกตัวที่เราทดสอบ ส่วนโมเดลอื่น ๆ อย่าง DeepSeek และ Qwen ทำงานบนโครงสร้างพื้นฐานของ SIAM.AI เอง"
+        : "Cohere model runs use evaluation API keys provided by the Cohere team. Every other model — DeepSeek, Qwen, the rest — runs on SIAM.AI infrastructure.",
+      href: ABOUT_LINKS.cohere,
+      hrefLabel: "cohere.com",
+      tone: "positive",
+      icon: "cohere",
+    },
+  ];
 }
 
-export const ABOUT_POWERED_BY = getAboutPoweredBy("EN");
+export const ABOUT_SPONSORS = getAboutSponsors("EN");
 
 export function getWhoWeAre(lang: Language = "EN"): string {
   if (lang === "TH") {

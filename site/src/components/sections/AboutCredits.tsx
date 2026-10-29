@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Github, HuggingFace } from "@lobehub/icons";
+import { Cohere, Github, HuggingFace } from "@lobehub/icons";
 import { AboutReveal } from "@/components/sections/AboutReveal";
-import { getAboutCredits, getAboutPoweredBy } from "@/lib/about-data";
+import { getAboutCredits, getAboutSponsors } from "@/lib/about-data";
 import type { AboutCredit } from "@/types/about";
 import { useLanguage } from "@/hooks/use-language";
 
@@ -30,7 +30,7 @@ export function AboutCredits() {
   const { language } = useLanguage();
   const isTh = language === "TH";
   const credits = getAboutCredits(language);
-  const poweredBy = getAboutPoweredBy(language);
+  const sponsors = getAboutSponsors(language);
 
   return (
     <AboutReveal>
@@ -89,49 +89,79 @@ export function AboutCredits() {
           ))}
         </ul>
 
-        <a
-          href={poweredBy.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-reveal
-          className="group flex min-h-[44px] flex-col gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--surface-brand)] p-6 transition-colors hover:border-[var(--brand-sky-light)] sm:flex-row sm:items-center sm:gap-5"
-        >
-          <Image
-            src="/brand-mark.png"
-            alt=""
-            aria-hidden="true"
-            width={279}
-            height={140}
-            unoptimized
-            className="h-6 w-auto shrink-0 self-start dark:hidden sm:self-center"
-          />
-          <Image
-            src="/brand-mark-white.png"
-            alt=""
-            aria-hidden="true"
-            width={279}
-            height={140}
-            unoptimized
-            className="hidden h-6 w-auto shrink-0 self-start dark:block sm:self-center"
-          />
+        {sponsors.map((sponsor) => (
+          <a
+            key={sponsor.name}
+            href={sponsor.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-reveal
+            className={`group flex min-h-[44px] flex-col gap-3 rounded-2xl border border-[var(--border-default)] p-6 transition-colors sm:flex-row sm:items-center sm:gap-5 ${
+              sponsor.tone === "positive"
+                ? "bg-[var(--positive-bg)] hover:border-[var(--positive)]"
+                : "bg-[var(--surface-brand)] hover:border-[var(--brand-sky-light)]"
+            }`}
+          >
+            {sponsor.icon === "brandmark" ? (
+              <>
+                <Image
+                  src="/brand-mark.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={279}
+                  height={140}
+                  unoptimized
+                  className="h-6 w-auto shrink-0 self-start dark:hidden sm:self-center"
+                />
+                <Image
+                  src="/brand-mark-white.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={279}
+                  height={140}
+                  unoptimized
+                  className="hidden h-6 w-auto shrink-0 self-start dark:block sm:self-center"
+                />
+              </>
+            ) : (
+              <span
+                aria-hidden="true"
+                className="inline-flex shrink-0 self-start text-[var(--positive)] sm:self-center"
+              >
+                <Cohere size={28} />
+              </span>
+            )}
 
-          <div className="flex min-w-0 flex-col">
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-text)]">
-              {poweredBy.label}
+            <div className="flex min-w-0 flex-col">
+              <span
+                className={`font-mono text-[11px] font-bold uppercase tracking-wider ${
+                  sponsor.tone === "positive"
+                    ? "text-[var(--positive)]"
+                    : "text-[var(--brand-text)]"
+                }`}
+              >
+                {sponsor.label}
+              </span>
+              <p className="font-sans text-base leading-7 text-[var(--text-secondary)]">
+                {sponsor.description}
+              </p>
+            </div>
+
+            <span
+              className={`inline-flex shrink-0 items-center gap-1.5 font-sans text-sm font-semibold underline-offset-2 group-hover:underline sm:ml-auto ${
+                sponsor.tone === "positive"
+                  ? "text-[var(--positive)]"
+                  : "text-[var(--brand-text)]"
+              }`}
+            >
+              {sponsor.hrefLabel}
+              <span aria-hidden="true">↗</span>
             </span>
-            <p className="font-sans text-base leading-7 text-[var(--text-secondary)]">
-              {poweredBy.description}
-            </p>
-          </div>
-
-          <span className="inline-flex shrink-0 items-center gap-1.5 font-sans text-sm font-semibold text-[var(--brand-text)] underline-offset-2 group-hover:underline sm:ml-auto">
-            siam.ai
-            <span aria-hidden="true">↗</span>
-          </span>
-          <span className="sr-only">
-            {poweredBy.name} (opens in a new tab)
-          </span>
-        </a>
+            <span className="sr-only">
+              {sponsor.name} (opens in a new tab)
+            </span>
+          </a>
+        ))}
       </div>
     </AboutReveal>
   );
