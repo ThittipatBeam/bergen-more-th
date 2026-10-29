@@ -3,7 +3,7 @@ services:
     build:
       context: ./site
       dockerfile: Dockerfile
-    image: reg.siam.ai/application/bergen_th_leaderboard:local
+    image: bergen-th-leaderboard:local
     container_name: bergen-th-leaderboard
     ports:
       - "3000:3000"
