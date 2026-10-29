@@ -56,42 +56,45 @@ export function MethodologySection() {
             className="inline-flex min-h-[44px] items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
             {isTh
-              ? "ดูตัวอย่างการคำนวณคะแนนทุกเมทริกซ์ →"
+              ? "ดูตัวอย่างการคำนวณคะแนนทุก metric →"
               : "See one sample answer scored across all metrics →"}
           </SmoothScrollLink>
         }
       />
 
-      <MethodologyChapter chapter={systemDesign}>
+      <MethodologyChapter
+        chapter={systemDesign}
+        kicker={isTh ? `บทที่ ${systemDesign.number}` : `Chapter ${systemDesign.number}`}
+      >
         <MethodologyPillar
           block={systemDesignBlock}
           accent={systemDesign.accent}
         />
         <PipelineFlow accent={systemDesign.accent} />
         <Payoff>
-          <span className="font-semibold text-[var(--text-primary)]">
-            {isTh ? "สรุปใจความสำคัญ: " : "Takeaway: "}
-          </span>
           {isTh
             ? "โครงสร้างไปป์ไลน์ 3 ขั้นตอนคงที่เหมือนกันทุกรัน เปลี่ยนเฉพาะโมเดลข้างใน จึงเปรียบเทียบผลลัพธ์ระหว่างโมเดลได้อย่างเป็นธรรม"
             : "The three-stage pipeline remains identical across runs, changing only the models inside. This keeps comparisons consistent."}
         </Payoff>
       </MethodologyChapter>
 
-      <MethodologyChapter chapter={questionBank}>
+      <MethodologyChapter
+        chapter={questionBank}
+        kicker={isTh ? `บทที่ ${questionBank.number}` : `Chapter ${questionBank.number}`}
+      >
         <DatasetStory />
       </MethodologyChapter>
 
-      <MethodologyChapter chapter={scoring}>
+      <MethodologyChapter
+        chapter={scoring}
+        kicker={isTh ? `บทที่ ${scoring.number}` : `Chapter ${scoring.number}`}
+      >
         <MethodologyPillar
           block={scoringProtocolBlock}
           accent={scoring.accent}
         />
         <ScoringChips />
         <Payoff>
-          <span className="font-semibold text-[var(--text-primary)]">
-            {isTh ? "สรุปใจความสำคัญ: " : "Takeaway: "}
-          </span>
           {isTh
             ? "คะแนนจาก judge มีสัดส่วน 45% ของคะแนนรวม เพื่อประเมินความถูกต้องตามความหมายจริง "
             : "The judge score makes up 45% of the overall score, measuring factual correctness in natural language. "}

@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SIAM.AI Thai RAG Benchmark — site
 
-## Getting Started
+Public leaderboard and documentation site for the Thai RAG benchmark produced
+by the tooling in this repository (`../bergen.py`, `../evaluate.py`,
+`../scripts/scan_experiments.py`).
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router, Turbopack) · React 19 · TypeScript
+- Tailwind CSS 4, tokens in `src/app/globals.css` (SIAM.AI "Cloudy Sky" system)
+- GSAP (ScrollTrigger, `@gsap/react`) for the hero pin and page transitions
+- KaTeX for the metric formulas on `/metrics`
+- Fonts: Space Grotesk (display/latin) · Noto Sans Thai (Thai text) ·
+  Space Mono (data and kickers), loaded via `next/font` in `src/app/layout.tsx`
+
+## Commands
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev        # dev server on :3000 (runs sync-data first)
+npm run build      # production build (runs sync-data first)
+npm run lint       # eslint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`sync-data` copies `../experiments_data.json` (the scan dump produced by
+`python scripts/scan_experiments.py` in the repo root) into
+`src/lib/experiments-data.json`. The committed snapshot is used as-is when the
+root file is absent. The leaderboard, champion cards, and all derived numbers
+in the copy are computed from that file at module scope.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` — hero + leaderboard (table on `md+`, stacked cards on phones)
+- `/methodology` — corpus, pipeline, judge protocol, worked scoring example
+- `/metrics` — the seven metrics, formulas, and the overall-score weights
+- `/request` — submit a pipeline for evaluation (see below)
+- `/about` — why the benchmark exists, resources, credits
 
-## Learn More
+## Request form delivery
 
-To learn more about Next.js, take a look at the following resources:
+`POST /api/request` validates server-side and delivers through the first
+configured provider — set exactly one of these in the environment:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Provider | Env vars |
+|---|---|
+| Any HTTP webhook (n8n, Zapier, Slack, Apps Script) | `REQUEST_WEBHOOK_URL` |
+| Email via Resend | `RESEND_API_KEY` + `REQUEST_INBOX_EMAIL` |
+| Notion database row | `NOTION_TOKEN` + `NOTION_REQUESTS_DATABASE_ID` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+With none configured the endpoint returns `503 not_configured` and the form
+shows the honest fallback (open a GitHub issue) instead of faking success.
 
-## Deploy on Vercel
+## Conventions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `AGENTS.md` — mobile-first, 44px touch targets, ~200-line file budget,
+three-tier component layout (`ui/` · `layout/` · `sections/`), thin `page.tsx`
+orchestrators. The site is bilingual EN/TH (`src/lib/i18n/`, `use-language`);
+the navbar itself stays English in both languages by design. Full bilingual
+parity is a product requirement: Thai and English copy must carry the same
+information.

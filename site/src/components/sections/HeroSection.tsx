@@ -52,7 +52,7 @@ export function HeroSection() {
       {/* Scroll cue */}
       <div className="relative z-10 mt-14 sm:mt-16 flex flex-col items-center gap-1.5 text-xs font-mono tracking-widest uppercase text-[var(--text-muted)]">
         <span>{t.scrollCue}</span>
-        <span className="animate-bounce motion-reduce:animate-none text-sm text-[var(--brand-text)]">&darr;</span>
+        <span className="text-sm text-[var(--brand-text)]">&darr;</span>
       </div>
     </section>
   );

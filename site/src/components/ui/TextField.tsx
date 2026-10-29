@@ -9,6 +9,7 @@ interface TextFieldProps {
   hint?: string;
   autoComplete?: string;
   inputMode?: "text" | "url" | "email";
+  maxLength?: number;
 }
 
 /** Labelled single-line input styled for the site's request form. */
@@ -23,6 +24,7 @@ export function TextField({
   hint,
   autoComplete,
   inputMode,
+  maxLength,
 }: TextFieldProps) {
   const hintId = hint ? `${id}-hint` : undefined;
 
@@ -49,6 +51,7 @@ export function TextField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         inputMode={inputMode}
+        maxLength={maxLength}
         aria-describedby={hintId}
         className="min-h-[44px] w-full min-w-0 rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] px-3.5 font-sans text-base text-[var(--text-primary)] transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--border-focus)] focus:outline-none"
       />

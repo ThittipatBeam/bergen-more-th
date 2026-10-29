@@ -22,7 +22,7 @@ export const METHODOLOGY_CHAPTERS_EN = {
     number: "02",
     title: "Where the questions come from",
     intro:
-      "We do not reuse a translated English dataset. We build Thai questions from Thai Wikipedia, check every one with a second model, then read a sample by eye.",
+      "Questions are written in Thai from Thai Wikipedia articles — not translated from an English set — then checked by a second model and spot-read by us.",
     icon: "fact_check",
     accent: { fg: "var(--metric-containment)", bg: "var(--metric-containment-bg)" },
   },
@@ -52,7 +52,7 @@ export const METHODOLOGY_CHAPTERS_TH = {
     number: "02",
     title: "ที่มาของชุดคำถาม",
     intro:
-      "เราไม่ใช้คำถามแปลจากภาษาอังกฤษ แต่สร้างคำถามภาษาไทยจากบทความบน Thai Wikipedia ตรวจทานความถูกต้องด้วยโมเดลอีกตัว แล้วสุ่มตรวจซ้ำด้วยคน",
+      "คำถามทุกข้อเขียนขึ้นจากบทความ Thai Wikipedia โดยตรง (ไม่ใช่ชุดแปลจากภาษาอังกฤษ) จากนั้นตรวจทานด้วยโมเดลอีกตัว และสุ่มอ่านตรวจด้วยคน",
     icon: "fact_check",
     accent: { fg: "var(--metric-containment)", bg: "var(--metric-containment-bg)" },
   },
@@ -224,7 +224,7 @@ export const DATASET_STEPS_TH: readonly DatasetStep[] = [
   {
     title: "สุ่มตรวจความถูกต้องด้วยคน",
     body:
-      "สุ่มตรวจ 50 คู่คำถาม-คำตอบด้วยคน เพื่อยืนยันว่าเกณฑ์การตัดสินของโมเดล judge ไม่ได้หละหลวมเกินไป",
+      "สุ่มตรวจ 50 คู่คำถาม-คำตอบด้วยคน ตัดสินเป็นผ่าน ไม่ผ่าน หรือข้าม ผลสุ่มตรวจบอกว่าโมเดล judge กับมนุษย์เห็นตรงกันบ่อยแค่ไหน — เป็นการตรวจสอบ judge ไม่ใช่การรับประกัน",
     meta: "สุ่ม 50 คู่ · มนุษย์ตรวจผ่าน / ไม่ผ่าน",
   },
 ] as const;
@@ -253,47 +253,55 @@ export function getDatasetResult(lang: Language = "EN"): string {
 
 export const DATASET_RESULT = DATASET_RESULT_EN;
 
-export const SAMPLE_REASONS_EN = [
-  {
-    title: "The same 500 for every pipeline",
-    body:
-      "Every row answers the exact same questions, so the comparison is like for like.",
-  },
-  {
-    title: "Big enough to tell pipelines apart",
-    body:
-      "Near the top, the gaps between pipelines are wider than the noise a 500-question sample adds.",
-  },
-  {
-    title: "The rest stay on file",
-    body:
-      "The remaining pairs are kept for deeper runs and for checking that the sample is not flattering one model.",
-  },
-] as const;
-
-export const SAMPLE_REASONS_TH = [
-  {
-    title: "ใช้คำถาม 500 ข้อเดียวกันในทุกระบบ",
-    body:
-      "ทุกไปป์ไลน์ตอบคำถามชุดเดียวกันทั้งหมด เพื่อให้เปรียบเทียบคะแนนกันได้โดยตรง",
-  },
-  {
-    title: "ขนาดกลุ่มตัวอย่างชัดเจนพอที่จะแยกความต่าง",
-    body:
-      "ผลต่างคะแนนของโมเดลกลุ่มหัวตารางกว้างกว่าค่าความแปรปรวน (noise) ของกลุ่มตัวอย่าง 500 ข้อ",
-  },
-  {
-    title: "เก็บคำถามที่เหลือไว้ทดสอบเพิ่มเติม",
-    body:
-      "คำถามส่วนที่เหลือถูกเก็บไว้สำหรับการทดสอบละเอียด และใช้ตรวจสอบว่าคำถาม 500 ข้อนี้ไม่ได้เอื้อประโยชน์ให้โมเดลใดเป็นพิเศษ",
-  },
-] as const;
-
-export function getSampleReasons(lang: Language = "EN") {
-  return lang === "TH" ? SAMPLE_REASONS_TH : SAMPLE_REASONS_EN;
+/** Repeat-run and spread stats computed from the board (see benchmark-data.ts). */
+export interface SampleStats {
+  maxRepeatGap: number;
+  judgeSpread: number;
+  judgeMin: number;
+  judgeMax: number;
 }
 
-export const SAMPLE_REASONS = SAMPLE_REASONS_EN;
+export function getSampleReasons(
+  lang: Language = "EN",
+  stats: SampleStats = {
+    maxRepeatGap: 0,
+    judgeSpread: 0,
+    judgeMin: 0,
+    judgeMax: 0,
+  }
+) {
+  const isTh = lang === "TH";
+  return [
+    {
+      title: isTh
+        ? "ทุกไปป์ไลน์ตอบคำถาม 500 ข้อชุดเดียวกัน"
+        : "Every pipeline answers the same 500 questions",
+      body: isTh
+        ? "คะแนนทุกแถวเทียบกันได้ตรงๆ: คำถามเดียวกัน คลังเอกสารเดียวกัน และ judge ตัวเดียวกัน"
+        : "Scores compare directly across rows: same questions, same corpus, same judge.",
+    },
+    {
+      title: isTh
+        ? `ผลรันซ้ำห่างกันไม่เกิน ${stats.maxRepeatGap} คะแนน`
+        : `Repeat runs land within ${stats.maxRepeatGap} judge ${
+            stats.maxRepeatGap === 1 ? "point" : "points"
+          }`,
+      body: isTh
+        ? `แต่ละไปป์ไลน์ถูกรันอย่างน้อยสองครั้ง ผลรันซ้ำห่างกันไม่เกิน ${stats.maxRepeatGap} คะแนน judge ขณะที่ generator ต่างกันมีช่วงคะแนนกว้างถึง ${stats.judgeSpread} คะแนน (${stats.judgeMin.toFixed(1)}–${stats.judgeMax.toFixed(1)})`
+        : `Each pipeline runs at least twice. Repeats differ by at most ${stats.maxRepeatGap} judge ${
+            stats.maxRepeatGap === 1 ? "point" : "points"
+          }, while different generators span ${stats.judgeSpread} points across the board (${stats.judgeMin.toFixed(1)}–${stats.judgeMax.toFixed(1)}).`,
+    },
+    {
+      title: isTh
+        ? "อีก 4,855 ข้อเก็บไว้ในคลัง"
+        : "The other 4,855 stay on file",
+      body: isTh
+        ? "คำถามส่วนที่เหลือเก็บไว้สำหรับการทดสอบละเอียด และใช้ตรวจว่าตัวอย่าง 500 ข้อไม่ได้เอื้อประโยชน์ให้โมเดลใดโดยเฉพาะ"
+        : "Unused pairs remain available for deeper runs and for checking that the 500-question sample is not favoring one model.",
+    },
+  ];
+}
 
 export const SCORING_PROTOCOL_EN: MethodologyBlock = {
   badge: "Scoring Protocol",
@@ -301,9 +309,9 @@ export const SCORING_PROTOCOL_EN: MethodologyBlock = {
   description:
     "KIMI-K3 evaluates each answer at temperature 0, which removes randomness and gives consistent verdicts for the same input.",
   details: [
-    "Verifies the answer against retrieved passages",
-    "Checks Thai phrasing and grammatical coherence",
-    "Compares model output with reference answers",
+    "Reads the answer against the retrieved passages, with the gold answer as a hint rather than the truth",
+    "Accepts a correct refusal when the retrieved context lacks the answer",
+    "Never rewards fluency, length, or confidence — only factual correctness",
   ],
 };
 
@@ -313,9 +321,9 @@ export const SCORING_PROTOCOL_TH: MethodologyBlock = {
   description:
     "เราใช้ KIMI-K3 ตรวจคำตอบโดยตั้งค่า temperature เป็น 0 เพื่อตัดความสุ่ม และทำให้การตัดสินคำตอบเดิมคงที่ทุกครั้ง",
   details: [
-    "ตรวจว่าคำตอบตรงกับเนื้อหาในพาสเสจที่ค้นเจอหรือไม่",
-    "ตรวจความถูกต้องของรูปประโยคและการใช้ภาษาไทย",
-    "เปรียบเทียบผลลัพธ์กับคำตอบเฉลยอ้างอิง",
+    "อ่านคำตอบเทียบกับพาสเสจที่ค้นเจอ โดยใช้คำตอบเฉลยเป็นเครื่องชี้นำ ไม่ใช่คำตอบสุดท้าย",
+    "ให้คะแนนเมื่อโมเดลตอบว่าไม่พบข้อมูล ในข้อที่เอกสารที่ค้นเจอไม่มีคำตอบจริง",
+    "ไม่ให้คะแนนกับความลื่นไหล ความยาว หรือความมั่นใจ นับเฉพาะความถูกต้องของข้อเท็จจริง",
   ],
 };
 

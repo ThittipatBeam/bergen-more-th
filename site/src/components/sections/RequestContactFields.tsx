@@ -44,6 +44,7 @@ export function RequestContactFields({
             value={form.contact}
             onChange={(value) => onFieldChange("contact", value)}
             autoComplete="organization"
+            maxLength={200}
           />
           <TextField
             id="email"
@@ -54,6 +55,7 @@ export function RequestContactFields({
             value={form.email}
             onChange={(value) => onFieldChange("email", value)}
             autoComplete="email"
+            maxLength={254}
           />
         </div>
       </section>
@@ -84,6 +86,7 @@ export function RequestContactFields({
         <textarea
           id="notes"
           rows={5}
+          maxLength={2000}
           value={form.notes}
           onChange={(event) => onFieldChange("notes", event.target.value)}
           placeholder={

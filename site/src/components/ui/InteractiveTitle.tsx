@@ -20,6 +20,9 @@ interface InteractiveTitleProps {
   className?: string;
 }
 
+/** Display title: a quiet staggered entrance and a gentle per-letter lift on
+ *  hover. No click handler — a heading click should do nothing, and it
+ *  should not advertise otherwise with a pointer cursor. */
 export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps) {
   const containerRef = useRef<HTMLHeadingElement>(null);
   const reducedMotion = useReducedMotion();
@@ -29,80 +32,46 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
       // Reduced motion: title renders in final state, no entrance wave
       if (reducedMotion) return;
 
-      // Gentle wave entrance animation on initial mount
       gsap.fromTo(
         ".interactive-char",
-        {
-          autoAlpha: 0,
-          y: 35,
-          scale: 0.9,
-          rotation: () => (Math.random() - 0.5) * 12,
-        },
+        { autoAlpha: 0, y: 16 },
         {
           autoAlpha: 1,
           y: 0,
-          scale: 1,
-          rotation: 0,
-          duration: 0.65,
+          duration: 0.5,
           stagger: 0.02,
-          ease: "back.out(1.6)",
+          ease: "power3.out",
         }
       );
     },
     { scope: containerRef, dependencies: [reducedMotion] }
   );
 
-  // Playful jelly bounce when mouse glides over a character
+  // A small lift with a smooth settle; the brand tint is the only flourish.
   const handleCharHover = useCallback(
     (e: React.MouseEvent<HTMLSpanElement>) => {
       if (reducedMotion) return;
-      const target = e.currentTarget;
-      const randomTilt = (Math.random() - 0.5) * 22; // Random tilt between -11deg and +11deg
-
-      gsap.timeline({ overwrite: "auto" })
-        .to(target, {
-          y: -22,
-          scaleY: 1.26,
-          scaleX: 0.88,
-          rotation: randomTilt,
-          color: readToken("--brand-sky-blue") || undefined, // brand pulse on hover
-          duration: 0.12,
-          ease: "power2.out",
-        })
-        .to(target, {
-          y: 0,
-          scaleY: 1,
-          scaleX: 1,
-          rotation: 0,
-          color: "inherit",
-          duration: 0.75,
-          ease: "elastic.out(1.25, 0.35)", // Bouncy jelly spring
-        });
+      gsap.to(e.currentTarget, {
+        y: -4,
+        color: readToken("--brand-text") || undefined,
+        duration: 0.18,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
     },
     [reducedMotion]
   );
 
-  // Easter egg: 360-degree backflip when clicking a letter!
-  const handleCharClick = useCallback(
+  const handleCharLeave = useCallback(
     (e: React.MouseEvent<HTMLSpanElement>) => {
       if (reducedMotion) return;
-      const target = e.currentTarget;
-      gsap.timeline({ overwrite: "auto" })
-        .to(target, {
-          y: -35,
-          scale: 1.35,
-          rotation: "+=360",
-          color: readToken("--brand-turquoise") || undefined, // turquoise accent on click
-          duration: 0.35,
-          ease: "power2.out",
-        })
-        .to(target, {
-          y: 0,
-          scale: 1,
-          color: "inherit",
-          duration: 0.8,
-          ease: "elastic.out(1.2, 0.4)",
-        });
+      gsap.to(e.currentTarget, {
+        y: 0,
+        color: "inherit",
+        duration: 0.35,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
     },
     [reducedMotion]
   );
@@ -121,8 +90,8 @@ export function InteractiveTitle({ text, className = "" }: InteractiveTitleProps
             <span
               key={`char-${wordIndex}-${charIndex}`}
               onMouseEnter={handleCharHover}
-              onClick={handleCharClick}
-              className="interactive-char inline-block cursor-pointer transform-gpu"
+              onMouseLeave={handleCharLeave}
+              className="interactive-char inline-block transform-gpu"
             >
               {char}
             </span>

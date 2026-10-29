@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 interface MobileMenuHeaderProps {
   onClose: () => void;
 }
 
 export function MobileMenuHeader({ onClose }: MobileMenuHeaderProps) {
+  const { language } = useLanguage();
   return (
     <div className="mobile-header-bar flex items-center justify-between w-full pb-4 border-b border-[var(--border-default)]">
       <div className="inline-flex items-center gap-2.5">
@@ -38,7 +41,7 @@ export function MobileMenuHeader({ onClose }: MobileMenuHeaderProps) {
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close navigation menu"
+        aria-label={I18N[language].nav.closeMenuAria}
         className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--border-default)] bg-[var(--background-primary)]/80 text-xs font-semibold tracking-wider text-[var(--text-primary)] hover:text-[var(--brand-text)] hover:border-[var(--brand-sky-light)] transition-all cursor-pointer shadow-xs"
       >
         <span>CLOSE</span>

@@ -116,13 +116,47 @@ export const BENCHMARK_ROWS: BenchmarkRow[] = rankedRows.map((row) => ({
   tieCount: tieCounts.get(row.rank) ?? 1,
 }));
 
+/** Observed overall-score range; drives the sequential tint so every band is used. */
+const qualityScores = BENCHMARK_ROWS.map((row) => row.q);
+
 const firstWithJudge = BENCHMARK_ROWS.find((row) => row.judgeName);
 
 export const JUDGE_NAME = firstWithJudge?.judgeName ?? "KIMI-K3";
 export const JUDGE_N = firstWithJudge?.judgeN ?? 500;
 
+/** Split recorded in the run configs; displayed instead of a hardcoded label. */
+export const QUERY_SPLIT =
+  (rawExperiments as unknown as ExperimentRecord[])[0]?.dataset?.query?.split ??
+  "train";
+
+/** Judge-point gap between repeat runs of the same generator+reranker pair —
+ *  the board's observed noise scale. Every pipeline ran at least twice. */
+function maxRepeatGap(): number {
+  const repeats = new Map<string, number[]>();
+  for (const row of BENCHMARK_ROWS) {
+    const key = `${row.generator}|${row.reranker ?? ""}`;
+    repeats.set(key, [...(repeats.get(key) ?? []), row.judgePct]);
+  }
+  let gap = 0;
+  for (const scores of repeats.values()) {
+    gap = Math.max(gap, Math.max(...scores) - Math.min(...scores));
+  }
+  return Math.round(gap * 10) / 10;
+}
+
+export const REPEAT_GAP_JUDGE = maxRepeatGap();
+
+/** Observed judge-score spread across all runs on the board. */
+export const JUDGE_SPREAD =
+  qualityScores.length > 0
+    ? Math.round(
+        (Math.max(...BENCHMARK_ROWS.map((r) => r.judgePct)) -
+          Math.min(...BENCHMARK_ROWS.map((r) => r.judgePct))) *
+          10
+      ) / 10
+    : 0;
+
 /** Observed overall-score range; drives the sequential tint so every band is used. */
-const qualityScores = BENCHMARK_ROWS.map((row) => row.q);
 export const QUALITY_MIN = qualityScores.length ? Math.min(...qualityScores) : 0;
 export const QUALITY_MAX = qualityScores.length ? Math.max(...qualityScores) : 100;
 
@@ -150,8 +184,16 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
         ? `คะแนนรวมสูงสุดบนตาราง: ${qualityBest.q.toFixed(1)} จาก 100`
         : `Top overall score: ${qualityBest.q.toFixed(1)} of 100.`,
       storyText: isTh
-        ? `${qualityBest.generator} ร่วมกับ ${qualityBest.retriever} ทำคะแนนรวมได้สมดุลที่สุด ทั้งคะแนนจาก judge ความตรงกับเฉลย และสัดส่วนคำไทยที่ตรงกัน`
-        : `${qualityBest.generator} paired with ${qualityBest.retriever} achieved the most balanced scores across the judge, exact match, and Thai word overlap.`,
+        ? `${qualityBest.generator} กับ ${qualityBest.retriever}${
+            qualityBest.reranker ? " และมี reranker" : ""
+          } ครองอันดับหนึ่ง: คะแนน judge ${qualityBest.judgePct.toFixed(
+            1
+          )}% · Match TH ${qualityBest.mTh.toFixed(1)} · F1 TH ${qualityBest.f1Th.toFixed(1)}`
+        : `${qualityBest.generator} with ${qualityBest.retriever}${
+            qualityBest.reranker ? " and a reranker" : ""
+          } ranks first: ${qualityBest.judgePct.toFixed(
+            1
+          )}% judge score, ${qualityBest.mTh.toFixed(1)} Match TH, ${qualityBest.f1Th.toFixed(1)} F1 TH.`,
       icon: "trophy",
       accent: "var(--brand-text)",
       primaryMetric: {
@@ -220,24 +262,24 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
         ? "มีข้อความเฉลยปรากฏในคำตอบครบถ้วนที่สุด"
         : "Most complete reference answers contained in output.",
       storyText: isTh
-        ? `มีข้อความเฉลยปรากฏครบถ้วนในคำตอบมากที่สุด โดยทำคะแนน Match TH ได้ ${matchBest.mTh.toFixed(
-            3
-          )} และ F1 ได้ ${matchBest.f1Th.toFixed(3)}`
-        : `Included the highest share of complete reference answers, scoring ${matchBest.mTh.toFixed(
-            3
-          )} on Match TH and ${matchBest.f1Th.toFixed(3)} on F1.`,
+        ? `มีข้อความเฉลยปรากฏครบถ้วนในคำตอบมากที่สุดบนตาราง: Match TH ${matchBest.mTh.toFixed(
+            1
+          )} และ F1 TH ${matchBest.f1Th.toFixed(1)}`
+        : `Highest gold-answer containment on the board: ${matchBest.mTh.toFixed(
+            1
+          )} Match TH and ${matchBest.f1Th.toFixed(1)} F1 TH.`,
       icon: "target",
       accent: "var(--brand-text)",
       primaryMetric: {
         label: isTh ? "Thai M-Score" : "Thai M-Score",
-        value: matchBest.mTh.toFixed(3),
+        value: matchBest.mTh.toFixed(1),
         detail: isTh
           ? "มีข้อความเฉลยครบถ้วนในคำตอบ"
           : "Gold answer contained in the response",
       },
       secondaryMetric: {
         label: isTh ? "Thai F1-Score" : "Thai F1-Score",
-        value: matchBest.f1Th.toFixed(3),
+        value: matchBest.f1Th.toFixed(1),
         detail: isTh
           ? "ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall"
           : "Harmonic mean of precision and recall",

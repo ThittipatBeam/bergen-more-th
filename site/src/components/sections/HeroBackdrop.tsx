@@ -18,19 +18,6 @@ export function HeroBackdrop() {
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--background-canvas)_85%)] transition-colors duration-300" />
       </div>
-
-      {/* Architectural sky rings */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.04] dark:opacity-[0.08] overflow-hidden"
-      >
-        <div className="relative w-[900px] h-[900px]">
-          <div className="absolute inset-10 border border-[var(--brand-sky-blue)] rotate-1 rounded-3xl" />
-          <div className="absolute inset-24 border border-[var(--brand-turquoise)] -rotate-2 rounded-3xl" />
-          <div className="absolute inset-36 border border-[var(--brand-sky-blue)] rotate-3 rounded-3xl" />
-          <div className="absolute inset-48 border border-[var(--brand-turquoise)] -rotate-1 rounded-3xl" />
-        </div>
-      </div>
     </>
   );
 }

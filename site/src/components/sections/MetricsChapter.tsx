@@ -40,9 +40,6 @@ export function MetricsChapter({
           className="max-w-[62ch] border-l-2 pl-4 font-sans text-base leading-7 text-[var(--text-secondary)]"
           style={{ borderColor: color.fg }}
         >
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
-            {isTh ? "จากตารางคะแนนปัจจุบัน. " : "On the current board. "}
-          </span>
           {insight}
         </p>
       )}
@@ -54,9 +51,6 @@ export function MetricsChapter({
       </div>
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-        <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "สรุปใจความสำคัญ: " : "Takeaway: "}
-        </span>
         {chapter.payoff}
       </p>
     </NumberedChapter>

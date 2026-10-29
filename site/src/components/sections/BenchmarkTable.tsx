@@ -14,6 +14,7 @@ import { BenchmarkTableToolbar } from "@/components/sections/BenchmarkTableToolb
 import { BenchmarkNextRunRow } from "@/components/sections/BenchmarkNextRunRow";
 import { BenchmarkMobileList } from "@/components/sections/BenchmarkMobileList";
 import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
@@ -31,6 +32,7 @@ const DEFAULT_COLUMNS: ColumnVisibility = {
 export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
   const { language } = useLanguage();
   const isTh = language === "TH";
+  const t = I18N[language].leaderboard;
   const [columns, setColumns] = useState<ColumnVisibility>(DEFAULT_COLUMNS);
   const [generator, setGenerator] = useState("all");
   const [reranker, setReranker] = useState<RerankerFilter>("all");
@@ -214,11 +216,7 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
               className="hidden overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors md:block"
             >
               <table className="w-full text-left border-collapse min-w-[800px]">
-                <caption className="sr-only">
-                  Leaderboard of evaluated Thai RAG pipeline combinations,
-                  ranked by overall score. Metric column headers are sortable
-                  buttons; the Model column is not sortable.
-                </caption>
+                <caption className="sr-only">{t.tableCaption}</caption>
                 <BenchmarkTableHeader
                   columns={columns}
                   sortKey={sortKey}

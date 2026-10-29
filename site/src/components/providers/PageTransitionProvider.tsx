@@ -4,9 +4,9 @@ import {
   createContext,
   useContext,
   useRef,
-  useState,
   useCallback,
   useEffect,
+  useState,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -21,9 +21,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 interface PageTransitionContextType {
   navigateTo: (href: string, options?: { skipExit?: boolean }) => void;
   isTransitioning: boolean;
-  laserRef: RefObject<HTMLDivElement | null>;
   contentRef: RefObject<HTMLDivElement | null>;
-  ambientRef: RefObject<HTMLDivElement | null>;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType | null>(
@@ -52,8 +50,6 @@ export function PageTransitionProvider({
   const reducedMotion = useReducedMotion();
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const laserRef = useRef<HTMLDivElement>(null);
-  const ambientRef = useRef<HTMLDivElement>(null);
 
   const [isTransitioning, setIsTransitioning] = useState(false);
   const isTransitioningRef = useRef(false);
@@ -95,7 +91,7 @@ export function PageTransitionProvider({
 
       // Debounce: prevent duplicate triggers while already animating
       if (isTransitioningRef.current) return;
-      setTransitioning(true);
+      isTransitioningRef.current = true;
 
       // If caller handles its own exit choreography (e.g. mobile drawer exit)
       if (options?.skipExit) {
@@ -103,48 +99,27 @@ export function PageTransitionProvider({
         return;
       }
 
-      // GSAP Exit Timeline
+      // GSAP Exit Timeline: the current page lifts slightly and fades.
       const exitTl = gsap.timeline({
         onComplete: () => {
           router.push(href);
         },
       });
 
-      // 1. Hairline laser sweeps across top directly below the frosted navbar
-      if (laserRef.current) {
-        exitTl.fromTo(
-          laserRef.current,
-          { scaleX: 0, opacity: 1 },
-          { scaleX: 0.72, duration: 0.22, ease: "power2.inOut" },
-          0
-        );
-      }
-
-      // 2. Subtle ambient atmospheric glow illuminates top of viewport
-      if (ambientRef.current) {
-        exitTl.to(
-          ambientRef.current,
-          { opacity: 1, duration: 0.2, ease: "power2.out" },
-          0
-        );
-      }
-
-      // 3. Current page content smoothly floats upward and dissolves
       if (contentRef.current) {
         exitTl.to(
           contentRef.current,
           {
-            y: -14,
+            y: -12,
             opacity: 0,
-            filter: "blur(4px)",
-            duration: 0.22,
+            duration: 0.2,
             ease: "power2.in",
           },
           0
         );
       }
     },
-    [reducedMotion, router, setTransitioning]
+    [reducedMotion, router]
   );
 
   // Entrance animation whenever pathname changes
@@ -191,7 +166,7 @@ export function PageTransitionProvider({
           return;
         }
 
-        // GSAP Entrance Timeline
+        // GSAP Entrance Timeline: the new page settles into place.
         const enterTl = gsap.timeline({
           onComplete: () => {
             setTransitioning(false);
@@ -202,44 +177,15 @@ export function PageTransitionProvider({
           },
         });
 
-        // 1. Finish laser beam sweep to 100% and fade away
-        if (laserRef.current) {
-          enterTl.to(
-            laserRef.current,
-            { scaleX: 1, duration: 0.18, ease: "power2.out" },
-            0
-          );
-          enterTl.to(
-            laserRef.current,
-            { opacity: 0, duration: 0.16, ease: "power1.in" },
-            0.12
-          );
-        }
-
-        // 2. Ambient top glow fades back to zero
-        if (ambientRef.current) {
-          enterTl.to(
-            ambientRef.current,
-            { opacity: 0, duration: 0.32, ease: "power2.out" },
-            0.05
-          );
-        }
-
-        // 3. New page content glides in from bottom with blur resolve
         if (contentRef.current) {
           enterTl.fromTo(
             contentRef.current,
-            {
-              y: 20,
-              opacity: 0,
-              filter: "blur(6px)",
-            },
+            { y: 14, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              filter: "blur(0px)",
-              duration: 0.4,
-              ease: "power3.out",
+              duration: 0.32,
+              ease: "power2.out",
             },
             0
           );
@@ -325,12 +271,6 @@ export function PageTransitionProvider({
             clearProps: "all",
           });
         }
-        if (laserRef.current) {
-          gsap.set(laserRef.current, { opacity: 0, scaleX: 0 });
-        }
-        if (ambientRef.current) {
-          gsap.set(ambientRef.current, { opacity: 0 });
-        }
       }
     }, 1500);
     return () => clearTimeout(timer);
@@ -341,9 +281,7 @@ export function PageTransitionProvider({
       value={{
         navigateTo,
         isTransitioning,
-        laserRef,
         contentRef,
-        ambientRef,
       }}
     >
       {children}
@@ -352,24 +290,15 @@ export function PageTransitionProvider({
 }
 
 export function PageTransitionView({ children }: { children: ReactNode }) {
-  const { contentRef, ambientRef } = usePageTransition();
+  const { contentRef } = usePageTransition();
 
   return (
-    <>
-      {/* Subtle atmospheric glow during transitions */}
-      <div
-        ref={ambientRef}
-        aria-hidden="true"
-        className="fixed top-0 inset-x-0 h-48 pointer-events-none z-30 opacity-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(56,189,248,0.14),transparent_70%)]"
-      />
-
-      {/* Main page content wrapper with GSAP animation targets */}
-      <div
-        ref={contentRef}
-        className="flex-1 flex flex-col w-full will-change-[transform,opacity,filter]"
-      >
-        {children}
-      </div>
-    </>
+    // Main page content wrapper with GSAP animation targets
+    <div
+      ref={contentRef}
+      className="flex-1 flex flex-col w-full will-change-[transform,opacity]"
+    >
+      {children}
+    </div>
   );
 }

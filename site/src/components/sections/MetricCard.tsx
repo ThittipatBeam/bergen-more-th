@@ -57,17 +57,11 @@ export function MetricCard({ metric, example }: MetricCardProps) {
       </div>
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-muted)]">
-        <span className="font-mono text-xs font-bold uppercase tracking-wider">
-          {isTh ? "ตัวอย่าง. " : "Example. "}
-        </span>
         {example ?? metric.simple.example}
       </p>
 
       <MetricDisclosure label={metric.name}>
         <p className="font-sans text-base leading-7 text-[var(--text-secondary)]">
-          <span className="font-semibold text-[var(--text-primary)]">
-            {isTh ? "วิธีอ่านค่า. " : "How to read it. "}
-          </span>
           {metric.technical.reading}
         </p>
 

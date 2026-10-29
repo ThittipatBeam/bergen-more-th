@@ -33,7 +33,7 @@ export function MetricsWhichScore() {
         className="hidden border-b border-[var(--border-default)] pb-2 font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] sm:grid sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.65fr)_minmax(0,1.2fr)] sm:gap-6"
       >
         <span>{isTh ? "ความต้องการของคุณ…" : "If you need…"}</span>
-        <span>{isTh ? "เมทริกซ์ที่ใช้" : "Use"}</span>
+        <span>{isTh ? "metric ที่ใช้" : "Use"}</span>
         <span>{isTh ? "เหตุผล" : "Because"}</span>
       </div>
 

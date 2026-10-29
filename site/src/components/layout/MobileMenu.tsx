@@ -9,6 +9,8 @@ import { MobileMenuItem } from "@/components/layout/MobileMenuItem";
 import { MobileMenuHeader } from "@/components/layout/MobileMenuHeader";
 import { NavItem } from "@/components/layout/Navbar";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
 import { usePageTransition } from "@/components/providers/PageTransitionProvider";
 
 gsap.registerPlugin(useGSAP);
@@ -22,6 +24,7 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose, items, returnFocusRef }: MobileMenuProps) {
   const { navigateTo } = usePageTransition();
+  const { language } = useLanguage();
   const drawerRef = useRef<HTMLDivElement>(null);
   const isClosingRef = useRef(false);
   const reducedMotion = useReducedMotion();
@@ -194,7 +197,7 @@ export function MobileMenu({ isOpen, onClose, items, returnFocusRef }: MobileMen
       id="mobile-menu-drawer"
       role="dialog"
       aria-modal="true"
-      aria-label="Navigation Menu"
+      aria-label={I18N[language].nav.openMenuAria}
       className="pointer-events-auto fixed inset-0 z-50 flex flex-col justify-between px-5 sm:px-8 pt-4 pb-12 sm:pb-8 text-[var(--text-primary)] bg-[var(--background-canvas)]/98 backdrop-blur-2xl select-none opacity-0 transition-colors overflow-y-auto"
     >
       {/* Top Header Bar */}

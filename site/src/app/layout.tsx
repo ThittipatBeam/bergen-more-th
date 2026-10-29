@@ -61,7 +61,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-200 selection:bg-[var(--brand-sky-blue)] selection:text-white">
+      <body className="min-h-full flex flex-col bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-200 selection:bg-[var(--brand-cta)] selection:text-white">
         <LanguageProvider>
           <PageTransitionProvider>
             <Navbar />

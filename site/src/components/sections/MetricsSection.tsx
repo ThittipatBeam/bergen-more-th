@@ -64,8 +64,8 @@ export function MetricsSection() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-12 px-4 pt-28 pb-20 sm:gap-16 sm:px-8 md:px-12">
       <PageHeader
-        kicker={isTh ? "คำอธิบายเมทริกซ์การวัดผล" : "Metrics guide"}
-        title={isTh ? "1 คำถาม 7 มิติการวัดผล" : "One question, seven metrics"}
+        kicker={isTh ? "คู่มือการอ่านคะแนน" : "Metrics guide"}
+        title={isTh ? "1 คำถาม 7 metric" : "One question, seven metrics"}
         lead={
           isTh
             ? "เราส่งคำถามภาษาไทย 1 ข้อ แล้วตรวจคำตอบเดียวกันใน 3 ด้าน: ความถูกต้องตามความหมาย, ความตรงกับเฉลยคำต่อคำ และความเร็วในการเขียน"
@@ -82,7 +82,7 @@ export function MetricsSection() {
             className="inline-flex min-h-[44px] items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
           >
             {isTh
-              ? "ดูตัวอย่างการคำนวณคะแนนจริงทุกเมทริกซ์ →"
+              ? "ดูตัวอย่างการคำนวณคะแนนจริงทุก metric →"
               : "See how one answer scores across every metric →"}
           </Link>
         }

@@ -76,7 +76,7 @@ export function BenchmarkColumnFilter({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        aria-label={isTh ? "เลือกแสดงคอลัมน์และเมทริกซ์" : "Filter metrics and columns"}
+        aria-label={isTh ? "เลือกแสดงคอลัมน์และ metric" : "Filter metrics and columns"}
         className="min-h-[44px] px-3.5 rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] hover:border-[var(--brand-sky-light)] text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
       >
         <svg
@@ -102,7 +102,7 @@ export function BenchmarkColumnFilter({
         <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] p-3.5 shadow-xl z-30 transition-all">
           <div className="flex items-center justify-between pb-2.5 border-b border-[var(--border-default)]/60">
             <span className="text-xs font-mono font-bold text-[var(--text-primary)]">
-              {isTh ? "แสดงคอลัมน์และเมทริกซ์" : "Display Metrics & Columns"}
+              {isTh ? "แสดงคอลัมน์และ metric" : "Display Metrics & Columns"}
             </span>
             <div className="flex items-center gap-2 text-xs font-mono">
               <button

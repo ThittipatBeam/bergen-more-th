@@ -27,7 +27,8 @@ export const TECHNICAL_DETAILS = {
   },
 
   em: {
-    reading: "All or nothing. A perfect paraphrase still scores 0.",
+    reading:
+      "Each question scores 0 or 1 after normalization; a paraphrased correct answer scores 0.",
     key: "EM (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\begin{aligned}
@@ -53,7 +54,8 @@ export const TECHNICAL_DETAILS = {
   },
 
   mth: {
-    reading: "All or nothing per question. One changed word scores zero.",
+    reading:
+      "The whole gold answer must appear inside the model answer; one changed word scores the question 0.",
     key: "M_th (stored 0 to 1, displayed x100)",
     formula: {
       tex: String.raw`\begin{aligned}

@@ -49,6 +49,7 @@ export function RequestPipelineFields({
             onChange={(value) => onFieldChange("generatorName", value)}
             placeholder="e.g. meta-llama/Llama-3.3-70B-Instruct"
             autoComplete="off"
+            maxLength={200}
           />
           <TextField
             id="generator-link"
@@ -58,6 +59,7 @@ export function RequestPipelineFields({
             onChange={(value) => onFieldChange("generatorLink", value)}
             placeholder="https://huggingface.co/…"
             autoComplete="off"
+            maxLength={500}
           />
         </RequestModelRow>
 
@@ -74,6 +76,7 @@ export function RequestPipelineFields({
             onChange={(value) => onFieldChange("embeddingName", value)}
             placeholder="e.g. BAAI/bge-m3"
             autoComplete="off"
+            maxLength={200}
           />
           <TextField
             id="embedding-link"
@@ -83,6 +86,7 @@ export function RequestPipelineFields({
             onChange={(value) => onFieldChange("embeddingLink", value)}
             placeholder="https://huggingface.co/…"
             autoComplete="off"
+            maxLength={500}
           />
         </RequestModelRow>
 
@@ -102,6 +106,7 @@ export function RequestPipelineFields({
             onChange={(value) => onFieldChange("rerankerName", value)}
             placeholder="e.g. BAAI/bge-reranker-v2-m3"
             autoComplete="off"
+            maxLength={200}
           />
           <TextField
             id="reranker-link"
@@ -111,6 +116,7 @@ export function RequestPipelineFields({
             onChange={(value) => onFieldChange("rerankerLink", value)}
             placeholder="https://huggingface.co/…"
             autoComplete="off"
+            maxLength={500}
           />
         </RequestModelRow>
       </div>

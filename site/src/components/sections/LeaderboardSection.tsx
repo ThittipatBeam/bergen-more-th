@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   BENCHMARK_ROWS,
   JUDGE_NAME,
+  QUERY_SPLIT,
   getLatestRunLabel,
 } from "@/lib/benchmark-data";
 import { BenchmarkTable } from "@/components/sections/BenchmarkTable";
@@ -29,19 +30,20 @@ export function LeaderboardSection() {
               {t.title}
             </h2>
             <p className="mt-1.5 max-w-[62ch] text-sm font-sans text-[var(--text-muted)] transition-colors">
-              {t.subtitle(datasetName, sampleCount, JUDGE_NAME)}
+              {t.subtitle(datasetName, QUERY_SPLIT, sampleCount, JUDGE_NAME)}
             </p>
           </div>
 
           <div className="flex flex-col gap-1.5 text-xs font-sans text-[var(--text-muted)] lg:items-end">
             <div className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-[var(--status-live)] animate-pulse motion-reduce:animate-none" />
+              <span className="inline-block w-2 h-2 rounded-full bg-[var(--status-live)]" />
               <span>
                 {latestRun ? t.latestRun(latestRun) : t.noRuns}{" "}
                 · {t.experimentsSoFar(BENCHMARK_ROWS.length)}
               </span>
             </div>
-            <p className="text-xs text-[var(--text-muted)]">
+            {/* Desktop-only: the phone view has no sortable table to hint at. */}
+            <p className="hidden text-xs text-[var(--text-muted)] md:block">
               {t.sortHint}
             </p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">

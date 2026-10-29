@@ -16,7 +16,10 @@ export interface ExperimentMetrics {
 export interface ExperimentRecord {
   experiment_id: string;
   run_date: string;
-  dataset?: { doc?: { target?: string | null } | null } | null;
+  dataset?: {
+    doc?: { target?: string | null } | null;
+    query?: { target?: string | null; split?: string | null } | null;
+  } | null;
   retriever?: { model_name?: string | null } | null;
   reranker?: { model_name?: string | null } | null;
   generator?: { model_name?: string | null } | null;

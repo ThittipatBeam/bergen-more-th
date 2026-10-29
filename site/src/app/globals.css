@@ -67,8 +67,9 @@
   --metric-bar-from: #0e7c66;
   --metric-bar-to: #34d399;
 
-  /* Sequential judge-score tint: five steps across the observed 93.6–97.4
-     range. Darker = higher; text inside always uses --text-primary. */
+  /* Sequential overall-score tint: five steps across the observed quality
+     range (runtime values printed by the toolbar legend). Darker = higher;
+     text inside always uses --text-primary. */
   --score-band-1: #f6fafd;
   --score-band-2: #eaf5fa;
   --score-band-3: #dceff7;

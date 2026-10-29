@@ -168,7 +168,7 @@ export function getMetricChapters(lang: Language = "EN"): MetricChapter[] {
     {
       id: "is-it-right",
       number: "01",
-      title: isTh ? "1. โมเดลตอบถูกหรือไม่" : "Is it right?",
+      title: isTh ? "โมเดลตอบถูกหรือไม่" : "Is it right?",
       icon: "fact_check",
       intro: isTh
         ? "วิธีตรวจความถูกต้อง 3 รูปแบบ ตั้งแต่การพิจารณาความหมายโดย LLM judge ไปจนถึงการตรวจข้อความตรงกันแบบ 100%"
@@ -182,7 +182,7 @@ export function getMetricChapters(lang: Language = "EN"): MetricChapter[] {
     {
       id: "word-overlap",
       number: "02",
-      title: isTh ? "2. คำตอบตรงกันกี่คำ (Word Overlap)" : "How close are the words?",
+      title: isTh ? "คำตอบตรงกันกี่คำ (Word Overlap)" : "How close are the words?",
       icon: "compare_arrows",
       intro: isTh
         ? "ภาษาไทยเขียนติดกันโดยไม่มีช่องว่าง จึงต้องตัดคำด้วย PyThaiNLP ก่อนวัดผล"
@@ -196,11 +196,11 @@ export function getMetricChapters(lang: Language = "EN"): MetricChapter[] {
     {
       id: "speed",
       number: "03",
-      title: isTh ? "3. โมเดลสร้างคำตอบเร็วแค่ไหน" : "How fast?",
+      title: isTh ? "โมเดลสร้างคำตอบเร็วแค่ไหน" : "How fast?",
       icon: "speed",
       intro: isTh
         ? "จับเวลาเฉพาะช่วงที่โมเดลสร้างคำตอบ (Generation time)"
-        : "One stopwatch: how long did the model spend writing?",
+        : "The timer wraps generation only: how long the model spent writing answers.",
       payoff: isTh
         ? "การเทียบความเร็วจะตรงไปตรงมาเมื่อแยกเวลาเขียนคำตอบออกจากเวลาค้นหาเอกสาร"
         : "Speed comparisons are meaningful because the timer isolates generation from retrieval.",

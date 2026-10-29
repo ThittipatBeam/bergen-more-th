@@ -2,6 +2,11 @@
 
 import { HuggingFace } from "@lobehub/icons";
 import {
+  BENCHMARK_ROWS,
+  JUDGE_SPREAD,
+  REPEAT_GAP_JUDGE,
+} from "@/lib/benchmark-data";
+import {
   DATASET_SIZE,
   getDatasetResult,
   getDatasetSteps,
@@ -16,7 +21,13 @@ export function DatasetStory() {
   const { language } = useLanguage();
   const isTh = language === "TH";
   const steps = getDatasetSteps(language);
-  const reasons = getSampleReasons(language);
+  const judgeScores = BENCHMARK_ROWS.map((row) => row.judgePct);
+  const reasons = getSampleReasons(language, {
+    maxRepeatGap: REPEAT_GAP_JUDGE,
+    judgeSpread: JUDGE_SPREAD,
+    judgeMin: judgeScores.length ? Math.min(...judgeScores) : 0,
+    judgeMax: judgeScores.length ? Math.max(...judgeScores) : 0,
+  });
   const resultText = getDatasetResult(language);
 
   const usedShare = (DATASET_SIZE.perRun / DATASET_SIZE.bank) * 100;
@@ -76,9 +87,6 @@ export function DatasetStory() {
       </ol>
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-        <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "ผลลัพธ์: " : "Result: "}
-        </span>
         {resultText}
       </p>
 

@@ -32,38 +32,8 @@ export const NAV_ITEMS_EN: NavItemTranslation[] = [
   },
 ];
 
-export const NAV_ITEMS_TH: NavItemTranslation[] = [
-  {
-    label: "ลีดเดอร์บอร์ด",
-    href: "/",
-    description: "อันดับโมเดล Thai RAG & LLM",
-  },
-  {
-    label: "ระเบียบวิธีวิจัย",
-    href: "/methodology",
-    description: "วิธีสร้างชุดข้อมูลและขั้นตอนทดสอบ",
-  },
-  {
-    label: "เมทริกซ์การวัดผล",
-    href: "/metrics",
-    description: "เกณฑ์การวัดผลและสูตรคำนวณ",
-  },
-  {
-    label: "ส่งโมเดลทดสอบ",
-    href: "/request",
-    description: "เสนอโมเดลหรือไปป์ไลน์เข้าทดสอบ",
-  },
-  {
-    label: "เกี่ยวกับโครงการ",
-    href: "/about",
-    description: "ที่มาและทีมงานผู้ดูแลโครงการ",
-  },
-];
-
-export function getNavItems(): NavItemTranslation[] {
-  // Navigation bar is strictly English across all languages per design guidelines
-  return NAV_ITEMS_EN;
-}
+// Navigation is deliberately English in both languages (locked-nav decision);
+// NAV_ITEMS_EN is the single source consumed by Navbar and MobileMenu.
 
 export const I18N = {
   EN: {
@@ -106,13 +76,15 @@ export const I18N = {
     },
     leaderboard: {
       title: "Benchmark results",
-      subtitle: (dataset: string, count: number, judge: string) =>
-        `${dataset} dev split · ${count.toLocaleString()} QA pairs · scored by ${judge}`,
+      subtitle: (dataset: string, split: string, count: number, judge: string) =>
+        `${dataset} · ${split} split · ${count.toLocaleString()} QA pairs · judged by ${judge}`,
       latestRun: (date: string) => `Latest run ${date}`,
       noRuns: "No runs yet",
       experimentsSoFar: (n: number) => `${n} experiments so far`,
-      sortHint: "The table sorts by overall score by default. Select any metric column to re-sort.",
+      sortHint: "Sorted by overall score. Click a metric column header to re-sort.",
       overallFormula: "Overall = 45% judge + 20% Match TH + 20% F1 + 15% EM",
+      tableCaption:
+        "Leaderboard of evaluated Thai RAG pipelines, ranked by overall score. Metric column headers are sortable; the Model column is not.",
       howBuilt: "How we score",
       filterGeneratorPlaceholder: "Filter by generator model…",
       allModels: "All models",
@@ -129,7 +101,7 @@ export const I18N = {
       noMatch: "No benchmark runs match your filters",
       requestRunRow: "Request a run →",
       mobileLead:
-        "Ranked by overall score. Generation time reflects model output writing only.",
+        "Ranked by overall score; a darker tint means a higher score. Generation time covers answer writing only.",
       genPrefix: "Gen",
       colRank: "#",
       colModel: "Model",
@@ -148,6 +120,14 @@ export const I18N = {
       kicker: "Custom evaluation",
       title: "Request a benchmark run",
       lead: "Tell us which generator, embedding model, and reranker to evaluate. We will email you before scheduling the run.",
+      sending: "Sending…",
+      errorTitle: "Couldn't send the request",
+      errorBody:
+        "Your form is still filled in. Check your connection and try again.",
+      retryBtn: "Try again",
+      unconfiguredTitle: "Online submission isn't set up yet",
+      unconfiguredBody:
+        "Nothing was sent. Open an issue on the GitHub repo with the pipeline you want tested, and we'll pick it up from there.",
       meta: (n: number, judge: string) =>
         `ThaiWikiV4 · ${n} questions · judge ${judge}`,
       pipelineGroup: "Pipeline components",
@@ -167,7 +147,7 @@ export const I18N = {
         `Every run evaluates against the same ${n} ThaiWikiV4 questions, and all results are public.`,
       successTitle: "Request received",
       successLead: (email: string) =>
-        `We will email ${email} before scheduling the run.`,
+        `We'll reply to ${email} before the run is scheduled.`,
       submitAnother: "Submit another request",
       noneFallback: "None",
     },
@@ -181,8 +161,8 @@ export const I18N = {
     nav: {
       menu: "MENU",
       close: "CLOSE",
-      openMenuAria: "Open navigation menu",
-      closeMenuAria: "Close navigation menu",
+      openMenuAria: "เปิดเมนูนำทาง",
+      closeMenuAria: "ปิดเมนูนำทาง",
       benchmarkTag: "SIAM.AI BENCHMARK",
       corpusTag: "THAI RAG CORPUS",
     },
@@ -190,7 +170,7 @@ export const I18N = {
       tagline:
         "SIAM.AI Thai RAG Benchmark: โครงการประเมินผล Thai Retrieval-Augmented Generation แบบเปิด เผยแพร่ผลการทดสอบทันทีที่รันเสร็จสิ้น",
       leaderboard: "ลีดเดอร์บอร์ด",
-      metrics: "เมทริกซ์การวัดผล",
+      metrics: "การวัดผล",
       methodology: "ระเบียบวิธีวิจัย",
       about: "เกี่ยวกับโครงการ",
       requestRun: "ส่งโมเดลเข้าทดสอบ →",
@@ -198,7 +178,7 @@ export const I18N = {
     hero: {
       title: "Thai RAG Benchmark",
       subtitle:
-        "เบนช์มาร์กสำหรับ Thai RAG: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์คำถาม-คำตอบจาก Thai Wikipedia โดยมี LLM judge เป็นผู้ตรวจคำตอบ",
+        "เบนช์มาร์กแบบเปิดสำหรับ Thai RAG: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์คำถาม-คำตอบจาก Thai Wikipedia โดยมี LLM judge เป็นผู้ตรวจคำตอบ",
       exploreBtn: "ดูผลการทดสอบ",
       requestBtn: "ส่งโมเดลเข้าทดสอบ",
       scrollCue: "เลื่อนลงเพื่อดูโมเดลทั้งหมด",
@@ -209,7 +189,7 @@ export const I18N = {
       ragPipelineArch: "ไปป์ไลน์ 3 ส่วน",
       rankPrefix: "อันดับ #",
       stageRetrieval: "1. ค้นหาเอกสาร (Retrieval)",
-      stageReranker: "2. คัดกรองซ้ำ (Reranker)",
+      stageReranker: "2. จัดอันดับซ้ำ (Reranker)",
       stageGenerator: "3. สร้างคำตอบ (Generator)",
       noneDirectDense: "ไม่มี (Dense เท่านั้น)",
       corpusLabel: "ชุดข้อมูล: Thai Wikipedia QA",
@@ -217,13 +197,14 @@ export const I18N = {
     },
     leaderboard: {
       title: "ตารางอันดับการทดสอบ",
-      subtitle: (dataset: string, count: number, judge: string) =>
-        `ชุดข้อมูล ${dataset} · ${count.toLocaleString()} คู่คำถาม-คำตอบ · ตรวจโดย ${judge}`,
+      subtitle: (dataset: string, split: string, count: number, judge: string) =>
+        `ชุดข้อมูล ${dataset} · split ${split} · ${count.toLocaleString()} คู่คำถาม-คำตอบ · ตรวจโดย ${judge}`,
       latestRun: (date: string) => `รันล่าสุดเมื่อ ${date}`,
       noRuns: "ยังไม่มีผลการทดสอบ",
       experimentsSoFar: (n: number) => `ทดสอบแล้ว ${n} การทดลอง`,
-      sortHint:
-        "ตารางเรียงตามคะแนนรวมเป็นค่าเริ่มต้น คุณสามารถคลิกหัวตารางเพื่อเรียงตามคะแนนอื่นได้",
+      sortHint: "เรียงตามคะแนนรวม คลิกหัวคอลัมน์ metric เพื่อเรียงใหม่ได้",
+      tableCaption:
+        "ตารางอันดับไปป์ไลน์ Thai RAG ที่ทดสอบแล้ว เรียงตามคะแนนรวม คลิกหัวคอลัมน์ metric เพื่อเรียงลำดับใหม่ได้ (คอลัมน์โมเดลเรียงไม่ได้)",
       overallFormula: "Overall = 45% Judge + 20% Match TH + 20% F1 + 15% EM",
       howBuilt: "ดูวิธีคิดคะแนนรวม",
       filterGeneratorPlaceholder: "ค้นหาโมเดล Generator…",
@@ -241,7 +222,7 @@ export const I18N = {
       noMatch: "ไม่พบผลการทดลองที่ตรงกับตัวกรอง",
       requestRunRow: "ส่งไปป์ไลน์เข้าทดสอบ →",
       mobileLead:
-        "จัดอันดับตามคะแนนรวม เวลาสร้างคำตอบไม่รวมช่วงค้นหาและตรวจข้อสอบ",
+        "จัดอันดับตามคะแนนรวม เฉดสีเข้มขึ้นคือคะแนนสูงขึ้น เวลาสร้างคำตอบครอบคลุมเฉพาะช่วงเขียนคำตอบ",
       genPrefix: "เวลาสร้างคำตอบ",
       colRank: "#",
       colModel: "โมเดล",
@@ -254,12 +235,19 @@ export const I18N = {
       colPrecisionTh: "Precision TH",
       colRecallTh: "Recall TH",
       colEm: "EM",
-      colLatency: "เวลาสร้างคำตอบ",
+      colLatency: "เวลาสร้างคำตอบ (m:ss)",
     },
     request: {
       kicker: "ส่งโมเดลเข้าทดสอบ",
       title: "ส่งโมเดลหรือไปป์ไลน์เข้าทดสอบ",
       lead: "ระบุโมเดล generator, embedding และ reranker ที่ต้องการให้ทดสอบ เราจะตอบกลับทางอีเมลก่อนเริ่มรัน",
+      sending: "กำลังส่ง…",
+      errorTitle: "ส่งคำขอไม่สำเร็จ",
+      errorBody: "ข้อมูลที่กรอกยังอยู่ครบ ตรวจการเชื่อมต่อแล้วลองส่งใหม่อีกครั้ง",
+      retryBtn: "ลองส่งใหม่",
+      unconfiguredTitle: "ยังไม่เปิดรับคำขอผ่านหน้าเว็บ",
+      unconfiguredBody:
+        "ยังไม่มีข้อมูลถูกส่งออกไป เปิด issue ใน GitHub repo พร้อมระบุไปป์ไลน์ที่ต้องการให้ทดสอบ เราจะรับเรื่องจากที่นั่น",
       meta: (n: number, judge: string) =>
         `ThaiWikiV4 · ${n} คำถาม · ตรวจโดย ${judge}`,
       pipelineGroup: "โมเดลที่ต้องการทดสอบ",
@@ -279,7 +267,7 @@ export const I18N = {
         `ทุกการทดสอบใช้ชุดข้อสอบ ThaiWikiV4 ${n} ข้อชุดเดียวกัน และเปิดเผยผลลัพธ์สู่สาธารณะ`,
       successTitle: "ได้รับคำขอทดสอบเรียบร้อยแล้ว",
       successLead: (email: string) =>
-        `เราจะติดต่อกลับไปที่ ${email} ก่อนจัดคิวรันการทดสอบ`,
+        `เราจะติดต่อกลับไปที่ ${email} ก่อนเริ่มจัดคิวรันการทดสอบ`,
       submitAnother: "ส่งคำขอรายการอื่นเพิ่มเติม",
       noneFallback: "ไม่มี",
     },

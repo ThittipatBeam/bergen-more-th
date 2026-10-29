@@ -98,21 +98,15 @@ export function MetricsOverallScore() {
       </dl>
 
       <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-        <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "ที่มาของน้ำหนักคะแนน: " : "Why these weights: "}
-        </span>
         {isTh
           ? "Judge ได้สัดส่วนสูงสุดเพราะยอมรับคำตอบที่ถูกแต่ใช้คำต่างจากเฉลย ส่วน EM ได้สัดส่วนน้อยที่สุดเพราะคำตอบที่ตอบถูกแต่เรียบเรียงต่างไปจะได้ 0 ทันที"
           : "The judge score receives the largest share because it recognizes correct answers that use different phrasing. EM receives the smallest share because paraphrased answers score zero."}
       </p>
 
       <p className="max-w-[62ch] border-l-2 border-[var(--perf-text)] pl-4 font-sans text-base leading-7 text-[var(--text-secondary)]">
-        <span className="font-semibold text-[var(--text-primary)]">
-          {isTh ? "ไม่นำความเร็วมาคิดในคะแนนรวม: " : "Speed is not part of the overall score: "}
-        </span>
         {isTh
-          ? "ไปป์ไลน์ที่เร็วกว่าไม่ได้แปลว่าตอบถูกกว่า เวลาสร้างคำตอบจึงแยกเป็นคอลัมน์ต่างหาก เพื่อให้คุณเลือกจัดอันดับตามความสำคัญของระบบที่คุณใช้งาน"
-          : "Faster generation does not mean higher accuracy. Generation time stays in its own column so you can sort by speed when latency matters for your use case."}
+          ? "เวลาสร้างคำตอบไม่เข้าสูตรคะแนนรวม และไม่มีผลกับอันดับ คงไว้เป็นคอลัมน์แยกเพื่อให้เรียงตามความเร็วได้เมื่อระบบของคุณสนใจ latency"
+          : "Generation time never enters the overall score and cannot change the ranking. It stays in its own column so you can sort by speed when latency matters for your use case."}
       </p>
 
       <Link

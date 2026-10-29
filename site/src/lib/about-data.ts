@@ -19,8 +19,7 @@ export const ABOUT_CHAPTERS_EN = {
     id: "why",
     number: "01",
     title: "Why we do it",
-    intro:
-      "Two pipelines can report the same score and still behave differently.",
+    intro: "Scores only compare when everything except the models stays fixed.",
     icon: "help",
     accent: { fg: "var(--brand-text)", bg: "var(--surface-brand)" },
   },
@@ -58,8 +57,7 @@ export const ABOUT_CHAPTERS_TH = {
     id: "why",
     number: "01",
     title: "ทำไมถึงจัดทำ Benchmark นี้",
-    intro:
-      "ไปป์ไลน์ RAG สองตัวอาจได้คะแนนเท่ากัน แต่คำตอบที่สร้างออกมาจริงกลับต่างกัน",
+    intro: "คะแนนจะเทียบกันได้ ก็ต่อเมื่อทุกอย่างนอกจากโมเดลถูกล็อกให้คงที่",
     icon: "help",
     accent: { fg: "var(--brand-text)", bg: "var(--surface-brand)" },
   },
@@ -99,7 +97,7 @@ export function getAboutChapters(lang: Language = "EN") {
 export const ABOUT_CHAPTERS = ABOUT_CHAPTERS_EN;
 
 export const WHY_PARAGRAPHS_EN = [
-  "Comparing RAG results across papers is difficult because setups vary widely. Each paper uses its own document split, questions, and scoring prompt, which means similar scores often measure completely different behavior. We keep the document corpus, the 500 questions, the prompt, and the judge model constant, and swap only the models being tested.",
+  "Comparing RAG results across papers is difficult because setups vary widely. Each paper uses its own document split, questions, and scoring prompt, so the same number can describe different questions, different corpora, and a different judge. We keep the document corpus, the 500 questions, the prompt, and the judge model constant, and swap only the models being tested.",
 ] as const;
 
 export const WHY_PARAGRAPHS_TH = [

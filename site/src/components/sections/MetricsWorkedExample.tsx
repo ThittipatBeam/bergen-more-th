@@ -85,7 +85,7 @@ export function MetricsWorkedExample() {
           className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
         >
           {isTh
-            ? "ตัวอย่างการให้คะแนนคำตอบจริงในทุกเมทริกซ์"
+            ? "ตัวอย่างการให้คะแนนคำตอบจริงในทุก metric"
             : "Scoring one sample answer across all metrics"}
         </h2>
       </header>
@@ -216,8 +216,8 @@ export function MetricsWorkedExample() {
 
       <p className="font-sans text-sm text-[var(--text-muted)]">
         {isTh
-          ? "ตัวอย่างนี้จัดทำขึ้นเพื่อสาธิตวิธีการคำนวณ ส่วนผลคะแนนบนลีดเดอร์บอร์ดมาจากการทดสอบจริง"
-          : "This example illustrates the formulas. Leaderboard scores come from actual pipeline runs."}
+          ? "ตัวเลขในตัวอย่างนี้คำนวณจากคำตอบคู่เดียวเพื่อสาธิตสูตร ผลคะแนนบนลีดเดอร์บอร์ดมาจากการรันจริงทั้ง 500 ข้อ"
+          : "The numbers here are computed from this one sample answer; leaderboard scores come from real 500-question runs."}
       </p>
     </section>
   );

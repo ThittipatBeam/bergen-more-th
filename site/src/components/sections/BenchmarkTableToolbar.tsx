@@ -72,10 +72,11 @@ export function BenchmarkTableToolbar({
         </div>
       </div>
 
-      {/* Column Customizer with Filter Icon */}
+      {/* Column customizer and tint legend: the phone list shows a fixed
+          metric set, so both are table-only affordances (md and up). */}
       <div className="flex items-center justify-between sm:justify-end gap-3">
         <div
-          className="hidden lg:flex items-center gap-1.5 whitespace-nowrap"
+          className="hidden md:flex items-center gap-1.5 whitespace-nowrap"
           title={t.overallTintTitle(QUALITY_MIN, QUALITY_MAX)}
         >
           <span className="text-xs font-sans text-[var(--text-muted)]">
@@ -97,7 +98,9 @@ export function BenchmarkTableToolbar({
         <span className="whitespace-nowrap text-xs font-sans text-[var(--text-muted)]">
           <span className="font-mono font-semibold text-[var(--text-secondary)]">{resultsCount}</span> {t.runsCount}
         </span>
-        <BenchmarkColumnFilter columns={columns} onChange={onColumnsChange} />
+        <div className="hidden md:block">
+          <BenchmarkColumnFilter columns={columns} onChange={onColumnsChange} />
+        </div>
       </div>
     </div>
   );

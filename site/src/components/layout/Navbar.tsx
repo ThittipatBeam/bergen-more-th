@@ -10,8 +10,8 @@ import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { NAV_ITEMS_EN } from "@/lib/i18n/translations";
-import { usePageTransition } from "@/components/providers/PageTransitionProvider";
+import { useLanguage } from "@/hooks/use-language";
+import { I18N, NAV_ITEMS_EN } from "@/lib/i18n/translations";
 
 export interface NavItem {
   label: string;
@@ -27,24 +27,19 @@ export function Navbar() {
   const cloudIconRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
-  const { laserRef } = usePageTransition();
+  const { language } = useLanguage();
   // Nav bar remains strictly in English across all language toggles
   const navItems = NAV_ITEMS_EN;
 
-  // Playful spring hover on the cloud logo emblem
+  // Small settle on the cloud logo emblem; the mark lifts, nothing spins.
   const handleLogoHover = useCallback(() => {
     if (!cloudIconRef.current || reducedMotion) return;
-    gsap.fromTo(
-      cloudIconRef.current,
-      { scale: 0.95, rotation: -4 },
-      {
-        scale: 1.08,
-        rotation: 0,
-        y: -2,
-        duration: 0.4,
-        ease: "back.out(2.2)",
-      }
-    );
+    gsap.to(cloudIconRef.current, {
+      scale: 1.05,
+      y: -1.5,
+      duration: 0.25,
+      ease: "power2.out",
+    });
   }, [reducedMotion]);
 
   const handleLogoLeave = useCallback(() => {
@@ -164,7 +159,7 @@ export function Navbar() {
               ref={menuButtonRef}
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open navigation menu"
+              aria-label={I18N[language].nav.openMenuAria}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu-drawer"
               className="md:hidden min-h-[44px] min-w-[44px] -mr-1 flex items-center justify-center text-xs font-semibold tracking-[0.18em] text-[var(--text-primary)] hover:text-[var(--brand-text)]"
@@ -173,13 +168,6 @@ export function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Luminous page transition laser beam glued to the bottom border */}
-        <div
-          ref={laserRef}
-          aria-hidden="true"
-          className="absolute -bottom-[1px] left-0 right-0 h-[2.5px] pointer-events-none origin-left scale-x-0 opacity-0 bg-gradient-to-r from-transparent via-[var(--brand-sky-light)] to-[var(--brand-sky-blue)] shadow-[0_0_12px_var(--brand-sky-light),0_0_2px_var(--brand-sky-blue)]"
-        />
       </header>
 
       {/* Animated GSAP Mobile Drawer */}
