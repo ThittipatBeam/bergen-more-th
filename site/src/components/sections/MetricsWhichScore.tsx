@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { getWhichScoreRows } from "@/lib/metrics-guide";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLanguage } from "@/hooks/use-language";
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, MEASURE_NOTE, SMALL } from "@/lib/design";
 
 /** The cheat sheet: match the reader's question to a metric, then the warning. */
 export function MetricsWhichScore() {
@@ -13,26 +15,20 @@ export function MetricsWhichScore() {
   return (
     <section
       aria-labelledby="which-score-title"
-      className="flex flex-col gap-6 rounded-3xl border border-[var(--border-default)] bg-[var(--background-subtle)] p-6 transition-colors sm:gap-8 sm:p-8"
+      className={`flex flex-col gap-6 ${CARD}`}
     >
-      <header className="flex flex-col gap-2">
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
-          {isTh ? "สรุปวิธีเลือกใช้" : "Cheat sheet"}
-        </span>
-        <h2
-          id="which-score-title"
-          className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
-        >
-          {isTh ? "ควรดูคะแนนตัวไหนดี" : "Which score should I use?"}
-        </h2>
-      </header>
+      <SectionHeading
+        id="which-score-title"
+        kicker={isTh ? "สรุปสั้นๆ" : "Cheat sheet"}
+        title={isTh ? "ควรดูคะแนนตัวไหนดี" : "Which score should I use?"}
+      />
 
       {/* Column headings exist only in the sm+ grid layout. */}
       <div
         aria-hidden="true"
         className="hidden border-b border-[var(--border-default)] pb-2 font-mono text-xs uppercase tracking-wider text-[var(--text-muted)] sm:grid sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.65fr)_minmax(0,1.2fr)] sm:gap-6"
       >
-        <span>{isTh ? "ความต้องการของคุณ…" : "If you need…"}</span>
+        <span>{isTh ? "ถ้าอยากรู้…" : "If you need…"}</span>
         <span>{isTh ? "metric ที่ใช้" : "Use"}</span>
         <span>{isTh ? "เหตุผล" : "Because"}</span>
       </div>
@@ -57,7 +53,7 @@ export function MetricsWhichScore() {
       </ul>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="min-w-0 max-w-[44ch] font-sans text-sm leading-relaxed text-[var(--text-muted)]">
+        <p className={`min-w-0 ${SMALL} ${MEASURE_NOTE} text-[var(--text-muted)]`}>
           {isTh
             ? "ทุกตัวเลขบนลีดเดอร์บอร์ดมาจากการทดสอบบนคำถาม Thai Wikipedia 500 ข้อเดียวกัน"
             : "Every number on the board comes from the same 500 Thai Wikipedia questions."}
@@ -65,13 +61,13 @@ export function MetricsWhichScore() {
         <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
           <Link
             href="/#leaderboard"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--brand-cta)] px-5 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"
+            className={BUTTON_PRIMARY}
           >
             {isTh ? "ดูผลบนลีดเดอร์บอร์ด →" : "View the leaderboard →"}
           </Link>
           <Link
             href="/request"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[var(--border-default)] bg-[var(--background-primary)] px-5 font-sans text-sm font-semibold text-[var(--text-primary)] shadow-2xs transition-colors"
+            className={BUTTON_SECONDARY}
           >
             {isTh ? "ส่งโมเดลเข้าทดสอบ" : "Request a run"}
           </Link>

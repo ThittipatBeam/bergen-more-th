@@ -2,6 +2,7 @@
 
 import { getWhyPanel, getWhyParagraphs } from "@/lib/about-data";
 import { useLanguage } from "@/hooks/use-language";
+import { BODY, MEASURE_BODY } from "@/lib/design";
 
 /** The case for the benchmark, with what stays fixed and what changes. */
 export function AboutWhy() {
@@ -15,7 +16,7 @@ export function AboutWhy() {
         {paragraphs.map((paragraph) => (
           <p
             key={paragraph.slice(0, 32)}
-            className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]"
+            className={`${BODY} ${MEASURE_BODY} text-[var(--text-secondary)]`}
           >
             {paragraph}
           </p>
@@ -28,7 +29,7 @@ export function AboutWhy() {
             <dt className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
               {item.label}
             </dt>
-            <dd className="max-w-[46ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
+            <dd className={`${BODY} ${MEASURE_BODY} text-[var(--text-secondary)]`}>
               {item.value}
             </dd>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type {
   BenchmarkRow,
   ColumnVisibility,
@@ -16,16 +16,21 @@ import { BenchmarkMobileList } from "@/components/sections/BenchmarkMobileList";
 import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
 
+/**
+ * Only the two ranking metrics (Overall, Judge, Match TH) and the pipeline
+ * columns start visible. The lexical diagnostics are one click away in
+ * "Customize Metrics".
+ */
 const DEFAULT_COLUMNS: ColumnVisibility = {
   retriever: true,
   reranker: true,
   q: true,
   judgePct: true,
   mTh: true,
-  f1Th: true,
-  precisionTh: true,
-  recallTh: true,
-  em: true,
+  f1Th: false,
+  precisionTh: false,
+  recallTh: false,
+  em: false,
   latency: true,
 };
 
@@ -42,8 +47,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
   // overflows. Starts false so the CSS baseline (md and up) can paint it
   // on the first frame; the measurement below only ever hides it.
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [fitsWithoutScroll, setFitsWithoutScroll] = useState(false);
-
   const generators = useMemo(
     () => [...new Set(rows.map((r) => r.generator))],
     [rows]
@@ -127,17 +130,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
     });
   }, [filteredRows, sortKey, sortDirection]);
 
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const measure = () =>
-      setFitsWithoutScroll(el.scrollWidth <= el.clientWidth + 1);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [columns]);
-
   return (
     <div className="flex flex-col gap-4">
       {/* Toolbar & Filters */}
@@ -151,30 +143,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
         onColumnsChange={setColumns}
         resultsCount={processedRows.length}
       />
-
-      {/* Definitions at the point of use, not only in title tooltips. */}
-      <p className="text-xs leading-5 text-[var(--text-muted)]">
-        <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          Judge
-        </span>{" "}
-        = {isTh ? "สัดส่วนคำตอบที่ Judge รับรอง" : "answers marked correct by judge"} ·{" "}
-        <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          Match TH
-        </span>{" "}
-        = {isTh ? "มีคำตอบเฉลยครบทุกคำในข้อความ" : "full gold answer found in text"} ·{" "}
-        <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          F1 TH
-        </span>{" "}
-        = {isTh ? "ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall" : "harmonic mean of Thai precision and recall"} ·{" "}
-        <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          EM
-        </span>{" "}
-        = {isTh ? "ตรงกับเฉลยทุกตัวอักษรหลังปรับมาตรฐาน" : "normalized exact match"} ·{" "}
-        <span className="font-mono font-semibold text-[var(--text-secondary)]">
-          {isTh ? "เวลาสร้างคำตอบ" : "Gen Time"}
-        </span>{" "}
-        = {isTh ? "เวลาสร้างข้อความเท่านั้น" : "generation time only"}
-      </p>
 
       {processedRows.length === 0 ? (
         <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] py-12 text-center font-mono">
@@ -199,17 +167,6 @@ export function BenchmarkTable({ rows }: { rows: BenchmarkRow[] }) {
           <BenchmarkMobileList rows={mobileRows} />
 
           <div className="flex flex-col gap-2">
-            <p
-              data-scroll-hint
-              className={`text-xs text-[var(--text-muted)] ${
-                fitsWithoutScroll ? "hidden" : "hidden md:block"
-              }`}
-            >
-              {isTh
-                ? "เลื่อนแถบไปด้านขวาเพื่อดู Judge, Match TH, F1, EM และเวลา Gen →"
-                : "Scroll sideways for Judge, Match TH, F1, EM and Gen Time →"}
-            </p>
-
             {/* Measured Sheet Table Container */}
             <div
               ref={scrollerRef}

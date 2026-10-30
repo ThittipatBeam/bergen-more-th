@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import {
   BAAI,
   Claude,
+  Cohere,
   DeepSeek,
   Google,
   Kimi,
@@ -18,6 +19,18 @@ const RULES: ReadonlyArray<{
 }> = [
   { test: (n) => n.includes("deepseek"), render: (s) => <DeepSeek.Color size={s} /> },
   { test: (n) => n.includes("qwen"), render: (s) => <Qwen.Color size={s} /> },
+  {
+    // Cohere's models are named by family rather than vendor: command-a/r for
+    // generation, embed-v*/embed-multilingual for retrieval, rerank-* for
+    // reranking. "bge-reranker" must not match, hence the leading hyphen.
+    test: (n) =>
+      n.includes("cohere") ||
+      n.includes("command-a") ||
+      n.includes("command-r") ||
+      /(^|\/)embed-(v|multilingual)/.test(n) ||
+      /(^|\/)rerank-/.test(n),
+    render: (s) => <Cohere.Color size={s} />,
+  },
   {
     test: (n) => n.includes("kimi") || n.includes("moonshot"),
     render: (s) => (

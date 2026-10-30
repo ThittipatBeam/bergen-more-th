@@ -2,6 +2,7 @@
 
 import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
+import { BODY, BUTTON_PRIMARY, H2, MEASURE_NOTE } from "@/lib/design";
 
 interface RequestSuccessCardProps {
   generator: string;
@@ -30,15 +31,15 @@ export function RequestSuccessCard({
 
   return (
     <div className="flex flex-col items-center gap-5 rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-brand)]/60 p-6 text-center shadow-xs transition-colors sm:p-8">
-      <div className="grid size-12 place-items-center rounded-full bg-[var(--brand-cta)] text-xl text-white shadow-xs">
+      <div className="animate-in zoom-in-75 grid size-12 place-items-center rounded-full bg-[var(--brand-cta)] text-xl text-white shadow-xs duration-300 motion-reduce:animate-none">
         ✓
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h2 className="font-sans text-2xl font-bold text-[var(--text-primary)]">
+      <div className="animate-in fade-in slide-in-from-bottom-1 flex flex-col gap-2 duration-300 [animation-delay:120ms] motion-reduce:animate-none">
+        <h2 className={`${H2} text-[var(--text-primary)]`}>
           {t.successTitle}
         </h2>
-        <p className="max-w-[52ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
+        <p className={`${BODY} ${MEASURE_NOTE} text-[var(--text-secondary)]`}>
           {isTh ? (
             <>
               เราจะส่งอีเมลไปที่{" "}
@@ -78,7 +79,7 @@ export function RequestSuccessCard({
       <button
         type="button"
         onClick={onReset}
-        className="mt-1 min-h-[44px] cursor-pointer rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"
+        className={`mt-1 cursor-pointer ${BUTTON_PRIMARY}`}
       >
         {t.submitAnother}
       </button>

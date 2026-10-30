@@ -1,125 +1,108 @@
 "use client";
 
 import type { RequestFormState } from "@/types/request";
-import { RequestModelRow } from "@/components/sections/RequestModelRow";
 import { TextField } from "@/components/ui/TextField";
 import { useLanguage } from "@/hooks/use-language";
+import { I18N } from "@/lib/i18n/translations";
+import { H3 } from "@/lib/design";
 
 interface RequestPipelineFieldsProps {
   form: RequestFormState;
   onFieldChange: (key: keyof RequestFormState, value: string) => void;
 }
 
-/** Generator, embedding and optional reranker — free text, with optional links. */
+/**
+ * Generator, embedding and optional reranker — one headed group per stage,
+ * visible labels, name on its own row with the link under it.
+ */
 export function RequestPipelineFields({
   form,
   onFieldChange,
 }: RequestPipelineFieldsProps) {
   const { language } = useLanguage();
+  const t = I18N[language].request;
   const isTh = language === "TH";
 
+  const stages = [
+    {
+      id: "generator",
+      title: t.generatorLabel,
+      required: true,
+      name: form.generatorName,
+      nameId: "generator-name",
+      onName: (value: string) => onFieldChange("generatorName", value),
+      link: form.generatorLink,
+      linkId: "generator-link",
+      onLink: (value: string) => onFieldChange("generatorLink", value),
+      placeholder: t.generatorPlaceholder,
+    },
+    {
+      id: "embedding",
+      title: t.embeddingLabel,
+      required: true,
+      name: form.embeddingName,
+      nameId: "embedding-name",
+      onName: (value: string) => onFieldChange("embeddingName", value),
+      link: form.embeddingLink,
+      linkId: "embedding-link",
+      onLink: (value: string) => onFieldChange("embeddingLink", value),
+      placeholder: t.embeddingPlaceholder,
+    },
+    {
+      id: "reranker",
+      title: t.rerankerLabel,
+      required: false,
+      name: form.rerankerName,
+      nameId: "reranker-name",
+      onName: (value: string) => onFieldChange("rerankerName", value),
+      link: form.rerankerLink,
+      linkId: "reranker-link",
+      onLink: (value: string) => onFieldChange("rerankerLink", value),
+      placeholder: t.rerankerPlaceholder,
+    },
+  ];
+
   return (
-    <section aria-labelledby="pipeline-title" className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h2
-          id="pipeline-title"
-          className="font-sans text-xl font-bold text-[var(--text-primary)] sm:text-2xl"
-        >
-          {isTh ? "โมเดลที่ต้องการทดสอบ" : "The pipeline"}
-        </h2>
-        <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-          {isTh
-            ? "ระบุชื่อโมเดลแต่ละส่วน การใส่ลิงก์โมเดลจะช่วยให้เราโหลด checkpoint ได้ถูกต้องตรงรุ่น"
-            : "Name each model. Adding a link is optional, but helps us load the exact checkpoint."}
-        </p>
-      </div>
+    <div className="flex flex-col gap-10 sm:gap-12">
+      <h2 className={`${H3} text-[var(--text-primary)]`}>
+        {t.pipelineGroup}
+      </h2>
 
-      {/* Rows are divided by a rule, not each wrapped in its own card. */}
-      <div className="flex flex-col [&>*+*]:mt-6 [&>*+*]:border-t [&>*+*]:border-[var(--border-default)] [&>*+*]:pt-6">
-        <RequestModelRow
-          step="01"
-          title={isTh ? "โมเดล Generator" : "Generator model"}
-          required
-        >
+      {stages.map((stage) => (
+        <fieldset key={stage.id} className="flex min-w-0 flex-col gap-4">
+          <legend className="font-sans text-sm font-bold text-[var(--text-primary)]">
+            {stage.title}
+            {stage.required && (
+              <>
+                <span aria-hidden="true" className="ml-0.5 text-[var(--negative)]">
+                  *
+                </span>
+                <span className="sr-only"> (required)</span>
+              </>
+            )}
+          </legend>
           <TextField
-            id="generator-name"
+            id={stage.nameId}
             label={isTh ? "ชื่อโมเดล" : "Model name"}
-            required
-            value={form.generatorName}
-            onChange={(value) => onFieldChange("generatorName", value)}
-            placeholder="e.g. meta-llama/Llama-3.3-70B-Instruct"
+            required={stage.required}
+            value={stage.name}
+            onChange={stage.onName}
+            placeholder={stage.placeholder}
             autoComplete="off"
             maxLength={200}
           />
           <TextField
-            id="generator-link"
-            label={isTh ? "ลิงก์โมเดล (ไม่บังคับ)" : "Model link (optional)"}
+            id={stage.linkId}
+            label={isTh ? "ลิงก์ (ไม่บังคับ)" : "Link (optional)"}
             inputMode="url"
-            value={form.generatorLink}
-            onChange={(value) => onFieldChange("generatorLink", value)}
+            value={stage.link}
+            onChange={stage.onLink}
             placeholder="https://huggingface.co/…"
             autoComplete="off"
             maxLength={500}
           />
-        </RequestModelRow>
-
-        <RequestModelRow
-          step="02"
-          title={isTh ? "โมเดล Embedding" : "Embedding model"}
-          required
-        >
-          <TextField
-            id="embedding-name"
-            label={isTh ? "ชื่อโมเดล" : "Model name"}
-            required
-            value={form.embeddingName}
-            onChange={(value) => onFieldChange("embeddingName", value)}
-            placeholder="e.g. BAAI/bge-m3"
-            autoComplete="off"
-            maxLength={200}
-          />
-          <TextField
-            id="embedding-link"
-            label={isTh ? "ลิงก์โมเดล (ไม่บังคับ)" : "Model link (optional)"}
-            inputMode="url"
-            value={form.embeddingLink}
-            onChange={(value) => onFieldChange("embeddingLink", value)}
-            placeholder="https://huggingface.co/…"
-            autoComplete="off"
-            maxLength={500}
-          />
-        </RequestModelRow>
-
-        <RequestModelRow
-          step="03"
-          title={isTh ? "โมเดล Reranker" : "Reranker model"}
-          hint={
-            isTh
-              ? "เว้นว่างไว้หากต้องการทดสอบเฉพาะ dense retrieval โดยไม่ใช้ reranker"
-              : "Leave blank to run dense retrieval only."
-          }
-        >
-          <TextField
-            id="reranker-name"
-            label={isTh ? "ชื่อโมเดล" : "Model name"}
-            value={form.rerankerName}
-            onChange={(value) => onFieldChange("rerankerName", value)}
-            placeholder="e.g. BAAI/bge-reranker-v2-m3"
-            autoComplete="off"
-            maxLength={200}
-          />
-          <TextField
-            id="reranker-link"
-            label={isTh ? "ลิงก์โมเดล (ไม่บังคับ)" : "Model link (optional)"}
-            inputMode="url"
-            value={form.rerankerLink}
-            onChange={(value) => onFieldChange("rerankerLink", value)}
-            placeholder="https://huggingface.co/…"
-            autoComplete="off"
-            maxLength={500}
-          />
-        </RequestModelRow>
-      </div>
-    </section>
+        </fieldset>
+      ))}
+    </div>
   );
 }

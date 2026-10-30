@@ -11,7 +11,7 @@ export const WHICH_SCORE_ROWS_EN: WhichScoreRow[] = [
   {
     need: "One number to rank pipelines on",
     use: "Overall",
-    why: "Combines all four correctness metrics, weighted toward the judge score.",
+    why: "Combines Judge (80%) with Match TH (20%). The word-overlap metrics are diagnostics only.",
   },
   {
     need: "Check factual correctness",
@@ -20,18 +20,18 @@ export const WHICH_SCORE_ROWS_EN: WhichScoreRow[] = [
   },
   {
     need: "Verify answer key coverage",
-    use: "Recall · F1",
-    why: "Measures what share of reference words appeared in the answer.",
+    use: "Match TH · Recall",
+    why: "Match TH decides 20% of the rank; Recall shows what share of key words appeared.",
   },
   {
     need: "Penalize wordy responses",
     use: "Precision",
-    why: "Extra words not present in the reference lower this score.",
+    why: "Extra words lower this diagnostic, but they do not change the rank.",
   },
   {
     need: "Require exact text match",
     use: "EM",
-    why: "Pass or fail after standard text normalization.",
+    why: "Pass or fail after normalization; a diagnostic with no effect on rank.",
   },
   {
     need: "Compare model latency",
@@ -44,7 +44,7 @@ export const WHICH_SCORE_ROWS_TH: WhichScoreRow[] = [
   {
     need: "ต้องการตัวเลขเดียวสำหรับจัดอันดับ",
     use: "Overall",
-    why: "รวมคะแนนความถูกต้อง 4 ด้านเข้าด้วยกัน โดยให้น้ำหนักกับ judge มากที่สุด",
+    why: "รวม Judge (80%) กับ Match TH (20%) ส่วน metric ด้านคำศัพท์ใช้ประกอบการตรวจสอบเท่านั้น",
   },
   {
     need: "ต้องการตรวจความถูกต้องของเนื้อหา",
@@ -53,18 +53,18 @@ export const WHICH_SCORE_ROWS_TH: WhichScoreRow[] = [
   },
   {
     need: "ต้องการตรวจว่าตอบเนื้อหาเฉลยครบไหม",
-    use: "Recall · F1",
-    why: "วัดว่าคำตอบของโมเดลครอบคลุมคำในเฉลยมากน้อยเพียงใด",
+    use: "Match TH · Recall",
+    why: "Match TH มีน้ำหนัก 20% ของอันดับ ส่วน Recall แสดงว่าครอบคลุมคำในเฉลยมากแค่ไหน",
   },
   {
     need: "ต้องการตรวจว่าโมเดลตอบคำเกินหรือไม่",
     use: "Precision",
-    why: "คำที่โมเดลตอบเกินและไม่มีในเฉลยจะทำให้คะแนนลดลง",
+    why: "คำตอบที่ยาวเกินทำให้คะแนนนี้ลดลง แต่ไม่เปลี่ยนอันดับ",
   },
   {
     need: "ต้องการข้อความที่ตรงกับเฉลยทุกตัวอักษร",
     use: "EM",
-    why: "ข้อความต้องตรงกับเฉลยทุกประการหลังปรับรูปแบบมาตรฐาน",
+    why: "ต้องตรงทุกตัวอักษรหลังปรับมาตรฐาน ใช้ประกอบการตรวจสอบ ไม่มีผลต่ออันดับ",
   },
   {
     need: "ต้องการดูความเร็วในการสร้างคำตอบ",

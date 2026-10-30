@@ -1,17 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/hooks/use-language";
-import { I18N } from "@/lib/i18n/translations";
+import { I18N, NAV_ITEMS_EN } from "@/lib/i18n/translations";
+import { RollingLink } from "@/components/ui/RollingLink";
+import { WIDE_SHELL } from "@/lib/design";
 
 export function SiteFooter() {
   const { language } = useLanguage();
   const t = I18N[language].footer;
+  const pathname = usePathname();
 
   return (
     <footer className="w-full border-t border-[var(--border-default)] bg-[var(--background-primary)] transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className={`${WIDE_SHELL} py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-4`}>
         <div className="flex items-start gap-3 sm:gap-4">
           <Image
             src="/brand-mark.png"
@@ -39,37 +42,33 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-sans">
-          <Link
-            href="/#leaderboard"
-            className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            {t.leaderboard}
-          </Link>
-          <Link
-            href="/metrics"
-            className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            {t.metrics}
-          </Link>
-          <Link
-            href="/methodology"
-            className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            {t.methodology}
-          </Link>
-          <Link
-            href="/about"
-            className="inline-flex items-center min-h-[44px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            {t.about}
-          </Link>
-          <Link
-            href="/request"
-            className="inline-flex items-center min-h-[44px] font-semibold text-[var(--brand-text)] hover:text-[var(--brand-cta-hover)] transition-colors"
-          >
-            {t.requestRun}
-          </Link>
+        <nav
+          aria-label="Footer"
+          className="grid w-full grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-2 lg:gap-x-7"
+        >
+          {NAV_ITEMS_EN.map((item) => {
+            const href = item.href === "/" ? "/#leaderboard" : item.href;
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
+            return (
+              <div key={item.label} className="relative w-fit py-1 sm:py-2">
+                <RollingLink
+                  href={href}
+                  label={item.label}
+                  className={`text-xs font-semibold tracking-[0.16em] transition-colors ${
+                    isActive
+                      ? "text-[var(--brand-text)] font-bold"
+                      : "text-[var(--text-primary)] hover:text-[var(--brand-text)]"
+                  }`}
+                />
+                {isActive && (
+                  <span className="absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-[var(--brand-sky-blue)]" />
+                )}
+              </div>
+            );
+          })}
         </nav>
       </div>
     </footer>

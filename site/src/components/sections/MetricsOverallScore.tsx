@@ -2,41 +2,32 @@
 
 import Link from "next/link";
 import { QUALITY_WEIGHTS } from "@/lib/benchmark-data";
-import { MathFormula } from "@/components/ui/MathFormula";
+import { FAMILY_COLORS } from "@/lib/metrics-styles";
 import { useLanguage } from "@/hooks/use-language";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { CARD, MEASURE_BODY, SMALL } from "@/lib/design";
 
+/** The overall score as one stacked bar: weights you can see. */
 export function MetricsOverallScore() {
   const { language } = useLanguage();
   const isTh = language === "TH";
 
-  const weightRows = [
+  const segments = [
     {
       key: "judgePct" as const,
       metric: "Judge",
+      color: FAMILY_COLORS.quality.fg,
       why: isTh
-        ? "เป็นเกณฑ์เดียวที่ยอมรับคำตอบที่ถูกต้องแม้จะเขียนเรียบเรียงใหม่ด้วยคำอื่น"
-        : "the only metric that accepts correct answers phrased in different words",
+        ? "ตรวจว่าคำตอบถูกต้องตามความหมาย แม้เขียนด้วยคำอื่น"
+        : "checks that the answer is correct, even in different words",
     },
     {
       key: "mTh" as const,
       metric: "Match TH",
+      color: FAMILY_COLORS.containment.fg,
       why: isTh
-        ? "ตรวจว่ามีข้อความเฉลยครบทุกคำในคำตอบ"
-        : "verifies that the entire gold answer appears in the text",
-    },
-    {
-      key: "f1Th" as const,
-      metric: "F1 TH",
-      why: isTh
-        ? "วัดสัดส่วนคำที่ตรงกับเฉลย ให้คะแนนตามสัดส่วนคำที่ตอบถูก"
-        : "measures word overlap, awarding partial credit for matched words",
-    },
-    {
-      key: "em" as const,
-      metric: "Exact Match",
-      why: isTh
-        ? "ข้อความต้องตรงกับเฉลยทุกตัวอักษร เป็นเกณฑ์ที่เข้มงวดที่สุด"
-        : "requires an exact string match, providing the strictest baseline",
+        ? "ตรวจว่าข้อความเฉลยอยู่ครบในคำตอบ"
+        : "checks the whole gold answer appears in the text",
     },
   ];
 
@@ -44,69 +35,70 @@ export function MetricsOverallScore() {
     <section
       id="overall-score"
       aria-labelledby="overall-score-title"
-      className="flex scroll-mt-28 flex-col gap-6 rounded-3xl border border-[var(--border-default)] bg-[var(--background-primary)] p-6 transition-colors sm:gap-8 sm:p-8"
+      className={`flex scroll-mt-28 flex-col gap-6 ${CARD}`}
     >
-      <header className="flex flex-col gap-2">
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--brand-text)]">
-          {isTh ? "คะแนนรวม Overall Score" : "Overall score"}
-        </span>
-        <h2
-          id="overall-score-title"
-          className="font-sans text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl"
-        >
-          {isTh ? "วิธีคำนวณคะแนนรวม" : "How we combine scores"}
-        </h2>
-        <p className="max-w-[58ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-          {isTh
-            ? "ตารางจัดอันดับด้วยคะแนนรวม Overall Score ซึ่งถ่วงน้ำหนักจากเกณฑ์วัดความถูกต้องทั้ง 4 ด้าน"
-            : "The leaderboard ranks pipelines by one overall score, combining the four correctness metrics above with specific weights."}
-        </p>
-      </header>
-
-      {/* One line wherever it fits; below that the expression breaks after the
-          second term so it never scrolls sideways on a phone. */}
-      <MathFormula
-        label={isTh ? "สูตรคำนวณ Overall score" : "Overall score formula"}
-        tex="\text{Overall} = 0.45\,\text{Judge} + 0.20\,M_{th} + 0.20\,F1_{th} + 0.15\,\text{EM}"
-        className="hidden rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] px-2 lg:block"
-      />
-      <MathFormula
-        label={isTh ? "สูตรคำนวณ Overall score" : "Overall score formula"}
-        tex="\begin{aligned}\text{Overall} = {}&0.45\,\text{Judge} + 0.20\,M_{th}\\ &+ 0.20\,F1_{th} + 0.15\,\text{EM}\end{aligned}"
-        className="rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] px-2 lg:hidden"
+      <SectionHeading
+        id="overall-score-title"
+        kicker={isTh ? "คะแนนรวม Overall Score" : "Overall score"}
+        title={isTh ? "วิธีคำนวณคะแนนรวม" : "How we combine scores"}
+        intro={
+          isTh
+            ? "อันดับบนตารางมาจากคะแนนรวมตัวเดียว: 80% Judge และ 20% Match TH ส่วน F1, Precision, Recall และ Exact Match เป็นตัวชี้วัดประกอบที่ไม่เปลี่ยนอันดับ"
+            : "The leaderboard ranks on one number: 80% Judge and 20% Match TH. F1, Precision, Recall and Exact Match stay as diagnostics and never move the rank."
+        }
       />
 
-      <dl className="flex flex-col border-t border-[var(--border-default)]">
-        {weightRows.map((row) => (
-          <div
-            key={row.key}
-            className="flex flex-col gap-1 border-b border-[var(--border-default)] py-4 last:border-b-0 sm:grid sm:grid-cols-[9rem_minmax(0,1fr)] sm:items-baseline sm:gap-6"
-          >
-            <dt className="flex items-baseline gap-2">
-              <span className="font-mono text-base font-bold text-[var(--brand-text)]">
-                {Math.round(QUALITY_WEIGHTS[row.key] * 100)}%
-              </span>
-              <span className="font-sans text-base font-semibold text-[var(--text-primary)]">
-                {row.metric}
-              </span>
-            </dt>
-            <dd className="font-sans text-base leading-7 text-[var(--text-secondary)]">
-              {row.why}
-            </dd>
-          </div>
-        ))}
-      </dl>
-
-      <p className="max-w-[62ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
-        {isTh
-          ? "Judge ได้สัดส่วนสูงสุดเพราะยอมรับคำตอบที่ถูกแต่ใช้คำต่างจากเฉลย ส่วน EM ได้สัดส่วนน้อยที่สุดเพราะคำตอบที่ตอบถูกแต่เรียบเรียงต่างไปจะได้ 0 ทันที"
-          : "The judge score receives the largest share because it recognizes correct answers that use different phrasing. EM receives the smallest share because paraphrased answers score zero."}
+      <p className="rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] px-4 py-3 font-mono text-sm leading-relaxed text-[var(--text-primary)]">
+        Overall = 0.80·Judge + 0.20·Match TH
       </p>
 
-      <p className="max-w-[62ch] border-l-2 border-[var(--perf-text)] pl-4 font-sans text-base leading-7 text-[var(--text-secondary)]">
+      <figure className="flex flex-col gap-4">
+        <div
+          role="img"
+          aria-label={isTh ? "แถบน้ำหนักคะแนนรวม: Judge 80%, Match TH 20%" : "Bar showing weights: Judge 80%, Match TH 20%"}
+          className="flex h-5 w-full overflow-hidden rounded-full border border-[var(--border-default)]"
+        >
+          {segments.map((segment, index) => (
+            <div
+              key={segment.key}
+              aria-hidden="true"
+              className={index > 0 ? "border-l-2 border-[var(--background-primary)]" : undefined}
+              style={{
+                width: `${QUALITY_WEIGHTS[segment.key] * 100}%`,
+                backgroundColor: segment.color,
+              }}
+            />
+          ))}
+        </div>
+        <figcaption className="sr-only">
+          {isTh ? "สัดส่วนน้ำหนักคะแนนรวม" : "Share of the overall score"}
+        </figcaption>
+        <ul className="grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+          {segments.map((segment) => (
+            <li
+              key={segment.key}
+              className="flex items-baseline gap-2 font-sans text-sm leading-relaxed"
+            >
+              <span
+                aria-hidden="true"
+                className="size-2 shrink-0 translate-y-[-1px] self-center rounded-full"
+                style={{ backgroundColor: segment.color }}
+              />
+              <span className="font-semibold text-[var(--text-primary)]">
+                {segment.metric} {Math.round(QUALITY_WEIGHTS[segment.key] * 100)}%
+              </span>
+              <span className="text-[var(--text-secondary)]">
+                — {segment.why}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </figure>
+
+      <p className={`${SMALL} ${MEASURE_BODY} border-l-2 border-[var(--perf-text)] pl-4 text-[var(--text-secondary)]`}>
         {isTh
-          ? "เวลาสร้างคำตอบไม่เข้าสูตรคะแนนรวม และไม่มีผลกับอันดับ คงไว้เป็นคอลัมน์แยกเพื่อให้เรียงตามความเร็วได้เมื่อระบบของคุณสนใจ latency"
-          : "Generation time never enters the overall score and cannot change the ranking. It stays in its own column so you can sort by speed when latency matters for your use case."}
+          ? "เวลาสร้างคำตอบไม่อยู่ในสูตรนี้ เปลี่ยนอันดับไม่ได้ แยกไว้เป็นคอลัมน์ของตัวเอง เผื่ออยากจัดเรียงตามความเร็ว"
+          : "Generation time never enters this formula and cannot change the ranking. It stays in its own column, for sorting by speed."}
       </p>
 
       <Link

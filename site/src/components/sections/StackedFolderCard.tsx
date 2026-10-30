@@ -5,6 +5,46 @@ import { BrandIcon } from "@/components/ui/BrandIcon";
 import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
 
+
+/** One pipeline stage: big icon tile, bold model name, small stage label. */
+function StageRow({
+  model,
+  label,
+  blank = false,
+}: {
+  model: string;
+  label: string;
+  /** True when the stage is skipped: empty tile, muted name. */
+  blank?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-[var(--border-default)]/60 bg-[var(--background-primary)] px-3 py-2.5">
+      <span
+        className={`grid size-9 shrink-0 place-items-center rounded-lg ${
+          blank
+            ? "border border-dashed border-[var(--border-default)] font-mono text-sm text-[var(--text-muted)]"
+            : "bg-[var(--surface-brand)] text-[var(--brand-text)]"
+        }`}
+      >
+        {blank ? "—" : <BrandIcon name={model} size={20} />}
+      </span>
+      <div className="flex min-w-0 flex-col">
+        <span
+          className={`truncate font-sans text-sm font-bold ${
+            blank ? "text-[var(--text-muted)]" : "text-[var(--text-primary)]"
+          }`}
+          title={model}
+        >
+          {model}
+        </span>
+        <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function CategoryIcon({
   icon,
   accent,
@@ -89,7 +129,7 @@ export function StackedFolderCard({
         transform: `translateY(${translateY}px)`,
         zIndex: level + 1,
       }}
-      className={`absolute inset-x-0 top-0 h-[380px] sm:h-[364px] rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${
+      className={`absolute inset-x-0 top-0 h-[432px] sm:h-[420px] rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${
         isActive
           ? "border-[var(--border-default)] bg-[var(--background-primary)] card-shadow"
           : "border-[var(--border-default)]/90 bg-[var(--background-subtle)] hover:border-[var(--brand-sky-light)] cursor-pointer shadow-sm"
@@ -142,9 +182,11 @@ export function StackedFolderCard({
                 {pick.primaryMetric.label}
               </span>
             </div>
-            <p className="text-xs font-mono text-[var(--text-muted)] mt-0.5">
-              {pick.primaryMetric.detail}
-            </p>
+            {pick.primaryMetric.detail && (
+              <p className="text-xs font-mono text-[var(--text-muted)] mt-0.5">
+                {pick.primaryMetric.detail}
+              </p>
+            )}
           </div>
 
           <div className="text-right shrink-0">
@@ -163,59 +205,29 @@ export function StackedFolderCard({
             <span className="flex items-center gap-1.5">
               {c.ragPipelineArch}
             </span>
-            <span className="text-[var(--text-secondary)] font-mono">
-              {c.rankPrefix}{row.rank}
+            <span className="font-mono text-sm font-bold text-[var(--text-primary)]">
+              #{row.rank}
             </span>
           </div>
 
           <div className="flex flex-col gap-1.5">
             {/* Stage 1: Retrieval */}
-            <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
-              <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
-                {c.stageRetrieval}
-              </span>
-              <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
-                <BrandIcon name={row.retriever} size={15} />
-                <span className="truncate" title={row.retriever}>
-                  {row.retriever}
-                </span>
-              </div>
-            </div>
+            <StageRow model={row.retriever} label={c.stageRetrieval} />
 
             {/* Stage 2: Reranker */}
-            <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
-              <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
-                {c.stageReranker}
-              </span>
-              <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
-                <BrandIcon name={row.reranker} size={15} />
-                <span className="truncate" title={row.reranker ?? c.noneDirectDense}>
-                  {row.reranker ?? c.noneDirectDense}
-                </span>
-              </div>
-            </div>
+            <StageRow
+              model={row.reranker ?? c.noneDirectDense}
+              label={c.stageReranker}
+              blank={!row.reranker}
+            />
 
             {/* Stage 3: Generator */}
-            <div className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg bg-[var(--background-primary)] border border-[var(--border-default)]/60 text-xs font-mono">
-              <span className="text-xs uppercase font-semibold text-[var(--text-secondary)] shrink-0">
-                {c.stageGenerator}
-              </span>
-              <div className="flex items-center gap-1.5 min-w-0 font-bold text-[var(--text-primary)]">
-                <BrandIcon name={row.generator} size={15} />
-                <span className="truncate" title={row.generator}>
-                  {row.generator}
-                </span>
-              </div>
-            </div>
+            <StageRow model={row.generator} label={c.stageGenerator} />
           </div>
         </div>
 
         {/* 3. Footer */}
-        <div className="flex items-center justify-between text-xs font-mono pt-0.5 text-[var(--text-muted)]">
-          <span className="text-xs truncate text-[var(--text-muted)]">
-            {c.corpusLabel}
-          </span>
-
+        <div className="flex items-center justify-end text-xs font-mono pt-0.5 text-[var(--text-muted)]">
           <a
             href="#leaderboard"
             className="shrink-0 text-xs font-mono font-semibold text-[var(--brand-text)] hover:text-[var(--brand-cta-hover)] transition-colors min-h-[44px] inline-flex items-center"

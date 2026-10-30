@@ -21,7 +21,7 @@ const parseClock = (clock: string): number | null => {
   );
 };
 
-/** m:ss display for generation time. */
+/** minutes:seconds display for generation time. */
 export const formatClock = (seconds: number | null): string => {
   if (seconds === null) return "—";
   const m = Math.floor(seconds / 60);
@@ -35,27 +35,25 @@ const toPercent = (v: number | undefined | null): number => {
 };
 
 /**
- * Overall score: one ranked number built from the four metrics that measure
- * correctness, weighted by how much each one tells us. Judge carries the most
- * because it is the only score that accepts a correct paraphrase; EM carries the
- * least because a correct answer in different words still scores 0. Weights sum
- * to 1, and generation time stays out — speed is a separate axis, not a
- * quality signal. Keep this in sync with the /metrics explainer.
+ * Overall score: one ranked number built from the two metrics that answer
+ * different questions — Judge (is the meaning right?) and Match TH (does the
+ * whole gold answer appear in the response?). Judge dominates because a
+ * correct answer written in other words, or with extra explanation, still
+ * counts. F1, Precision, Recall and Exact Match stay on the board as
+ * diagnostics: they measure wording and length, not correctness, so they do
+ * not move the rank. Weights sum to 1; generation time stays out entirely —
+ * speed is a separate axis, not a quality signal.
+ * Keep this in sync with the /metrics explainer.
  */
 export const QUALITY_WEIGHTS = {
-  judgePct: 0.45,
+  judgePct: 0.8,
   mTh: 0.2,
-  f1Th: 0.2,
-  em: 0.15,
 } as const;
 
 export const qualityScore = (
-  row: Pick<BenchmarkRow, "judgePct" | "mTh" | "f1Th" | "em">
+  row: Pick<BenchmarkRow, "judgePct" | "mTh">
 ): number =>
-  row.judgePct * QUALITY_WEIGHTS.judgePct +
-  row.mTh * QUALITY_WEIGHTS.mTh +
-  row.f1Th * QUALITY_WEIGHTS.f1Th +
-  row.em * QUALITY_WEIGHTS.em;
+  row.judgePct * QUALITY_WEIGHTS.judgePct + row.mTh * QUALITY_WEIGHTS.mTh;
 
 const toRow = (exp: ExperimentRecord): BenchmarkRow | null => {
   const metrics = exp.metrics ?? {};
@@ -188,31 +186,21 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
             qualityBest.reranker ? " และมี reranker" : ""
           } ครองอันดับหนึ่ง: คะแนน judge ${qualityBest.judgePct.toFixed(
             1
-          )}% · Match TH ${qualityBest.mTh.toFixed(1)} · F1 TH ${qualityBest.f1Th.toFixed(1)}`
+          )}% · Match TH ${qualityBest.mTh.toFixed(1)}`
         : `${qualityBest.generator} with ${qualityBest.retriever}${
             qualityBest.reranker ? " and a reranker" : ""
           } ranks first: ${qualityBest.judgePct.toFixed(
             1
-          )}% judge score, ${qualityBest.mTh.toFixed(1)} Match TH, ${qualityBest.f1Th.toFixed(1)} F1 TH.`,
+          )}% judge score and ${qualityBest.mTh.toFixed(1)} Match TH.`,
       icon: "trophy",
       accent: "var(--brand-text)",
       primaryMetric: {
         label: isTh ? "Overall Score" : "Overall Score",
         value: qualityBest.q.toFixed(1),
-        detail: isTh
-          ? "45% Judge · 20% Match TH · 20% F1 · 15% EM"
-          : "45% judge · 20% Match TH · 20% F1 · 15% EM",
       },
       secondaryMetric: {
         label: isTh ? "คะแนน LLM Judge" : "LLM Judge Score",
         value: `${qualityBest.judgePct.toFixed(1)}%`,
-        detail: isTh
-          ? `ตัดสินโดย ${qualityBest.judgeName ?? "Kimi-K3"}${
-              qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
-            }`
-          : `Scored by ${qualityBest.judgeName ?? "Kimi-K3"}${
-              qualityBest.judgeN ? ` · n=${qualityBest.judgeN}` : ""
-            }`,
       },
       row: qualityBest,
     });
@@ -239,14 +227,10 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
       primaryMetric: {
         label: isTh ? "เวลาสร้างคำตอบ" : "Generation Time",
         value: formatClock(speedBest.genSeconds),
-        detail: isTh
-          ? "เฉพาะเวลาเขียนข้อความ · ไม่รวมค้นหาเอกสารและตรวจคะแนน"
-          : "Generation only · excludes retrieval and scoring",
       },
       secondaryMetric: {
         label: isTh ? "คะแนน Judge" : "Judge Score",
         value: `${speedBest.judgePct.toFixed(1)}%`,
-        detail: isTh ? "สัดส่วนคำตอบที่ judge ตรวจว่าถูก" : "Answers marked correct by judge",
       },
       row: speedBest,
     });
@@ -264,25 +248,19 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
       storyText: isTh
         ? `มีข้อความเฉลยปรากฏครบถ้วนในคำตอบมากที่สุดบนตาราง: Match TH ${matchBest.mTh.toFixed(
             1
-          )} และ F1 TH ${matchBest.f1Th.toFixed(1)}`
+          )}`
         : `Highest gold-answer containment on the board: ${matchBest.mTh.toFixed(
             1
-          )} Match TH and ${matchBest.f1Th.toFixed(1)} F1 TH.`,
+          )} Match TH.`,
       icon: "target",
       accent: "var(--brand-text)",
       primaryMetric: {
         label: isTh ? "Thai M-Score" : "Thai M-Score",
         value: matchBest.mTh.toFixed(1),
-        detail: isTh
-          ? "มีข้อความเฉลยครบถ้วนในคำตอบ"
-          : "Gold answer contained in the response",
       },
       secondaryMetric: {
         label: isTh ? "Thai F1-Score" : "Thai F1-Score",
         value: matchBest.f1Th.toFixed(1),
-        detail: isTh
-          ? "ค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall"
-          : "Harmonic mean of precision and recall",
       },
       row: matchBest,
     });

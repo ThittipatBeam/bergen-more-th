@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { MetricIcon } from "@/components/ui/MetricIcon";
+import { H2, KICKER, LEAD, MEASURE_LEAD } from "@/lib/design";
 import type { MetricIconName } from "@/types/metrics";
 
 interface NumberedChapterProps {
@@ -7,12 +8,10 @@ interface NumberedChapterProps {
   /** Small line above the title, e.g. "Chapter 01" or just "01". */
   kicker: string;
   title: string;
-  /** One sentence introducing the chapter. */
-  intro: string;
+  /** One sentence introducing the chapter. Omit when the content speaks for itself. */
+  intro?: string;
   icon: MetricIconName;
   accent: { fg: string; bg: string };
-  /** "relaxed" gives long reading pages a wider rhythm and larger type. */
-  density?: "compact" | "relaxed";
   children: ReactNode;
 }
 
@@ -24,53 +23,40 @@ export function NumberedChapter({
   intro,
   icon,
   accent,
-  density = "compact",
   children,
 }: NumberedChapterProps) {
-  const relaxed = density === "relaxed";
-
   return (
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className={`flex scroll-mt-28 flex-col border-t border-[var(--border-default)] first-of-type:border-t-0 first-of-type:pt-0 ${
-        relaxed ? "gap-6 pt-8 sm:gap-8 sm:pt-12" : "gap-4 pt-6"
-      }`}
+      className="flex scroll-mt-28 flex-col gap-6 border-t border-[var(--border-default)] pt-8 first-of-type:border-t-0 first-of-type:pt-0 sm:gap-8 sm:pt-12"
     >
-      <header className={`flex items-start ${relaxed ? "gap-4" : "gap-3"}`}>
+      <header className="flex items-start gap-4">
         <span
           aria-hidden="true"
-          className={`grid shrink-0 place-items-center rounded-xl ${
-            relaxed ? "size-12" : "size-10"
-          }`}
+          className="grid size-12 shrink-0 place-items-center rounded-xl"
           style={{ backgroundColor: accent.bg, color: accent.fg }}
         >
-          <MetricIcon name={icon} className={relaxed ? "size-7" : "size-6"} />
+          <MetricIcon name={icon} className="size-7" />
         </span>
-        <div className={`flex min-w-0 flex-col ${relaxed ? "gap-2" : "gap-1"}`}>
+        <div className="flex min-w-0 flex-col gap-2">
           <span
-            className="font-mono text-xs font-bold uppercase tracking-wider"
+            className={`${KICKER}`}
             style={{ color: accent.fg }}
           >
             {kicker}
           </span>
           <h2
             id={`${id}-title`}
-            className={`font-sans font-bold tracking-tight text-[var(--text-primary)] ${
-              relaxed ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"
-            }`}
+            className={`${H2} text-[var(--text-primary)]`}
           >
             {title}
           </h2>
-          <p
-            className={`font-sans text-[var(--text-secondary)] ${
-              relaxed
-                ? "max-w-[58ch] text-base leading-7"
-                : "max-w-2xl text-sm leading-relaxed"
-            }`}
-          >
-            {intro}
-          </p>
+          {intro && (
+            <p className={`${LEAD} ${MEASURE_LEAD} text-[var(--text-secondary)]`}>
+              {intro}
+            </p>
+          )}
         </div>
       </header>
 
