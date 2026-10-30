@@ -11,6 +11,10 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
+    # Copy site/.env.example to site/.env and fill one provider block.
+    # Without this file the request form returns 503 not_configured.
+    env_file:
+      - ./site/.env
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]

@@ -11,6 +11,16 @@ export interface RequestFormState {
   notes: string;
 }
 
+/** Shared submission state for the form and its error banner. */
+export type SubmitStatus =
+  | "idle"
+  | "sending"
+  | "success"
+  | "error"
+  | "rate_limited"
+  | "invalid"
+  | "unconfigured";
+
 export const EMPTY_REQUEST_FORM: RequestFormState = {
   generatorName: "",
   generatorLink: "",

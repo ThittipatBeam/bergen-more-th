@@ -6,9 +6,13 @@
 //
 //   1. REQUEST_WEBHOOK_URL            — any HTTP endpoint (n8n, Zapier,
 //                                        Slack/Discord webhook, Apps Script)
-//   2. RESEND_API_KEY +
+//   2. REQUEST_SMTP_HOST +
+//      REQUEST_SMTP_USER +
+//      REQUEST_SMTP_PASS +
+//      REQUEST_INBOX_EMAIL            — SMTP (Microsoft 365 / Outlook, Gmail…)
+//   3. RESEND_API_KEY +
 //      REQUEST_INBOX_EMAIL            — email to a real inbox
-//   3. NOTION_TOKEN +
+//   4. NOTION_TOKEN +
 //      NOTION_REQUESTS_DATABASE_ID     — a row in a Notion database
 //
 // With no provider configured the route answers 503 { reason: "not_configured" }
@@ -16,6 +20,9 @@
 // green checkmark that was never true.
 
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+export const runtime = "nodejs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -79,6 +86,26 @@ function validate(body: unknown): { errors: Record<string, string>; payload: Req
   return { errors, payload };
 }
 
+function formatBody(payload: RequestPayload): string {
+  return [
+    `Generator: ${payload.generatorName}`,
+    payload.generatorLink && `Generator link: ${payload.generatorLink}`,
+    `Embedding: ${payload.embeddingName}`,
+    payload.embeddingLink && `Embedding link: ${payload.embeddingLink}`,
+    `Reranker: ${payload.rerankerName || "(dense only)"}`,
+    payload.rerankerLink && `Reranker link: ${payload.rerankerLink}`,
+    `Contact: ${payload.contact}`,
+    `Email: ${payload.email}`,
+    payload.notes && `Notes: ${payload.notes}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function subjectFor(payload: RequestPayload): string {
+  return `Benchmark run request: ${payload.generatorName} + ${payload.embeddingName}`;
+}
+
 async function deliverViaWebhook(payload: RequestPayload): Promise<void> {
   const url = process.env.REQUEST_WEBHOOK_URL;
   const response = await fetch(url!, {
@@ -91,6 +118,27 @@ async function deliverViaWebhook(payload: RequestPayload): Promise<void> {
   }
 }
 
+async function deliverViaSmtp(payload: RequestPayload): Promise<void> {
+  const port = Number(process.env.REQUEST_SMTP_PORT ?? 587);
+  const transport = nodemailer.createTransport({
+    host: process.env.REQUEST_SMTP_HOST,
+    port,
+    secure: port === 465,
+    requireTLS: port !== 465,
+    auth: {
+      user: process.env.REQUEST_SMTP_USER,
+      pass: process.env.REQUEST_SMTP_PASS,
+    },
+  });
+  await transport.sendMail({
+    from:
+      process.env.REQUEST_FROM_EMAIL ?? process.env.REQUEST_SMTP_USER,
+    to: process.env.REQUEST_INBOX_EMAIL,
+    subject: subjectFor(payload),
+    text: formatBody(payload),
+  });
+}
+
 async function deliverViaResend(payload: RequestPayload): Promise<void> {
   const to = process.env.REQUEST_INBOX_EMAIL!;
   const response = await fetch("https://api.resend.com/emails", {
@@ -100,22 +148,12 @@ async function deliverViaResend(payload: RequestPayload): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Thai RAG Benchmark <onboarding@resend.dev>",
+      from:
+        process.env.REQUEST_FROM_EMAIL ??
+        "Thai RAG Benchmark <onboarding@resend.dev>",
       to,
-      subject: `Benchmark run request: ${payload.generatorName} + ${payload.embeddingName}`,
-      text: [
-        `Generator: ${payload.generatorName}`,
-        payload.generatorLink && `Generator link: ${payload.generatorLink}`,
-        `Embedding: ${payload.embeddingName}`,
-        payload.embeddingLink && `Embedding link: ${payload.embeddingLink}`,
-        `Reranker: ${payload.rerankerName || "(dense only)"}`,
-        payload.rerankerLink && `Reranker link: ${payload.rerankerLink}`,
-        `Contact: ${payload.contact}`,
-        `Email: ${payload.email}`,
-        payload.notes && `Notes: ${payload.notes}`,
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      subject: subjectFor(payload),
+      text: formatBody(payload),
     }),
   });
   if (!response.ok) {
@@ -154,15 +192,6 @@ async function deliverViaNotion(payload: RequestPayload): Promise<void> {
 }
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  if (rateLimited(ip)) {
-    return NextResponse.json(
-      { ok: false, reason: "rate_limited" },
-      { status: 429 }
-    );
-  }
-
   let body: unknown;
   try {
     body = await request.json();
@@ -181,8 +210,25 @@ export async function POST(request: Request) {
     );
   }
 
+  // Count only valid submissions, so fixing a typo never burns the quota.
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  if (rateLimited(ip)) {
+    return NextResponse.json(
+      { ok: false, reason: "rate_limited" },
+      { status: 429 }
+    );
+  }
+
   const providers: Array<() => Promise<void>> = [];
   if (process.env.REQUEST_WEBHOOK_URL) providers.push(() => deliverViaWebhook(payload));
+  if (
+    process.env.REQUEST_SMTP_HOST &&
+    process.env.REQUEST_SMTP_USER &&
+    process.env.REQUEST_SMTP_PASS &&
+    process.env.REQUEST_INBOX_EMAIL
+  )
+    providers.push(() => deliverViaSmtp(payload));
   if (process.env.RESEND_API_KEY && process.env.REQUEST_INBOX_EMAIL)
     providers.push(() => deliverViaResend(payload));
   if (process.env.NOTION_TOKEN && process.env.NOTION_REQUESTS_DATABASE_ID)

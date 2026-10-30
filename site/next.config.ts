@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   reactCompiler: true,
+  // Nodemailer resolves its transports at runtime; keep it out of the bundle.
+  serverExternalPackages: ["nodemailer"],
   experimental: {
     // Rewrite @lobehub/icons barrel imports to per-icon modules at build time
     optimizePackageImports: ["@lobehub/icons"],

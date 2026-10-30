@@ -1,30 +1,39 @@
 "use client";
 
 import type { FormEvent } from "react";
-import type { RequestFormState } from "@/types/request";
+import type { RequestFormState, SubmitStatus } from "@/types/request";
 import { RequestPipelineFields } from "@/components/sections/RequestPipelineFields";
 import { RequestContactFields } from "@/components/sections/RequestContactFields";
 import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
-
-type SubmitStatus = "idle" | "sending" | "success" | "error" | "unconfigured";
 
 interface RequestFormProps {
   form: RequestFormState;
   onFieldChange: (key: keyof RequestFormState, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   status: SubmitStatus;
+  /** Server-side validation detail, already localized. */
+  invalidDetail?: string | null;
 }
 
 /**
  * The request form: pipeline groups, contact fields, submit — spaced by
  * section, not boxed in one padded mega-panel.
  */
-export function RequestForm({ form, onFieldChange, onSubmit, status }: RequestFormProps) {
+export function RequestForm({
+  form,
+  onFieldChange,
+  onSubmit,
+  status,
+  invalidDetail,
+}: RequestFormProps) {
   const { language } = useLanguage();
   const t = I18N[language].request;
   const sending = status === "sending";
   const failed = status === "error";
+  const rateLimited = status === "rate_limited";
+  const invalid = status === "invalid";
+  const showError = failed || rateLimited || invalid;
 
   return (
     <form
@@ -40,13 +49,24 @@ export function RequestForm({ form, onFieldChange, onSubmit, status }: RequestFo
       </div>
 
       <div data-form-reveal className="flex flex-col gap-4">
-        {failed && (
+        {showError && (
           <p
             role="alert"
             className="rounded-xl bg-[var(--negative-bg)] px-3 py-2 font-sans text-sm leading-relaxed text-[var(--negative)]"
           >
-            <span className="font-semibold">{t.errorTitle}. </span>
-            {t.errorBody}
+            <span className="font-semibold">
+              {rateLimited
+                ? t.rateLimitTitle
+                : invalid
+                  ? t.invalidTitle
+                  : t.errorTitle}
+              .{" "}
+            </span>
+            {rateLimited
+              ? t.rateLimitBody
+              : invalid
+                ? invalidDetail ?? t.invalidBody
+                : t.errorBody}
           </p>
         )}
 
@@ -66,7 +86,7 @@ export function RequestForm({ form, onFieldChange, onSubmit, status }: RequestFo
               </>
             ) : (
               <>
-                {failed ? t.retryBtn : t.submitBtn}
+                {showError ? t.retryBtn : t.submitBtn}
                 <span
                   aria-hidden="true"
                   className="transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"

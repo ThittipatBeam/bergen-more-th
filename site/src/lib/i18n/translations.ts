@@ -121,6 +121,12 @@ export const I18N = {
       errorTitle: "Couldn't send the request",
       errorBody:
         "Your form is still filled in. Check your connection and try again.",
+      rateLimitTitle: "Too many attempts",
+      rateLimitBody:
+        "You can submit 5 requests per 10 minutes. Wait a few minutes and try again — your answers are still here.",
+      invalidTitle: "Check the form",
+      invalidBody:
+        "Check the fields marked with an asterisk, then submit again.",
       retryBtn: "Try again",
       unconfiguredTitle: "Online submission isn't set up yet",
       unconfiguredBody:
@@ -236,6 +242,11 @@ export const I18N = {
       sending: "กำลังส่ง…",
       errorTitle: "ส่งคำขอไม่สำเร็จ",
       errorBody: "ข้อมูลที่กรอกยังอยู่ครบ ตรวจการเชื่อมต่อแล้วลองส่งใหม่อีกครั้ง",
+      rateLimitTitle: "ส่งถี่เกินไป",
+      rateLimitBody:
+        "ส่งได้ 5 ครั้งใน 10 นาที รอสักครู่แล้วลองใหม่ ข้อมูลที่กรอกยังอยู่ครบ",
+      invalidTitle: "ตรวจข้อมูลอีกครั้ง",
+      invalidBody: "ตรวจช่องที่มีเครื่องหมาย * แล้วส่งอีกครั้ง",
       retryBtn: "ลองส่งใหม่",
       unconfiguredTitle: "ยังไม่เปิดรับคำขอผ่านหน้าเว็บ",
       unconfiguredBody:

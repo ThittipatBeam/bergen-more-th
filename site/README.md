@@ -42,12 +42,71 @@ configured provider — set exactly one of these in the environment:
 
 | Provider | Env vars |
 |---|---|
-| Any HTTP webhook (n8n, Zapier, Slack, Apps Script) | `REQUEST_WEBHOOK_URL` |
-| Email via Resend | `RESEND_API_KEY` + `REQUEST_INBOX_EMAIL` |
+| SMTP (Microsoft 365 / Outlook, Gmail) | `REQUEST_SMTP_HOST` + `REQUEST_SMTP_PORT` + `REQUEST_SMTP_USER` + `REQUEST_SMTP_PASS` + `REQUEST_INBOX_EMAIL`, optional `REQUEST_FROM_EMAIL` |
+| Any HTTP webhook (n8n, Zapier, Power Automate, Slack, Apps Script) | `REQUEST_WEBHOOK_URL` |
+| Email via Resend | `RESEND_API_KEY` + `REQUEST_INBOX_EMAIL`, optional `REQUEST_FROM_EMAIL` |
 | Notion database row | `NOTION_TOKEN` + `NOTION_REQUESTS_DATABASE_ID` |
 
+Priority is webhook → SMTP → Resend → Notion; only the first one runs.
 With none configured the endpoint returns `503 not_configured` and the form
 shows the honest fallback (open a GitHub issue) instead of faking success.
+
+### Deploying the request form
+
+1. Copy the template and fill one provider block:
+
+   ```bash
+   cp site/.env.example site/.env
+   ```
+
+2. Start the container. `docker-compose.yml` passes `site/.env` in via
+   `env_file`, so the variables reach the Node server at runtime:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. Submit the form, or test the endpoint directly:
+
+   ```bash
+   curl -X POST https://your-domain/api/request \
+     -H 'Content-Type: application/json' \
+     -d '{"generatorName":"test","embeddingName":"test","contact":"me","email":"me@example.com"}'
+   ```
+
+   `{"ok":true}` means it was delivered; `502` means the provider rejected it
+   and the reason is in the server log.
+
+**Google Sheets (no SMTP, no mailbox password).** Use the webhook provider with
+the ready-made Apps Script in `scripts/google-sheet-webhook.gs`:
+
+1. Create a Google Sheet → **Extensions → Apps Script**, paste the script, save.
+2. **Deploy → New deployment → Web app**; execute as **Me**, access **Anyone**.
+3. Copy the `/exec` URL into `site/.env` as `REQUEST_WEBHOOK_URL`.
+4. Restart the site; each submission appends one row.
+
+The script can also require a `?token=` query parameter — set `SHARED_TOKEN`
+in the script and append the same token to the URL. Apps Script quotas are
+ample for a request form; the webhook has priority over email providers.
+
+**Company Outlook / Microsoft 365.** `REQUEST_SMTP_HOST=smtp.office365.com`,
+port `587`, and the mailbox credentials. SMTP AUTH is disabled by default on
+new Microsoft 365 tenants; an admin enables it per mailbox:
+
+```powershell
+Set-CASMailbox -Identity benchmark@yourdomain -SmtpClientAuthenticationDisabled $false
+```
+
+If the tenant blocks SMTP AUTH entirely, use the webhook provider with a Power
+Automate flow ("When an HTTP request is received" → "Send an email (V2)"),
+which sends from the Outlook mailbox without SMTP.
+
+**Resend.** `onboarding@resend.dev` only delivers to the account owner. Set
+`REQUEST_FROM_EMAIL` to an address on a verified domain for production.
+
+The endpoint needs a Node runtime — `output: "standalone"` (the Docker image)
+or `next start`. Static hosting will not run it. The rate limit is in-memory
+and per process, so it does not coordinate across replicas or survive restarts.
 
 ## Conventions
 

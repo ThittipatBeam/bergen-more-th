@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { ABOUT_LINKS } from "@/lib/about-data";
 import { EMPTY_REQUEST_FORM } from "@/types/request";
-import type { RequestFormState } from "@/types/request";
+import type { RequestFormState, SubmitStatus } from "@/types/request";
 import { RequestForm } from "@/components/sections/RequestForm";
 import { RequestReveal } from "@/components/sections/RequestReveal";
 import { RequestSuccessCard } from "@/components/sections/RequestSuccessCard";
@@ -13,13 +13,38 @@ import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
 import { BODY, BUTTON_PRIMARY, H2, MEASURE_NOTE, PAGE_SHELL } from "@/lib/design";
 
-type SubmitStatus = "idle" | "sending" | "success" | "error" | "unconfigured";
-
 export function RequestSection() {
   const [form, setForm] = useState<RequestFormState>(EMPTY_REQUEST_FORM);
   const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [invalidDetail, setInvalidDetail] = useState<string | null>(null);
   const { language } = useLanguage();
   const t = I18N[language].request;
+  const isTh = language === "TH";
+
+  const fieldMessage = (key: string): string => {
+    switch (key) {
+      case "email":
+        return isTh
+          ? "อีเมลไม่ถูกต้อง ตรวจสอบรูปแบบแล้วลองอีกครั้ง"
+          : "The email address isn't valid. Check it and try again.";
+      case "contact":
+        return isTh
+          ? "ต้องระบุชื่อคุณหรือทีม"
+          : "Your name or team is required.";
+      case "generatorName":
+        return isTh
+          ? "ต้องระบุชื่อโมเดล Generator"
+          : "Generator model name is required.";
+      case "embeddingName":
+        return isTh
+          ? "ต้องระบุชื่อโมเดล Embedding"
+          : "Embedding model name is required.";
+      default:
+        return isTh
+          ? "ตรวจช่องที่มีเครื่องหมาย * แล้วส่งอีกครั้ง"
+          : "Check the fields marked * and submit again.";
+    }
+  };
 
   const handleFieldChange = (key: keyof RequestFormState, value: string) =>
     setForm((previous) => ({ ...previous, [key]: value }));
@@ -39,7 +64,22 @@ export function RequestSection() {
       }
       // 503 means no delivery provider is configured on the server: say so
       // instead of pretending the request went somewhere.
-      setStatus(response.status === 503 ? "unconfigured" : "error");
+      if (response.status === 503) {
+        setStatus("unconfigured");
+      } else if (response.status === 429) {
+        setStatus("rate_limited");
+      } else if (response.status === 400) {
+        const detail = await response.json().catch(() => null);
+        const keys = Object.keys(
+          (detail as { errors?: Record<string, string> } | null)?.errors ?? {}
+        );
+        setInvalidDetail(
+          keys.length > 0 ? keys.map(fieldMessage).join(" ") : null
+        );
+        setStatus("invalid");
+      } else {
+        setStatus("error");
+      }
     } catch {
       // Network failure: the form keeps its values so nothing is lost.
       setStatus("error");
@@ -103,6 +143,7 @@ export function RequestSection() {
           onFieldChange={handleFieldChange}
           onSubmit={handleSubmit}
           status={status}
+          invalidDetail={invalidDetail}
         />
       </div>
     </RequestReveal>
