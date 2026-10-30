@@ -27,19 +27,49 @@ export const runtime = "nodejs";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Best-effort in-memory rate limit: 5 submissions per IP per 10 minutes.
- *  Single-instance only; the outer spam barrier is provider-side validation. */
+ *  Single-instance only; the outer spam barrier is provider-side validation.
+ *  The map is capped so spoofed headers cannot grow memory without bound. */
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_KEYS = 5000;
 const hitsByIp = new Map<string, number[]>();
+
+/** Prefer the proxy's verified client IP; never trust the first XFF entry alone. */
+function clientIp(request: Request): string {
+  return (
+    request.headers.get("cf-connecting-ip")?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown"
+  );
+}
 
 function rateLimited(ip: string): boolean {
   const now = Date.now();
   const recent = (hitsByIp.get(ip) ?? []).filter(
     (t) => now - t < RATE_LIMIT_WINDOW_MS
   );
-  if (recent.length >= RATE_LIMIT_MAX) return true;
+  if (recent.length >= RATE_LIMIT_MAX) {
+    hitsByIp.set(ip, recent);
+    return true;
+  }
   recent.push(now);
   hitsByIp.set(ip, recent);
+
+  // Drop stale keys once the map grows past the cap.
+  if (hitsByIp.size > RATE_LIMIT_MAX_KEYS) {
+    for (const [key, times] of hitsByIp) {
+      if (!times.some((t) => now - t < RATE_LIMIT_WINDOW_MS)) {
+        hitsByIp.delete(key);
+      }
+    }
+    while (hitsByIp.size > RATE_LIMIT_MAX_KEYS) {
+      const oldest = hitsByIp.keys().next().value;
+      if (oldest === undefined) break;
+      hitsByIp.delete(oldest);
+    }
+  }
+
   return false;
 }
 
@@ -53,6 +83,8 @@ interface RequestPayload {
   contact: string;
   email: string;
   notes?: string;
+  /** Honeypot: real users never fill this; bots usually do. */
+  website?: string;
 }
 
 /** Trim, cap length, drop control characters. One helper for every field. */
@@ -76,6 +108,7 @@ function validate(body: unknown): { errors: Record<string, string>; payload: Req
     contact: clean(raw.contact, 200),
     email: clean(raw.email, 254),
     notes: clean(raw.notes, 2000),
+    website: clean(raw.website, 200),
   };
 
   const errors: Record<string, string> = {};
@@ -210,9 +243,13 @@ export async function POST(request: Request) {
     );
   }
 
+  // Honeypot hit: accept without delivering, so bots get no useful signal.
+  if (payload.website) {
+    return NextResponse.json({ ok: true });
+  }
+
   // Count only valid submissions, so fixing a typo never burns the quota.
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  const ip = clientIp(request);
   if (rateLimited(ip)) {
     return NextResponse.json(
       { ok: false, reason: "rate_limited" },

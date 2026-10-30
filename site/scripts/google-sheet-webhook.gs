@@ -35,6 +35,13 @@ function doPost(e) {
     return text("invalid json");
   }
 
+  // A cell starting with = + - @ is executed as a formula by Sheets.
+  // Prefix with an apostrophe so submitted text always stays text.
+  const cell = (value) => {
+    const s = String(value == null ? "" : value);
+    return /^[=+\-@]/.test(s) ? "'" + s : s;
+  };
+
   const book = SpreadsheetApp.getActiveSpreadsheet();
   const sheet =
     book.getSheetByName(SHEET_NAME) || book.insertSheet(SHEET_NAME);
@@ -56,15 +63,15 @@ function doPost(e) {
 
   sheet.appendRow([
     new Date(),
-    data.generatorName || "",
-    data.generatorLink || "",
-    data.embeddingName || "",
-    data.embeddingLink || "",
-    data.rerankerName || "(dense only)",
-    data.rerankerLink || "",
-    data.contact || "",
-    data.email || "",
-    data.notes || "",
+    cell(data.generatorName),
+    cell(data.generatorLink),
+    cell(data.embeddingName),
+    cell(data.embeddingLink),
+    cell(data.rerankerName || "(dense only)"),
+    cell(data.rerankerLink),
+    cell(data.contact),
+    cell(data.email),
+    cell(data.notes),
   ]);
 
   return text(JSON.stringify({ ok: true }));

@@ -39,8 +39,25 @@ export function RequestForm({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="flex flex-col gap-12 sm:gap-16"
+      className="relative flex flex-col gap-12 sm:gap-16"
     >
+      {/* Honeypot: visually hidden, skipped by keyboard and screen readers.
+          Bots that fill it get a silent success and nothing is delivered. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+      >
+        <label htmlFor="company-website">Company website</label>
+        <input
+          id="company-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={form.website}
+          onChange={(event) => onFieldChange("website", event.target.value)}
+        />
+      </div>
       <div data-form-reveal>
         <RequestPipelineFields form={form} onFieldChange={onFieldChange} />
       </div>

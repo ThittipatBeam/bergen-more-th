@@ -9,6 +9,8 @@ export interface RequestFormState {
   contact: string;
   email: string;
   notes: string;
+  /** Honeypot field. Must stay empty; bots that fill it are dropped. */
+  website: string;
 }
 
 /** Shared submission state for the form and its error banner. */
@@ -31,4 +33,5 @@ export const EMPTY_REQUEST_FORM: RequestFormState = {
   contact: "",
   email: "",
   notes: "",
+  website: "",
 };
