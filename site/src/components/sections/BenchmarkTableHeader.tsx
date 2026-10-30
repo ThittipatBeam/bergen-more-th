@@ -20,7 +20,7 @@ const COLUMN_DEFS_EN: Record<SortKey, string> = {
   rank: "Rank: position by overall score",
   retriever: "Embedding: dense retrieval model",
   reranker: "Reranker: optional second-pass model",
-  q: "Overall score: 45% judge, 20% Match TH, 20% F1 TH, and 15% Exact Match (0 to 100). Determines leaderboard rank. Excludes generation time.",
+  q: "Overall score: 80% Judge + 20% Match TH (0 to 100). Determines leaderboard rank. Excludes generation time and the diagnostic lexical metrics.",
   judgePct:
     "Judge Score: percentage of answers marked correct by the LLM judge (0 to 100).",
   mTh: "Match TH: percentage of questions where the full gold answer appears inside the model answer, ignoring whitespace.",
@@ -31,14 +31,14 @@ const COLUMN_DEFS_EN: Record<SortKey, string> = {
     "Recall TH: percentage of reference Thai word tokens included in the model answer.",
   em: "Exact Match: percentage of questions where the normalized answer equals a reference.",
   latency:
-    "Generation time: time spent generating text across all 500 answers (m:ss), excluding retrieval and scoring.",
+    "Generation time: time spent generating text across all 500 answers (minutes:seconds), excluding retrieval and scoring.",
 };
 
 const COLUMN_DEFS_TH: Record<SortKey, string> = {
   rank: "อันดับ: จัดอันดับตามคะแนนรวม Overall Score",
   retriever: "Embedding: โมเดล dense retrieval สำหรับค้นหาเอกสาร",
   reranker: "Reranker: โมเดลจัดอันดับซ้ำรอบสอง (ไม่บังคับ)",
-  q: "คะแนนรวม: 45% Judge + 20% Match TH + 20% F1 TH + 15% Exact Match (เต็ม 100) ไม่รวมเวลาสร้างคำตอบ",
+  q: "คะแนนรวม: 80% Judge + 20% Match TH (เต็ม 100) ใช้จัดอันดับ ไม่รวมเวลาสร้างคำตอบและ metric ด้านคำศัพท์ที่ใช้ประกอบการตรวจสอบ",
   judgePct:
     "คะแนน Judge: สัดส่วนคำตอบที่ LLM judge ตัดสินว่าถูกต้อง (เต็ม 100)",
   mTh: "Match TH: สัดส่วนคำถามที่มีข้อความเฉลยครบถ้วนในคำตอบ โดยไม่นับช่องว่าง",

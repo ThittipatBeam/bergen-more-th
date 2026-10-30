@@ -55,7 +55,7 @@ export interface BenchmarkRow {
 export interface ChampionMetric {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
 }
 
 export type MetricColumnKey =

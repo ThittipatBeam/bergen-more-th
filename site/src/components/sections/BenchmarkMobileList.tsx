@@ -92,11 +92,9 @@ export function BenchmarkMobileList({ rows }: BenchmarkMobileListProps) {
                 </div>
               </div>
 
-              <dl className="grid grid-cols-4 gap-2 border-t border-[var(--border-default)]/60 pt-3">
+              <dl className="grid grid-cols-2 gap-2 border-t border-[var(--border-default)]/60 pt-3">
                 <MobileMetric label={t.colJudge} value={row.judgePct} />
                 <MobileMetric label={t.colMatchTh} value={row.mTh} />
-                <MobileMetric label={t.colF1Th} value={row.f1Th} />
-                <MobileMetric label={t.colEm} value={row.em} />
               </dl>
 
               <p className="font-mono text-[11px] text-[var(--text-muted)]">

@@ -1,7 +1,6 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { JUDGE_N } from "@/lib/benchmark-data";
 import type { RequestFormState } from "@/types/request";
 import { RequestPipelineFields } from "@/components/sections/RequestPipelineFields";
 import { RequestContactFields } from "@/components/sections/RequestContactFields";
@@ -17,49 +16,67 @@ interface RequestFormProps {
   status: SubmitStatus;
 }
 
-/** The whole request form: pipeline, reply-to details, notes, submit. */
+/**
+ * The request form: pipeline groups, contact fields, submit — spaced by
+ * section, not boxed in one padded mega-panel.
+ */
 export function RequestForm({ form, onFieldChange, onSubmit, status }: RequestFormProps) {
   const { language } = useLanguage();
   const t = I18N[language].request;
   const sending = status === "sending";
   const failed = status === "error";
 
-  const submitLabel = sending
-    ? t.sending
-    : failed
-      ? t.retryBtn
-      : t.submitBtn;
-
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col gap-8 rounded-3xl border border-[var(--border-default)] bg-[var(--background-primary)] p-6 shadow-xs sm:p-8"
+      noValidate
+      className="flex flex-col gap-12 sm:gap-16"
     >
-      <RequestPipelineFields form={form} onFieldChange={onFieldChange} />
-      <RequestContactFields form={form} onFieldChange={onFieldChange} />
+      <div data-form-reveal>
+        <RequestPipelineFields form={form} onFieldChange={onFieldChange} />
+      </div>
+      <div data-form-reveal>
+        <RequestContactFields form={form} onFieldChange={onFieldChange} />
+      </div>
 
-      <div className="flex flex-col gap-4 border-t border-[var(--border-default)] pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex max-w-[52ch] flex-col gap-2">
-          <p className="font-sans text-sm leading-relaxed text-[var(--text-muted)]">
-            {t.disclaimer(JUDGE_N)}
+      <div data-form-reveal className="flex flex-col gap-4">
+        {failed && (
+          <p
+            role="alert"
+            className="rounded-xl bg-[var(--negative-bg)] px-3 py-2 font-sans text-sm leading-relaxed text-[var(--negative)]"
+          >
+            <span className="font-semibold">{t.errorTitle}. </span>
+            {t.errorBody}
           </p>
-          {failed && (
-            <p
-              role="alert"
-              className="rounded-xl bg-[var(--negative-bg)] px-3 py-2 font-sans text-sm leading-relaxed text-[var(--negative)]"
-            >
-              <span className="font-semibold">{t.errorTitle}. </span>
-              {t.errorBody}
-            </p>
-          )}
+        )}
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <button
+            type="submit"
+            disabled={sending}
+            className="group inline-flex min-h-[48px] w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)] disabled:cursor-wait disabled:opacity-70 sm:w-auto"
+          >
+            {sending ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none"
+                />
+                {t.sending}
+              </>
+            ) : (
+              <>
+                {failed ? t.retryBtn : t.submitBtn}
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                >
+                  →
+                </span>
+              </>
+            )}
+          </button>
         </div>
-        <button
-          type="submit"
-          disabled={sending}
-          className="min-h-[44px] shrink-0 cursor-pointer rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)] disabled:cursor-wait disabled:opacity-70"
-        >
-          {submitLabel}
-        </button>
       </div>
     </form>
   );

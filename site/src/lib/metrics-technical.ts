@@ -132,7 +132,7 @@ M_{th} &= \frac{100}{N} \sum_{i=1}^{N} \max_{r}\\
 
   generation: {
     reading: "The clock covers all 500 answers, not one.",
-    key: "generation_time (h:mm:ss stored, m:ss displayed)",
+    key: "generation_time (h:mm:ss stored, minutes:seconds displayed)",
     formula: {
       tex: String.raw`T_{\mathrm{gen}} = t_{\mathrm{stop}} - t_{\mathrm{start}}`,
       symbols: [

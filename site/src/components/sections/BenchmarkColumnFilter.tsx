@@ -19,7 +19,7 @@ const COLUMN_OPTIONS: ColumnOption[] = [
   { key: "precisionTh", labelEn: "Thai Precision (Precision_th)", labelTh: "Thai Precision (Precision_th)", category: "metric" },
   { key: "recallTh", labelEn: "Thai Recall (Recall_th)", labelTh: "Thai Recall (Recall_th)", category: "metric" },
   { key: "em", labelEn: "Exact Match (EM)", labelTh: "Exact Match (EM)", category: "metric" },
-  { key: "latency", labelEn: "Generation Time (m:ss)", labelTh: "เวลาสร้างคำตอบ (m:ss)", category: "metric" },
+  { key: "latency", labelEn: "Generation Time (min:sec)", labelTh: "เวลาสร้างคำตอบ (นาที:วินาที)", category: "metric" },
   { key: "retriever", labelEn: "Embedding (Retriever)", labelTh: "โมเดล Embedding", category: "pipeline" },
   { key: "reranker", labelEn: "Reranker Model", labelTh: "โมเดล Reranker", category: "pipeline" },
 ];
@@ -142,8 +142,13 @@ export function BenchmarkColumnFilter({
             ))}
           </div>
 
-          <div className="pt-2 border-t border-[var(--border-default)]/60 text-xs font-mono text-[var(--text-muted)] text-center">
-            {isTh ? "เลือกเพื่อแสดงหรือซ่อนคอลัมน์ในตาราง" : "Check or uncheck to show/hide columns"}
+          <div className="flex flex-col gap-1 pt-2 border-t border-[var(--border-default)]/60 text-center font-mono text-xs leading-relaxed text-[var(--text-muted)]">
+            <span>Overall = Judge 80% + Match TH 20%</span>
+            <span>
+              {isTh
+                ? "metric อื่นไม่เปลี่ยนอันดับ"
+                : "Other metrics never move the rank."}
+            </span>
           </div>
         </div>
       )}

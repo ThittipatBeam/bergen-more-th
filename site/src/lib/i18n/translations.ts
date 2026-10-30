@@ -47,7 +47,7 @@ export const I18N = {
     },
     footer: {
       tagline:
-        "SIAM.AI Thai RAG Benchmark: open evaluation of Thai retrieval-augmented generation pipelines. New runs are published as they complete.",
+        "SIAM GPT Thai RAG Benchmark: open evaluation of Thai retrieval-augmented generation pipelines",
       leaderboard: "Leaderboard",
       metrics: "Metrics",
       methodology: "Methodology",
@@ -57,7 +57,7 @@ export const I18N = {
     hero: {
       title: "Thai RAG Benchmark",
       subtitle:
-        "Open benchmark for Thai retrieval-augmented generation. Evaluates retriever, reranker, and generator combinations against Thai Wikipedia QA, with answers scored by an LLM judge.",
+        "Thai RAG Benchmark: tests embedding, reranker, and generator models on question-answer pairs from Thai Wikipedia",
       exploreBtn: "Explore Leaderboard",
       requestBtn: "Request a Benchmark",
       scrollCue: "Scroll to explore models",
@@ -70,22 +70,19 @@ export const I18N = {
       stageRetrieval: "1. Retrieval",
       stageReranker: "2. Reranker",
       stageGenerator: "3. Generator",
-      noneDirectDense: "None (Direct Dense)",
+      noneDirectDense: "None",
       corpusLabel: "Corpus: Thai Wikipedia QA",
       fullResults: "Full results ↓",
     },
     leaderboard: {
       title: "Benchmark results",
-      subtitle: (dataset: string, split: string, count: number, judge: string) =>
-        `${dataset} · ${split} split · ${count.toLocaleString()} QA pairs · judged by ${judge}`,
       latestRun: (date: string) => `Latest run ${date}`,
       noRuns: "No runs yet",
       experimentsSoFar: (n: number) => `${n} experiments so far`,
-      sortHint: "Sorted by overall score. Click a metric column header to re-sort.",
-      overallFormula: "Overall = 45% judge + 20% Match TH + 20% F1 + 15% EM",
+      readMetrics: "Metrics guide →",
+      readMethodology: "How it's built →",
       tableCaption:
         "Leaderboard of evaluated Thai RAG pipelines, ranked by overall score. Metric column headers are sortable; the Model column is not.",
-      howBuilt: "How we score",
       filterGeneratorPlaceholder: "Filter by generator model…",
       allModels: "All models",
       modelLabel: "Model:",
@@ -101,8 +98,8 @@ export const I18N = {
       noMatch: "No benchmark runs match your filters",
       requestRunRow: "Request a run →",
       mobileLead:
-        "Ranked by overall score; a darker tint means a higher score. Generation time covers answer writing only.",
-      genPrefix: "Gen",
+        "Ranked by overall score (Judge 80% + Match TH 20%). A darker tint means a higher score. Generation time is shown in minutes:seconds and covers answer writing only.",
+      genPrefix: "Gen time",
       colRank: "#",
       colModel: "Model",
       colRetriever: "Embedding",
@@ -114,7 +111,7 @@ export const I18N = {
       colPrecisionTh: "Precision TH",
       colRecallTh: "Recall TH",
       colEm: "EM",
-      colLatency: "Gen (m:ss)",
+      colLatency: "Gen time (min:sec)",
     },
     request: {
       kicker: "Custom evaluation",
@@ -142,9 +139,7 @@ export const I18N = {
       emailLabel: "Your Email",
       nameLabel: "Your Name or Team",
       notesLabel: "Additional Notes or API Endpoint instructions",
-      submitBtn: "Request this run →",
-      disclaimer: (n: number) =>
-        `Every run evaluates against the same ${n} ThaiWikiV4 questions, and all results are public.`,
+      submitBtn: "Request this run",
       successTitle: "Request received",
       successLead: (email: string) =>
         `We'll reply to ${email} before the run is scheduled.`,
@@ -168,7 +163,7 @@ export const I18N = {
     },
     footer: {
       tagline:
-        "SIAM.AI Thai RAG Benchmark: โครงการประเมินผล Thai Retrieval-Augmented Generation แบบเปิด เผยแพร่ผลการทดสอบทันทีที่รันเสร็จสิ้น",
+        "SIAM GPT Thai RAG Benchmark: โครงการประเมินผล Thai Retrieval-Augmented Generation",
       leaderboard: "ลีดเดอร์บอร์ด",
       metrics: "การวัดผล",
       methodology: "ระเบียบวิธีวิจัย",
@@ -178,7 +173,7 @@ export const I18N = {
     hero: {
       title: "Thai RAG Benchmark",
       subtitle:
-        "เบนช์มาร์กแบบเปิดสำหรับ Thai RAG: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์คำถาม-คำตอบจาก Thai Wikipedia โดยมี LLM judge เป็นผู้ตรวจคำตอบ",
+        "Thai RAG Benchmark: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์คำถาม-คำตอบจาก Thai Wikipedia",
       exploreBtn: "ดูผลการทดสอบ",
       requestBtn: "ส่งโมเดลเข้าทดสอบ",
       scrollCue: "เลื่อนลงเพื่อดูโมเดลทั้งหมด",
@@ -191,22 +186,19 @@ export const I18N = {
       stageRetrieval: "1. ค้นหาเอกสาร (Retrieval)",
       stageReranker: "2. จัดอันดับซ้ำ (Reranker)",
       stageGenerator: "3. สร้างคำตอบ (Generator)",
-      noneDirectDense: "ไม่มี (Dense เท่านั้น)",
+      noneDirectDense: "ไม่มี",
       corpusLabel: "ชุดข้อมูล: Thai Wikipedia QA",
       fullResults: "ดูตารางทั้งหมด ↓",
     },
     leaderboard: {
       title: "ตารางอันดับการทดสอบ",
-      subtitle: (dataset: string, split: string, count: number, judge: string) =>
-        `ชุดข้อมูล ${dataset} · split ${split} · ${count.toLocaleString()} คู่คำถาม-คำตอบ · ตรวจโดย ${judge}`,
       latestRun: (date: string) => `รันล่าสุดเมื่อ ${date}`,
       noRuns: "ยังไม่มีผลการทดสอบ",
       experimentsSoFar: (n: number) => `ทดสอบแล้ว ${n} การทดลอง`,
-      sortHint: "เรียงตามคะแนนรวม คลิกหัวคอลัมน์ metric เพื่อเรียงใหม่ได้",
+      readMetrics: "อ่านเรื่อง metric →",
+      readMethodology: "ดูวิธีสร้างชุดข้อมูล →",
       tableCaption:
         "ตารางอันดับไปป์ไลน์ Thai RAG ที่ทดสอบแล้ว เรียงตามคะแนนรวม คลิกหัวคอลัมน์ metric เพื่อเรียงลำดับใหม่ได้ (คอลัมน์โมเดลเรียงไม่ได้)",
-      overallFormula: "Overall = 45% Judge + 20% Match TH + 20% F1 + 15% EM",
-      howBuilt: "ดูวิธีคิดคะแนนรวม",
       filterGeneratorPlaceholder: "ค้นหาโมเดล Generator…",
       allModels: "โมเดลทั้งหมด",
       modelLabel: "โมเดล:",
@@ -222,7 +214,7 @@ export const I18N = {
       noMatch: "ไม่พบผลการทดลองที่ตรงกับตัวกรอง",
       requestRunRow: "ส่งไปป์ไลน์เข้าทดสอบ →",
       mobileLead:
-        "จัดอันดับตามคะแนนรวม เฉดสีเข้มขึ้นคือคะแนนสูงขึ้น เวลาสร้างคำตอบครอบคลุมเฉพาะช่วงเขียนคำตอบ",
+        "จัดอันดับตามคะแนนรวม (Judge 80% + Match TH 20%) เฉดสีเข้มขึ้นคือคะแนนสูงขึ้น เวลาสร้างคำตอบแสดงเป็นนาที:วินาที และครอบคลุมเฉพาะช่วงเขียนคำตอบ",
       genPrefix: "เวลาสร้างคำตอบ",
       colRank: "#",
       colModel: "โมเดล",
@@ -235,12 +227,12 @@ export const I18N = {
       colPrecisionTh: "Precision TH",
       colRecallTh: "Recall TH",
       colEm: "EM",
-      colLatency: "เวลาสร้างคำตอบ (m:ss)",
+      colLatency: "เวลาสร้างคำตอบ (นาที:วินาที)",
     },
     request: {
       kicker: "ส่งโมเดลเข้าทดสอบ",
       title: "ส่งโมเดลหรือไปป์ไลน์เข้าทดสอบ",
-      lead: "ระบุโมเดล generator, embedding และ reranker ที่ต้องการให้ทดสอบ เราจะตอบกลับทางอีเมลก่อนเริ่มรัน",
+      lead: "บอกมาว่าอยากให้ทดสอบ generator, embedding และ reranker ตัวไหน เราจะเมลกลับก่อนเริ่มรัน",
       sending: "กำลังส่ง…",
       errorTitle: "ส่งคำขอไม่สำเร็จ",
       errorBody: "ข้อมูลที่กรอกยังอยู่ครบ ตรวจการเชื่อมต่อแล้วลองส่งใหม่อีกครั้ง",
@@ -257,18 +249,16 @@ export const I18N = {
       embeddingPlaceholder: "เช่น BAAI/bge-m3 หรือ text-embedding-3-small",
       rerankerLabel: "โมเดล Reranker (ไม่บังคับ)",
       rerankerPlaceholder:
-        "เช่น BAAI/bge-reranker-v2-m3 หรือเว้นว่างหากใช้เฉพาะ Dense",
+        "เช่น BAAI/bge-reranker-v2-m3 หรือเว้นว่างถ้าใช้เฉพาะ Dense",
       contactGroup: "ข้อมูลสำหรับติดต่อกลับ",
       emailLabel: "อีเมลของคุณ",
-      nameLabel: "ชื่อของคุณหรือทีม",
+      nameLabel: "ชื่อคุณหรือทีม",
       notesLabel: "หมายเหตุเพิ่มเติม หรือรายละเอียด endpoint",
-      submitBtn: "ส่งคำขอทดสอบนี้ →",
-      disclaimer: (n: number) =>
-        `ทุกการทดสอบใช้ชุดข้อสอบ ThaiWikiV4 ${n} ข้อชุดเดียวกัน และเปิดเผยผลลัพธ์สู่สาธารณะ`,
-      successTitle: "ได้รับคำขอทดสอบเรียบร้อยแล้ว",
+      submitBtn: "ส่งคำขอทดสอบนี้",
+      successTitle: "รับคำขอแล้ว",
       successLead: (email: string) =>
-        `เราจะติดต่อกลับไปที่ ${email} ก่อนเริ่มจัดคิวรันการทดสอบ`,
-      submitAnother: "ส่งคำขอรายการอื่นเพิ่มเติม",
+        `จะเมลกลับไปที่ ${email} ก่อนจัดคิวรัน`,
+      submitAnother: "ส่งคำขอเพิ่มอีก",
       noneFallback: "ไม่มี",
     },
     about: {

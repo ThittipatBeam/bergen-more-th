@@ -12,6 +12,7 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useLanguage } from "@/hooks/use-language";
 import { I18N, NAV_ITEMS_EN } from "@/lib/i18n/translations";
+import { WIDE_SHELL } from "@/lib/design";
 
 export interface NavItem {
   label: string;
@@ -57,7 +58,7 @@ export function Navbar() {
     <>
       {/* Full-Width Frosted Glass Navbar Header */}
       <header className="fixed top-0 inset-x-0 z-40 w-full select-none border-b border-[var(--border-default)] bg-[var(--background-canvas)]/85 backdrop-blur-md transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-2.5 sm:py-3 flex items-center justify-between">
+        <div className={`${WIDE_SHELL} py-2.5 sm:py-3 flex items-center justify-between`}>
           {/* Left: Brand with Official Cloud Logo */}
           <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <Link

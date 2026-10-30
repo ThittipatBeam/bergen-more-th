@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { JUDGE_NAME, JUDGE_N } from "@/lib/benchmark-data";
 import { ABOUT_LINKS } from "@/lib/about-data";
 import { EMPTY_REQUEST_FORM } from "@/types/request";
 import type { RequestFormState } from "@/types/request";
 import { RequestForm } from "@/components/sections/RequestForm";
+import { RequestReveal } from "@/components/sections/RequestReveal";
 import { RequestSuccessCard } from "@/components/sections/RequestSuccessCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
+import { BODY, BUTTON_PRIMARY, H2, MEASURE_NOTE, PAGE_SHELL } from "@/lib/design";
 
 type SubmitStatus = "idle" | "sending" | "success" | "error" | "unconfigured";
 
@@ -50,16 +51,9 @@ export function RequestSection() {
     setForm(EMPTY_REQUEST_FORM);
   };
 
-  return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-4 pt-28 pb-20 sm:gap-12 sm:px-8 md:px-12">
-      <PageHeader
-        kicker={t.kicker}
-        title={t.title}
-        lead={t.lead}
-        meta={t.meta(JUDGE_N, JUDGE_NAME)}
-      />
-
-      {status === "success" ? (
+  if (status === "success") {
+    return (
+      <div className={PAGE_SHELL}>
         <RequestSuccessCard
           generator={form.generatorName}
           embedding={form.embeddingName}
@@ -67,34 +61,50 @@ export function RequestSection() {
           email={form.email}
           onReset={handleReset}
         />
-      ) : status === "unconfigured" ? (
+      </div>
+    );
+  }
+
+  if (status === "unconfigured") {
+    return (
+      <div className={PAGE_SHELL}>
         <div
           role="status"
           className="flex flex-col items-start gap-4 rounded-3xl border border-[var(--border-strong)] bg-[var(--surface-brand)]/60 p-6 sm:p-8"
         >
-          <h2 className="font-sans text-xl font-bold text-[var(--text-primary)]">
+          <h2 className={`${H2} text-[var(--text-primary)]`}>
             {t.unconfiguredTitle}
           </h2>
-          <p className="max-w-[52ch] font-sans text-base leading-7 text-[var(--text-secondary)]">
+          <p className={`${BODY} ${MEASURE_NOTE} text-[var(--text-secondary)]`}>
             {t.unconfiguredBody}
           </p>
           <a
             href={ABOUT_LINKS.code}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-[44px] items-center rounded-xl bg-[var(--brand-cta)] px-6 font-sans text-sm font-semibold text-white shadow-2xs transition-colors hover:bg-[var(--brand-cta-hover)]"
+            className={BUTTON_PRIMARY}
           >
             GitHub ↗
           </a>
         </div>
-      ) : (
+      </div>
+    );
+  }
+
+  return (
+    <RequestReveal>
+      <div className={PAGE_SHELL}>
+        <div data-form-reveal>
+          <PageHeader title={t.title} lead={t.lead} />
+        </div>
+
         <RequestForm
           form={form}
           onFieldChange={handleFieldChange}
           onSubmit={handleSubmit}
           status={status}
         />
-      )}
-    </div>
+      </div>
+    </RequestReveal>
   );
 }

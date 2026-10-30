@@ -23,7 +23,6 @@ export function MethodologyChapter({
       intro={chapter.intro}
       icon={chapter.icon}
       accent={chapter.accent}
-      density="relaxed"
     >
       {children}
     </NumberedChapter>

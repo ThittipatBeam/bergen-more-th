@@ -24,6 +24,10 @@ export type MetricIconName =
   | "timer"
   | "expand_more"
   | "help"
+  | "bolt"
+  | "search"
+  | "mail"
+  | "edit_note"
   | "folder_open"
   | "handshake"
   | "cloud";
@@ -71,19 +75,6 @@ export interface MetricDefinition {
   direction: "higher" | "lower";
   simple: MetricSimpleCopy;
   technical: MetricTechnicalCopy;
-}
-
-export interface MetricChapter {
-  id: "is-it-right" | "word-overlap" | "speed";
-  number: string;
-  title: string;
-  icon: MetricIconName;
-  /** One line, at most twelve words. */
-  intro: string;
-  /** The sentence that closes the chapter, after the cards. */
-  payoff: string;
-  family: MetricFamily;
-  metrics: MetricId[];
 }
 
 /** One PyThaiNLP word piece in the worked example. */
