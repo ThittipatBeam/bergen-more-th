@@ -23,9 +23,11 @@ npm run lint       # eslint
 
 `sync-data` copies `../experiments_data.json` (the scan dump produced by
 `python scripts/scan_experiments.py` in the repo root) into
-`src/lib/experiments-data.json`. The committed snapshot is used as-is when the
-root file is absent. The leaderboard, champion cards, and all derived numbers
-in the copy are computed from that file at module scope.
+`src/lib/experiments-data.json`. Both data files are untracked: when the root
+file is absent, the existing local copy is kept as-is, and a fresh clone
+falls back to an empty board until a dump is dropped in. The leaderboard,
+champion cards, and all derived numbers in the copy are computed from that
+file at module scope.
 
 ## Routes
 
