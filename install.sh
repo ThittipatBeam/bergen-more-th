@@ -141,6 +141,11 @@ fi
 # ---------------------------------------------------------------------------
 # Dependency installation
 # ---------------------------------------------------------------------------
+# Ensure C++ extensions (like fasttext on Python 3.13 with GCC 13+) have <cstdint> included for uint64_t.
+# Note: cstdint is a C++ header only; pure C compilation (e.g. pytrec_eval) requires stdint.h or clean CFLAGS.
+export CFLAGS="${CFLAGS:-} -include stdint.h"
+export CXXFLAGS="${CXXFLAGS:-} -include cstdint"
+
 echo ">>> Installing core requirements..."
 run_install -r requirements.txt
 
