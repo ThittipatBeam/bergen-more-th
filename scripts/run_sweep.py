@@ -200,12 +200,14 @@ def execute_command(cmd: list, log_file: Path, env: dict):
     exp_folder = None
     already_exists = False
 
-    with open(log_file, "w", encoding="utf-8") as lf:
+    with open(log_file, "w", encoding="utf-8", errors="replace") as lf:
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             bufsize=1,
             env=env,
         )
@@ -284,9 +286,13 @@ def run_sweep():
         log_warn("No enabled runs to execute. Enable runs in sweep_config.yaml or use --list.")
         return
 
+    # Inherit sample count from defaults if not specified on CLI
+    if args.pilot is None and ("samples" in defaults or "pilot" in defaults):
+        args.pilot = int(defaults.get("samples") or defaults.get("pilot"))
+
     mode_str = "Matrix Grid" if matrix_cfg.get("enabled", False) else "Explicit List"
     if args.pilot:
-        mode_str += f" | {YELLOW}PILOT SMOKE-TEST: {args.pilot} Q{RESET}"
+        mode_str += f" | {YELLOW}SAMPLE SIZE: {args.pilot} Q{RESET}"
 
     print("=" * 80)
     print(f"{BOLD}{CYAN}BERGEN-TH Batch Sweep Runner ({mode_str}){RESET}")
@@ -374,7 +380,7 @@ def run_sweep():
         tag = f" [PILOT: {args.pilot} Q]" if args.pilot else ""
         log_info(f"[{idx}/{len(active_runs)}] Starting:{tag} {BOLD}{run_name}{RESET}")
         cmd_args = build_command_args(r, defaults, force=args.force, pilot=args.pilot)
-        cmd = ["python3", "bergen.py"] + cmd_args
+        cmd = [sys.executable, "bergen.py"] + cmd_args
         env = prepare_environment(r, defaults, pilot=args.pilot)
         print(f"Executing: {' '.join(shlex.quote(c) for c in cmd)}")
         print(f"Environment: LLM_MODEL={env.get('LLM_MODEL', '-')} EMBED_MODEL={env.get('EMBED_MODEL', '-')} RERANK_MODEL={env.get('RERANK_MODEL', 'none')}")
@@ -385,7 +391,10 @@ def run_sweep():
         elapsed = time.time() - t0
         elapsed_str = f"{int(elapsed // 60)}m {int(elapsed % 60)}s"
 
-        if ret_code == 0:
+        if already_exists and r.get("skip_existing", defaults.get("skip_existing", True)):
+            log_info(f"Experiment already completed on disk. Skipping {run_name}.")
+            status = "SKIPPED"
+        elif ret_code == 0:
             log_success(f"Finished {run_name} in {elapsed_str}")
             status = "SUCCESS"
 
@@ -393,7 +402,7 @@ def run_sweep():
             should_judge = args.judge or (r.get("run_judge", defaults.get("run_judge", False)) and not args.no_judge)
             if should_judge and exp_folder and os.path.exists(exp_folder):
                 split = r.get("split", defaults.get("split", "dev"))
-                judge_cmd = ["python3", "evaluate.py", "--folder", exp_folder, "--split", split, "--judge"]
+                judge_cmd = [sys.executable, "evaluate.py", "--folder", exp_folder, "--split", split, "--judge"]
                 judge_model = r.get("judge_model", defaults.get("judge_model"))
                 if judge_model:
                     judge_cmd.extend(["--judge_model", judge_model])
@@ -415,9 +424,7 @@ def run_sweep():
                 except Exception as e:
                     log_warn(f"Failed to auto-scan experiments: {e}")
 
-        elif already_exists and r.get("skip_existing", defaults.get("skip_existing", True)):
-            log_info(f"Experiment already completed on disk. Skipping {run_name}.")
-            status = "SKIPPED"
+
         else:
             log_error(f"Run {run_name} failed with exit code {ret_code}. Check log: {log_file}")
             status = "FAILED"
@@ -451,7 +458,7 @@ def run_sweep():
     print("\n" + "=" * 80)
     log_info("Overall Benchmark Results:")
     try:
-        subprocess.run(["python3", "print_results.py", "--folder", "experiments/", "--format=tiny"])
+        subprocess.run([sys.executable, "print_results.py", "--folder", "experiments/", "--format=tiny"])
     except Exception as e:
         log_warn(f"Could not print results table: {e}")
     print("=" * 80 + "\n")

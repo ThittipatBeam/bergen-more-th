@@ -17,9 +17,14 @@ else:
 
 @hydra.main(config_path="config", config_name=CONFIG, version_base="1.2")
 def main(config):
-
     from modules.rag import RAG
-    rag = RAG(**config, config=config)
+    try:
+        rag = RAG(**config, config=config)
+    except OSError as e:
+        if "already exists" in str(e):
+            print(f"[SKIP] Experiment {e}")
+            return
+        raise
 
     if 'train' in config:
         rag.train()

@@ -1,0 +1,112 @@
+# ==============================================================================
+# BERGEN-TH: Cohere Comprehensive Sweep Configuration
+# ==============================================================================
+# Combinations: 3 Generators x 5 Embeddings x 7 Rerankers = 105 total runs
+#
+# Generators:
+#   - command-a-03-2025 (Command-A)
+#   - command-a-plus-05-2026 (Command-A-Plus)
+#   - command-a-reasoning-08-2025 (Command-A-Reasoning)
+#
+# Embeddings:
+#   - embed-v5.0-pro
+#   - embed-v5.0-fast
+#   - embed-v4.0
+#   - embed-multilingual-v3.0
+#   - embed-multilingual-light-v3.0
+#
+# Rerankers:
+#   - rerank-v5.0-pro
+#   - rerank-v5.0-fast
+#   - rerank-v4.0-pro
+#   - rerank-v4.0-fast
+#   - rerank-v3.5
+#   - rerank-multilingual-v3.0
+#   - No-Rerank (null)
+#
+# Usage:
+#   python3 scripts/run_sweep.py --config cohere_sweep_config.yaml --list
+#   python3 scripts/run_sweep.py --config cohere_sweep_config.yaml --dry-run
+#   python3 scripts/run_sweep.py --config cohere_sweep_config.yaml --filter "Command-A +"
+# ==============================================================================
+
+defaults:
+  dataset: "mkqa/thai_wiki_v4_qa.retrieve_th"
+  
+  # Cohere API Retriever Base
+  retriever: "api-embed-cohere-embed-multilingual-v3"
+  retriever_model: "embed-v5.0-pro"
+  retrieve_top_k: 100
+  
+  # Cohere API Reranker Base
+  reranker: "api-rerank-cohere-rerank-v3"
+  reranker_model: "rerank-v5.0-pro"
+  rerank_top_k: 10
+  
+  # Generator Base
+  generator: "cohere_command_a"
+  generator_model: "command-a-03-2025"
+  generation_top_k: 5
+
+  # Evaluation
+  run_judge: true             # Automatically evaluate with LLM-as-judge
+  judge_model: "KIMI-K3"
+  
+  thai_metrics: true          # Thai-aware lexical metrics (M_th, F1_th, Precision_th, Recall_th)
+  auto_scan: true             # Update experiments_data.json
+  skip_existing: true         # Skip if experiment already completed
+  split: "dev"
+
+matrix:
+  enabled: true
+
+  generators:
+    - name: "Command-A"
+      config: "cohere_command_a"
+      model: "command-a-03-2025"
+    - name: "Command-A-Plus"
+      config: "cohere_command_a"
+      model: "command-a-plus-05-2026"
+    - name: "Command-A-Reasoning"
+      config: "cohere_command_a"
+      model: "command-a-reasoning-08-2025"
+
+  retrievers:
+    - name: "Embed-v5.0-Pro"
+      config: "api-embed-cohere-embed-multilingual-v3"
+      model: "embed-v5.0-pro"
+    - name: "Embed-v5.0-Fast"
+      config: "api-embed-cohere-embed-multilingual-v3"
+      model: "embed-v5.0-fast"
+    - name: "Embed-v4.0"
+      config: "api-embed-cohere-embed-multilingual-v3"
+      model: "embed-v4.0"
+    - name: "Embed-Multilingual-v3.0"
+      config: "api-embed-cohere-embed-multilingual-v3"
+      model: "embed-multilingual-v3.0"
+    - name: "Embed-Multilingual-Light-v3.0"
+      config: "api-embed-cohere-embed-multilingual-v3"
+      model: "embed-multilingual-light-v3.0"
+
+  rerankers:
+    - name: "Rerank-v5.0-Pro"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-v5.0-pro"
+    - name: "Rerank-v5.0-Fast"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-v5.0-fast"
+    - name: "Rerank-v4.0-Pro"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-v4.0-pro"
+    - name: "Rerank-v4.0-Fast"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-v4.0-fast"
+    - name: "Rerank-v3.5"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-v3.5"
+    - name: "Rerank-Multilingual-v3.0"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-multilingual-v3.0"
+    - name: "No-Rerank"
+      config: null
+      model: null

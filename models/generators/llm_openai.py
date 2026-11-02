@@ -41,7 +41,10 @@ class OpenAI(Generator):
         # LiteLLM, local proxy) works; per-component env vars let the LLM sit
         # on a different server than the embedder/reranker
         base_url = base_url or os.environ.get('LLM_BASE_URL') or None
-        api_key = os.environ.get('LLM_API_KEY') or os.environ.get('OPENAI_API_KEY')
+        if base_url and 'cohere.ai' in base_url:
+            api_key = os.environ.get('COHERE_API_KEY') or os.environ.get('LLM_API_KEY') or os.environ.get('OPENAI_API_KEY')
+        else:
+            api_key = os.environ.get('LLM_API_KEY') or os.environ.get('OPENAI_API_KEY')
         self._base_url = base_url
         self._api_key = api_key
         self.client = None
@@ -88,13 +91,17 @@ class OpenAI(Generator):
                 for i, content in enumerate(pool.map(self._generate_one, messages)):
                     responses[i] = content
         # systemic-failure guard: a single dead question must not kill the run,
-        # but a dead endpoint (every request in the batch failed) must - writing
+        # but a dead endpoint (many consecutive failed requests) must - writing
         # an all-empty output silently would be worse than crashing
         if messages and all(r == '' for r in responses):
-            raise RuntimeError(
-                f'all {len(messages)} generation requests in this batch failed - '
-                f'the endpoint is likely down or misconfigured; aborting instead of '
-                f'writing empty answers')
+            self.consecutive_failures = getattr(self, 'consecutive_failures', 0) + len(messages)
+            if self.consecutive_failures >= 10:
+                raise RuntimeError(
+                    f'{self.consecutive_failures} consecutive generation requests failed - '
+                    f'the endpoint is likely down or misconfigured; aborting instead of '
+                    f'writing empty answers')
+        else:
+            self.consecutive_failures = 0
         n_failed = sum(1 for r in responses if r == '')
         if n_failed:
             print(f'WARNING: {n_failed}/{len(messages)} generation requests failed in this batch '

@@ -1,0 +1,87 @@
+# ==============================================================================
+# BERGEN-TH: Hybrid Cross-Sweep Configuration (Gateway vs Cohere)
+# ==============================================================================
+# Cross-pairs Gateway models (DeepSeek, Qwen) with Cohere models
+# 2 Generators x 2 Retrievers x 2 Rerankers = 8 runs total
+#
+# Generators:
+#   - DeepSeek-V4.1F (Gateway API via openai_compatible)
+#   - Command-A-Plus (Cohere API via cohere_command_a)
+#
+# Retrievers:
+#   - QWEN3-EMBED-8B (Gateway API via api-embed-openai-compatible)
+#   - embed-v5.0-pro (Cohere API via api-embed-cohere-embed-multilingual-v3)
+#
+# Rerankers:
+#   - BAAI/bge-reranker-v2-m3 (Gateway API via api-rerank-openai-compatible)
+#   - rerank-v4.0-pro (Cohere API via api-rerank-cohere-rerank-v3)
+#
+# Usage:
+#   python3 scripts/run_sweep.py --config hybrid_sweep_config.yaml --list
+#   python3 scripts/run_sweep.py --config hybrid_sweep_config.yaml --dry-run
+#   python3 scripts/run_sweep.py --config hybrid_sweep_config.yaml --pilot 1
+#   python3 scripts/run_sweep.py --config hybrid_sweep_config.yaml
+# ==============================================================================
+
+defaults:
+  dataset: "mkqa/thai_wiki_v4_qa.retrieve_th"
+  samples: 500                # Fixed to 500 questions (matching previous benchmark runs)
+  
+  # Default Retriever Base
+  retriever: "api-embed-openai-compatible"
+  retriever_model: "QWEN3-EMBED-8B"
+  retrieve_top_k: 100
+  
+  # Default Reranker Base
+  reranker: "api-rerank-openai-compatible"
+  reranker_model: "BAAI/bge-reranker-v2-m3"
+  rerank_top_k: 10
+  
+  # Default Generator Base
+  generator: "openai_compatible"
+  generator_model: "DEEPSEEK-V4.1F"
+  generation_top_k: 5
+
+  # Factuality Judge (Evaluated via Gateway endpoint)
+  run_judge: true
+  judge_model: "KIMI-K3"
+
+  thai_metrics: true
+  auto_scan: true
+  skip_existing: true
+  split: "dev"
+
+matrix:
+  enabled: true
+
+  generators:
+    - name: "DeepSeek-V4.1F (Gateway)"
+      generator: "openai_compatible"
+      model: "DEEPSEEK-V4.1F"
+
+    - name: "Command-A-Plus (Cohere)"
+      generator: "cohere_command_a"
+      model: "command-a-plus-05-2026"
+
+    # Optional 3rd generator (uncomment to test 12 runs instead of 8):
+    # - name: "Qwen3.6-27B (Gateway)"
+    #   generator: "openai_compatible"
+    #   model: "QWEN3.6-27B"
+
+  retrievers:
+    - name: "Qwen3-Embed-8B (Gateway)"
+      config: "api-embed-openai-compatible"
+      model: "QWEN3-EMBED-8B"
+
+    - name: "Embed-v5.0-Pro (Cohere)"
+      config: "api-embed-cohere-embed-multilingual-v3"
+      model: "embed-v5.0-pro"
+
+  rerankers:
+    - name: "BGE-Rerank-v2-m3 (Gateway)"
+      config: "api-rerank-openai-compatible"
+      model: "BAAI/bge-reranker-v2-m3"
+
+    - name: "Rerank-v4.0-Pro (Cohere)"
+      config: "api-rerank-cohere-rerank-v3"
+      model: "rerank-v4.0-pro"
