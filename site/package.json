@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync-data": "cp ../experiments_data.json src/lib/experiments-data.json 2>/dev/null || echo 'sync-data: ../experiments_data.json not found, using committed snapshot'",
+    "sync-data": "cp ../experiments_data.json src/lib/experiments-data.json 2>/dev/null || { test -f src/lib/experiments-data.json || echo '[]' > src/lib/experiments-data.json; }",
     "predev": "npm run sync-data",
     "prebuild": "npm run sync-data"
   },

@@ -14,8 +14,9 @@ logs/
 # secrets
 .env
 
-# Scan dump for leaderboard site (tracked)
-# experiments_data.json
+# Scan dump + synced site copy for leaderboard site (untracked)
+experiments_data.json
+site/src/lib/experiments-data.json
 
 # TREC run outputs — regenerable (scripts/eval_ranking.py etc.), hundreds of MB
 runs/
