@@ -371,6 +371,234 @@ def judge_eval(experiment_folder, folder, split, judge_model, judge_prompt,
         del judge
 
 
+def rubric_eval(experiment_folder, folder, split, judge_model, judge_prompt,
+                nb_samples, force, rubric_fresh, rubric_concurrency,
+                judge_sample_seed=None, dry_run=False, require_confirmation=True):
+    """NitiBench+ official rubric judging, post-hoc over a finished run.
+
+    One API call per CASE (all sub-questions together, per the official
+    harness), structured gold joined from datasets/nitibench_plus_qa_gold.jsonl,
+    verdicts checkpointed to eval_{split}_rubric_{slug}_partial.jsonl.
+    --sample picks CASES, not rows (the judge is called per case).
+    """
+    from models.evaluators.niti_rubric import (
+        NitiRubricJudge, gold_block, model_block, group_rows_by_case,
+        select_case_scope, load_gold_sidecar, rollup_scores, UNKNOWN_SCORE,
+    )
+    from models.evaluators.niti_rubric import case_id_of
+
+    if folder is not None:
+        folders = [folder]
+    else:
+        folders = [f.path for f in os.scandir(experiment_folder)
+                   if f.is_dir() and 'tmp_' not in f.path]
+
+    sidecar = load_gold_sidecar()
+
+    for experiment_folder in folders:
+        print('rubric judging', experiment_folder)
+        input_file = f'{experiment_folder}/eval_{split}_out.json'
+        if not os.path.exists(input_file):
+            continue
+        data = load_data(input_file, -1)
+        assert data['q_id'].is_unique, \
+            f'{input_file} has duplicate q_id values - cannot align rubric results'
+
+        groups = group_rows_by_case(data, sidecar)
+        if not groups:
+            print(f'{experiment_folder}\tniti_rubric\tskipped: no rows matched the '
+                  f'gold sidecar (is this a nitibench_plus_qa run?)')
+            continue
+        kept_cases, scope_suffix = select_case_scope(
+            groups.keys(), nb_samples, judge_sample_seed)
+        cases = {cid: groups[cid] for cid in kept_cases}
+
+        metrics_file = f'{experiment_folder}/eval_{split}_metrics.json'
+        metrics_dict = json.load(open(metrics_file)) if os.path.exists(metrics_file) else {}
+        if ('niti_rubric_bar_standard' in metrics_dict
+                and metrics_dict.get('niti_rubric_n_cases') == len(cases) and not force):
+            print(f'{experiment_folder}\tniti_rubric\talready done')
+            continue
+
+        judge = NitiRubricJudge(model=judge_model, prompt_config=judge_prompt,
+                                concurrency=rubric_concurrency, dry_run=dry_run,
+                                require_confirmation=require_confirmation)
+
+        # official _format() blocks: gold from the sidecar, model from the row
+        for rows in cases.values():
+            for r in rows:
+                gold_rec = sidecar[r['q_id']]
+                r['gold_block'] = gold_block(gold_rec)
+                r['model_block'], r['parseable'] = model_block(r['response'])
+
+        slug = re.sub(r'[^A-Za-z0-9._-]', '_', judge.model_name)
+        checkpoint = (f'{experiment_folder}/eval_{split}_rubric_{slug}'
+                      f'{scope_suffix}_partial.jsonl')
+        if rubric_fresh and os.path.exists(checkpoint):
+            os.remove(checkpoint)
+            print(f'rubric: --rubric_fresh removed {checkpoint}')
+
+        results_by_qid, stats = judge.judge_batch(cases, checkpoint_path=checkpoint)
+
+        if dry_run:
+            continue
+
+        # align per-row (as_completed order is arbitrary)
+        rows_qid = [r['q_id'] for cid in cases for r in cases[cid]]
+        scores = [results_by_qid.get(q, {'score': UNKNOWN_SCORE})['score']
+                  for q in rows_qid]
+        tiers = [results_by_qid.get(q, {}).get('tier') for q in rows_qid]
+        justifies = [results_by_qid.get(q, {}).get('justification', '')
+                     for q in rows_qid]
+        data = data.set_index('q_id').loc[rows_qid].reset_index()
+
+        per_q = [{'case_id': case_id_of(q),
+                  'domain': sidecar[q]['domain'],
+                  'score': s}
+                 for q, s in zip(rows_qid, scores) if s != UNKNOWN_SCORE]
+        micro, macro, n_domains = rollup_scores(per_q)
+
+        persist_metric(experiment_folder, split, 'niti_rubric', data, scores,
+                       micro, nb_samples=nb_samples,
+                       extra_columns={'niti_rubric_tier': tiers,
+                                      'niti_rubric_justification': justifies},
+                       metrics_dict=metrics_dict)
+        metrics_dict['niti_rubric_micro'] = micro
+        metrics_dict['niti_rubric_bar_standard'] = macro
+        metrics_dict['niti_rubric_bar_standard_pct'] = round(macro * 10, 2)
+        metrics_dict['niti_rubric_unknown_rate'] = stats['unknown_rate']
+        metrics_dict['niti_rubric_n'] = len(rows_qid)
+        metrics_dict['niti_rubric_n_cases'] = len(cases)
+        metrics_dict['niti_rubric_n_domains'] = n_domains
+        metrics_dict['niti_rubric_judge'] = judge.model_name
+        with open(metrics_file + '_', 'w') as fp:
+            json.dump(metrics_dict, fp, indent=2, ensure_ascii=False)
+        shutil.move(metrics_file + '_', metrics_file)
+
+        costs_out_file = f'{experiment_folder}/eval_{split}_cost_niti_rubric_out.json'
+        with open(costs_out_file, 'w') as fout:
+            json.dump({'n_cases': len(cases), 'n_reused': stats['n_reused'],
+                       'n_judged': stats['n_judged'],
+                       'n_failed': stats['n_failed']}, fout)
+
+        print(f'niti_rubric bar_standard={macro:.2f}/10 ({macro * 10:.1f}%)  '
+              f'micro={micro:.2f}  cases={len(cases)} (judged={stats["n_judged"]} '
+              f'reused={stats["n_reused"]} failed={stats["n_failed"]}) '
+              f'unknown_rate={stats["unknown_rate"]:.3f}')
+        del judge
+
+
+def citation_eval(experiment_folder, folder, split, nb_samples, force,
+                  judge_sample_seed=None):
+    """NitiBench+ Citation F1, post-hoc; pure matching, no API calls.
+
+    Identifier matching when the run gave the model statute text (RAG /
+    Gold-cited), fuzzy resolution (Parametric) otherwise, per the official
+    citation rules. --sample picks CASES, like rubric_eval.
+    """
+    from models.evaluators.citation_f1 import load_corpus_index, score_case_predictions
+    from models.evaluators.judge import extract_docs
+    from models.evaluators.niti_rubric import (
+        group_rows_by_case, select_case_scope, load_gold_sidecar, parse_loose_json,
+    )
+
+    if folder is not None:
+        folders = [folder]
+    else:
+        folders = [f.path for f in os.scandir(experiment_folder)
+                   if f.is_dir() and 'tmp_' not in f.path]
+
+    sidecar = load_gold_sidecar()
+    by_uri, by_key, norm2law = load_corpus_index()
+
+    for experiment_folder in folders:
+        print('citation F1', experiment_folder)
+        input_file = f'{experiment_folder}/eval_{split}_out.json'
+        if not os.path.exists(input_file):
+            continue
+        data = load_data(input_file, -1)
+        assert data['q_id'].is_unique, \
+            f'{input_file} has duplicate q_id values - cannot align citation results'
+
+        groups = group_rows_by_case(data, sidecar)
+        if not groups:
+            print(f'{experiment_folder}\tniti_citation\tskipped: no rows matched the '
+                  f'gold sidecar (is this a nitibench_plus_qa run?)')
+            continue
+        kept_cases, _ = select_case_scope(groups.keys(), nb_samples, judge_sample_seed)
+
+        has_docs_by_qid = {}
+        for row in data.itertuples():
+            _, has = extract_docs(row.instruction)
+            has_docs_by_qid[row.q_id] = has
+
+        sq_records, rows_qid, n_with_docs = [], [], 0
+        for cid in kept_cases:
+            for r in groups[cid]:
+                has_docs = has_docs_by_qid.get(r['q_id'], False)
+                n_with_docs += 1 if has_docs else 0
+                parsed = parse_loose_json(r['response'])
+                if not isinstance(parsed, dict):
+                    parsed = None
+                gold_rec = sidecar[r['q_id']]
+                sq_records.append({
+                    'q_id': r['q_id'], 'case_id': cid,
+                    'domain': gold_rec['domain'],
+                    'decision_date': gold_rec['decision_date'],
+                    'parsed': parsed, 'gold': gold_rec,
+                })
+                rows_qid.append(r['q_id'])
+
+        mode = 'identifier' if n_with_docs > len(sq_records) / 2 else 'fuzzy'
+        per_qid, aggregates = score_case_predictions(sq_records, by_uri, by_key,
+                                                     norm2law, mode)
+
+        metrics_file = f'{experiment_folder}/eval_{split}_metrics.json'
+        metrics_dict = json.load(open(metrics_file)) if os.path.exists(metrics_file) else {}
+        if ('niti_citation_f1' in metrics_dict
+                and metrics_dict.get('niti_citation_n_cases') == len(kept_cases)
+                and not force):
+            print(f'{experiment_folder}\tniti_citation\talready done')
+            continue
+
+        f1s = [per_qid.get(q, {}).get('f1') for q in rows_qid]
+        precs = [per_qid.get(q, {}).get('precision') for q in rows_qid]
+        recs = [per_qid.get(q, {}).get('recall') for q in rows_qid]
+        notes = [(per_qid.get(q, {}) or {}).get('note', '') for q in rows_qid]
+        data = data.set_index('q_id').loc[rows_qid].reset_index()
+
+        persist_metric(experiment_folder, split, 'niti_citation_f1', data, f1s,
+                       aggregates['micro']['f1'], nb_samples=nb_samples,
+                       extra_columns={'niti_citation_precision': precs,
+                                      'niti_citation_recall': recs,
+                                      'niti_citation_note': notes},
+                       metrics_dict=metrics_dict)
+        metrics_dict['niti_citation_precision'] = aggregates['micro']['precision']
+        metrics_dict['niti_citation_recall'] = aggregates['micro']['recall']
+        metrics_dict['niti_citation_f1_macro'] = aggregates['macro']['f1']
+        metrics_dict['niti_citation_precision_macro'] = aggregates['macro']['precision']
+        metrics_dict['niti_citation_recall_macro'] = aggregates['macro']['recall']
+        metrics_dict['niti_citation_hallucinated'] = aggregates['n_hallucinated']
+        metrics_dict['niti_citation_undecidable'] = aggregates['n_undecidable']
+        metrics_dict['niti_citation_unparseable'] = aggregates['n_unparseable']
+        metrics_dict['niti_citation_mode'] = aggregates['mode']
+        metrics_dict['niti_citation_n'] = aggregates['n_scored']
+        metrics_dict['niti_citation_n_cases'] = len(kept_cases)
+        metrics_dict['niti_citation_n_domains'] = aggregates['n_domains']
+        metrics_dict['niti_citation_rubric_only'] = aggregates['n_rubric_only']
+        with open(metrics_file + '_', 'w') as fp:
+            json.dump(metrics_dict, fp, indent=2, ensure_ascii=False)
+        shutil.move(metrics_file + '_', metrics_file)
+
+        print(f"niti_citation F1 micro={aggregates['micro']['f1']:.3f} "
+              f"macro={aggregates['macro']['f1']:.3f} "
+              f"P={aggregates['micro']['precision']:.3f} "
+              f"R={aggregates['micro']['recall']:.3f} "
+              f"mode={aggregates['mode']} scored={aggregates['n_scored']} "
+              f"hallucinated={aggregates['n_hallucinated']} "
+              f"unparseable={aggregates['n_unparseable']}")
+
+
 def gpt_eval(gpt, experiment_folder, folder, split, opponent_folder, opponent_name, nb_samples, force):
     from models.evaluators.openai import OpenAI
     model = OpenAI(gpt)
@@ -394,6 +622,11 @@ def run_eval(experiment_folder=None,
              judge_concurrency: int=None,
              judge_fresh: bool=False,
              judge_sample_seed: int=None,
+             rubric: bool=None,
+             rubric_prompt: str="niti_rubric",
+             rubric_concurrency: int=None,
+             rubric_fresh: bool=False,
+             citation: bool=None,
              dry_run: bool=False,
              require_confirmation: bool=True,
              llm_batch_size: int=None,
@@ -450,6 +683,24 @@ def run_eval(experiment_folder=None,
                    dry_run=dry_run,
                    require_confirmation=require_confirmation)
 
+    if rubric is not None:
+        rubric_eval(experiment_folder, folder, split,
+                    judge_model=judge_model,
+                    judge_prompt=rubric_prompt,
+                    nb_samples=nb_samples,
+                    force=force,
+                    rubric_fresh=rubric_fresh,
+                    rubric_concurrency=rubric_concurrency,
+                    judge_sample_seed=judge_sample_seed,
+                    dry_run=dry_run,
+                    require_confirmation=require_confirmation)
+
+    if citation is not None:
+        citation_eval(experiment_folder, folder, split,
+                      nb_samples=nb_samples,
+                      force=force,
+                      judge_sample_seed=judge_sample_seed)
+
 
 if __name__ == "__main__":
     import argparse
@@ -489,6 +740,23 @@ if __name__ == "__main__":
              "first N rows (which are all one topic and give a biased estimate).")
     parser.add_argument('--dry_run', action='store_true',
         help="Print how many judge calls would be made and exit before any API call.")
+
+    parser.add_argument('--rubric', action='store_true', default=None, help="""NitiBench+
+        official Thai Bar Council 8-tier rubric judging, post-hoc over a finished run:
+        one API call per case, strict-JSON {tier, score, justification} per sub-question.
+        Model from --judge_model or JUDGE_MODEL; endpoint from JUDGE_BASE_URL/JUDGE_API_KEY.
+        With --sample, N counts CASES (not rows). Resumable via a case-keyed sidecar.""")
+    parser.add_argument('--rubric_prompt', type=str, default="niti_rubric",
+        help="Rubric system prompt config under config/evaluator/ (default: niti_rubric - "
+             "the official judge prompt, verbatim).")
+    parser.add_argument('--rubric_concurrency', type=int, default=None,
+        help="In-flight rubric judge requests (default: $JUDGE_CONCURRENCY or 4).")
+    parser.add_argument('--rubric_fresh', action='store_true',
+        help="Discard the rubric checkpoint sidecar and re-judge everything.")
+    parser.add_argument('--citation', action='store_true', default=None, help="""NitiBench+
+        Citation F1, post-hoc; pure matching, no API calls. Identifier matching for
+        runs that gave the model statute text (RAG/Gold-cited), fuzzy law-name matching
+        (rapidfuzz WRatio>=85) for Parametric runs. With --sample, N counts CASES.""")
 
     parser.add_argument('--llm', type=str, nargs='*', default=None,
             help=""" 
@@ -544,6 +812,11 @@ if __name__ == "__main__":
         judge_concurrency=args.judge_concurrency,
         judge_fresh=args.judge_fresh,
         judge_sample_seed=args.judge_sample_seed,
+        rubric=args.rubric,
+        rubric_prompt=args.rubric_prompt,
+        rubric_concurrency=args.rubric_concurrency,
+        rubric_fresh=args.rubric_fresh,
+        citation=args.citation,
         dry_run=args.dry_run,
         llm_batch_size=args.llm_batch_size,
         llm_prompt=args.llm_prompt,
