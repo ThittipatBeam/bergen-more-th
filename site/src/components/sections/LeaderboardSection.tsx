@@ -1,19 +1,33 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   BENCHMARK_ROWS,
   getLatestRunLabel,
 } from "@/lib/benchmark-data";
+import { NITI_ROWS } from "@/lib/nitibench-data";
 import { BenchmarkTable } from "@/components/sections/BenchmarkTable";
+import { NitiBenchTable } from "@/components/sections/NitiBenchTable";
 import { useLanguage } from "@/hooks/use-language";
 import { I18N } from "@/lib/i18n/translations";
 import { DATA_SHELL, H2 } from "@/lib/design";
+import type { LeaderboardMode } from "@/types/benchmark";
+
+const MODES: { key: LeaderboardMode }[] = [
+  { key: "wikipedia" },
+  { key: "nitibench" },
+];
 
 export function LeaderboardSection() {
   const { language } = useLanguage();
   const t = I18N[language].leaderboard;
   const latestRun = getLatestRunLabel(language);
+  const [mode, setMode] = useState<LeaderboardMode>("wikipedia");
+  const isNiti = mode === "nitibench";
+
+  const modeLabel = (key: LeaderboardMode) =>
+    key === "nitibench" ? t.modeNitibench : t.modeWikipedia;
 
   return (
     <section className="w-full py-12 sm:py-16">
@@ -47,13 +61,50 @@ export function LeaderboardSection() {
               <span className="inline-block w-2 h-2 rounded-full bg-[var(--status-live)]" />
               <span>
                 {latestRun ? t.latestRun(latestRun) : t.noRuns}{" "}
-                · {t.experimentsSoFar(BENCHMARK_ROWS.length)}
+                · {isNiti
+                  ? t.nitiExperimentsSoFar(NITI_ROWS.length)
+                  : t.experimentsSoFar(BENCHMARK_ROWS.length)}
               </span>
             </div>
           </div>
         </div>
 
-        <BenchmarkTable rows={BENCHMARK_ROWS} />
+        {/* Board switch: Wikipedia QA vs NitiBench+ legal */}
+        <div className="flex flex-col gap-2">
+          <div
+            role="group"
+            aria-label={t.title}
+            className="flex w-full rounded-xl border border-[var(--border-default)] p-1 sm:w-fit"
+          >
+            {MODES.map(({ key }) => {
+              const active = mode === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setMode(key)}
+                  className={`min-h-[44px] flex-1 rounded-lg px-4 font-sans text-xs font-semibold transition-colors cursor-pointer sm:min-w-[140px] sm:flex-none ${
+                    active
+                      ? "bg-[var(--text-primary)] text-[var(--background-primary)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--brand-text)]"
+                  }`}
+                >
+                  {modeLabel(key)}
+                </button>
+              );
+            })}
+          </div>
+          <p className="max-w-3xl text-xs font-sans leading-relaxed text-[var(--text-muted)]">
+            {isNiti ? t.nitiDesc : t.wikiDesc}
+          </p>
+        </div>
+
+        {isNiti ? (
+          <NitiBenchTable rows={NITI_ROWS} />
+        ) : (
+          <BenchmarkTable rows={BENCHMARK_ROWS} />
+        )}
       </div>
     </section>
   );

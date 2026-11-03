@@ -112,6 +112,13 @@ export const I18N = {
       colRecallTh: "Recall TH",
       colEm: "EM",
       colLatency: "Gen time (min:sec)",
+      modeWikipedia: "Wikipedia V4",
+      modeNitibench: "NitiBench+ RAG",
+      wikiDesc:
+        "Thai Wikipedia QA — ranked by overall score (Judge 80% + Match TH 20%).",
+      nitiDesc:
+        "Thai legal QA (498 cases / 1,228 sub-questions) — ranked by the official Bar-Council 8-tier rubric (0–10) with Citation F1. Lexical EM/F1 are computed but intentionally hidden in this mode.",
+      nitiExperimentsSoFar: (n: number) => `${n} NitiBench+ runs scored`,
     },
     request: {
       kicker: "Custom evaluation",
@@ -234,6 +241,13 @@ export const I18N = {
       colRecallTh: "Recall TH",
       colEm: "EM",
       colLatency: "เวลาสร้างคำตอบ (นาที:วินาที)",
+      modeWikipedia: "Wikipedia V4",
+      modeNitibench: "NitiBench+ RAG",
+      wikiDesc:
+        "คำถาม-ตอบวิกิพีเดียไทย จัดอันดับด้วยคะแนนรวม (Judge 80% + Match TH 20%)",
+      nitiDesc:
+        "คำถามกฎหมายไทย (498 คดี / 1,228 คำถามย่อย) จัดอันดับด้วย rubric 8 ระดับตามเกณฑ์สภาทนายความ (0–10) พร้อม Citation F1 — EM/F1 แบบเทียบคำคำนวณเก็บไว้แต่ตั้งใจไม่แสดงในโหมดนี้",
+      nitiExperimentsSoFar: (n: number) => `ประเมินแล้ว ${n} รันบน NitiBench+`,
     },
     request: {
       kicker: "ส่งโมเดลเข้าทดสอบ",
