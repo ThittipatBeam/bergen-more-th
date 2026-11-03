@@ -1,0 +1,75 @@
+# ==============================================================================
+# BERGEN-TH: NitiBench+ Sweep Configuration (Thai legal RAG benchmark)
+# ==============================================================================
+# Dataset: nitibench_plus (498 cases / 1,228 sub-questions / 3,253 statute-
+# section versions). Scored with the official Thai Bar Council rubric judge
+# (--rubric, one call per case) plus Citation F1 (--citation, local matching).
+#
+# Three modes (see documentation/nitibench-plus.md):
+#   RAG         retriever over the 3,253-section corpus
+#   Parametric  retriever: null  -> model answers from memory (fuzzy citation
+#               matching, WRatio >= 85 against the law catalog)
+#   Gold-cited  retriever: oracle_provenance -> gold section text as context
+#
+# IMPORTANT: there is deliberately NO `samples:` key in defaults — without it
+# every enabled run runs the FULL 1,228-row split. Use --pilot N on the CLI
+# for a debug run on the first N rows (debug dataset is cached, cheap).
+#
+# Usage:
+#   python3 scripts/run_sweep.py --config nitibench_sweep_config.yaml --list
+#   python3 scripts/run_sweep.py --config nitibench_sweep_config.yaml --dry-run
+#   python3 scripts/run_sweep.py --config nitibench_sweep_config.yaml --pilot 75
+#   python3 scripts/run_sweep.py --config nitibench_sweep_config.yaml          # full
+# ==============================================================================
+
+defaults:
+  dataset: "nitibench_plus"
+  prompt: "nitibench_legal"
+  split: "dev"
+  skip_existing: true
+  auto_scan: true
+  thai_metrics: true          # explicit; lang='th' would auto-enable anyway
+
+  # Retrieval over the 3,253-section corpus (index is cached from the pilot)
+  retriever: "api-embed-openai-compatible"
+  retriever_model: "QWEN3-EMBED-8B"
+  retrieve_top_k: 100
+  # No reranker by default; add api-rerank-* runs explicitly below.
+  reranker:
+
+  # Generator via the LLM gateway; legal JSON needs a generous token budget
+  generator: "openai_compatible"
+  generator_model: "DEEPSEEK-V4.1F"
+  generation_top_k: 5
+  generator_max_new_tokens: 2048
+
+  # NitiBench+ scoring: official 8-tier rubric (KIMI-K3, 1 call per case) +
+  # Citation F1 (local). The binary wiki judge stays OFF for these runs.
+  run_judge: false
+  run_rubric: true
+  run_citation: true
+  judge_model: "KIMI-K3"      # rubric judge model (JUDGE_* env fallback)
+
+runs:
+  # ---- pilot / baseline: one RAG run. This is the only enabled run so
+  # ---- --pilot N and full runs both have an unambiguous default row.
+  - name: "NITI RAG | DEEPSEEK-V4.1F | QWEN3-EMBED-8B"
+
+  # ---- Phase E candidates (enable as needed; parametric = retriever omitted)
+  - name: "NITI Parametric | DEEPSEEK-V4.1F"
+    enabled: false
+    retriever:
+
+  - name: "NITI Gold-cited | DEEPSEEK-V4.1F"
+    enabled: false
+    retriever: "oracle_provenance"
+    retriever_model:
+    generation_top_k: 5
+
+  - name: "NITI RAG | command-a-03-2025 | embed-v5.0-pro"
+    enabled: false
+    generator: "cohere_command_a"
+    generator_model: "command-a-03-2025"
+    generator_max_new_tokens: 2048   # cohere_command_a.yaml defaults to 512: too short
+    retriever: "api-embed-cohere-embed-multilingual-v3"
+    retriever_model: "embed-v5.0-pro"

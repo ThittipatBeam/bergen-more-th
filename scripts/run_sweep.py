@@ -115,7 +115,14 @@ def build_command_args(run_cfg: dict, defaults: dict, force: bool = False, pilot
     if pilot:
         args.append("debug=true")
 
+    # Prompt (config/prompt/<name>.yaml) - e.g. nitibench_legal for legal JSON answers
+    if cfg.get("prompt"):
+        args.append(f"prompt='{cfg['prompt']}'")
+
     # Retriever
+    # NOTE: a run that omits `retriever` (or sets it null) runs Parametric:
+    # rag.yaml already defaults retriever/generator to null, and hydra cannot
+    # take retriever=null from the CLI, so "absent" IS the off switch.
     retriever = cfg.get("retriever")
     if retriever:
         retriever_cfg = str(retriever)
@@ -150,6 +157,9 @@ def build_command_args(run_cfg: dict, defaults: dict, force: bool = False, pilot
             args.append(f"generator.init_args.model_name='{cfg['generator_model']}'")
         if cfg.get("generation_top_k") is not None:
             args.append(f"generation_top_k={cfg['generation_top_k']}")
+        # legal JSON answers easily exceed the 512-token generator default
+        if cfg.get("generator_max_new_tokens"):
+            args.append(f"generator.init_args.max_new_tokens={cfg['generator_max_new_tokens']}")
 
     # Thai metrics
     if cfg.get("thai_metrics"):
@@ -311,11 +321,19 @@ def run_sweep():
             print(f"  Env: LLM_MODEL={env_vars.get('LLM_MODEL', '-')} EMBED_MODEL={env_vars.get('EMBED_MODEL', '-')}{pilot_str}")
             print(f"  Command: {full_cmd}")
             should_judge = args.judge or (r.get("run_judge", defaults.get("run_judge", False)) and not args.no_judge)
-            if should_judge:
+            run_rubric = r.get("run_rubric", defaults.get("run_rubric", False))
+            run_citation = r.get("run_citation", defaults.get("run_citation", False))
+            if should_judge or run_rubric or run_citation:
                 judge_model = r.get("judge_model", defaults.get("judge_model"))
                 judge_arg = f" --judge_model {judge_model}" if judge_model else ""
-                sample_arg = f" --sample {args.pilot}" if args.pilot else ""
-                print(f"  Judge: python3 evaluate.py --folder <exp_folder> --split {r.get('split', defaults.get('split', 'dev'))} --judge{judge_arg}{sample_arg}")
+                flags = []
+                if should_judge:
+                    flags.append("--judge" + (f" --sample {args.pilot}" if args.pilot else ""))
+                if run_rubric:
+                    flags.append("--rubric")
+                if run_citation:
+                    flags.append("--citation")
+                print(f"  Eval: python3 evaluate.py --folder <exp_folder> --split {r.get('split', defaults.get('split', 'dev'))} {' '.join(flags)}{judge_arg}")
         print("\n" + "=" * 80)
         return
 
@@ -398,24 +416,47 @@ def run_sweep():
             log_success(f"Finished {run_name} in {elapsed_str}")
             status = "SUCCESS"
 
-            # Post-run LLM Judge if configured
+            # Post-run evaluations, combined into ONE evaluate.py invocation:
+            # binary LLM judge (--judge), NitiBench+ rubric (--rubric) and
+            # Citation F1 (--citation, local matching - free). Per-run/default
+            # flags: run_judge, run_rubric, run_citation, judge_prompt,
+            # rubric_prompt. NOTE: rubric/citation get no --sample - they score
+            # cases, and a pilot folder already contains only the debug rows;
+            # --sample N would count N CASES (~2.5N rows), not rows.
             should_judge = args.judge or (r.get("run_judge", defaults.get("run_judge", False)) and not args.no_judge)
-            if should_judge and exp_folder and os.path.exists(exp_folder):
+            run_rubric = r.get("run_rubric", defaults.get("run_rubric", False))
+            run_citation = r.get("run_citation", defaults.get("run_citation", False))
+            judge_model = r.get("judge_model", defaults.get("judge_model"))
+            if (should_judge or run_rubric or run_citation) and exp_folder and os.path.exists(exp_folder):
                 split = r.get("split", defaults.get("split", "dev"))
-                judge_cmd = [sys.executable, "evaluate.py", "--folder", exp_folder, "--split", split, "--judge"]
-                judge_model = r.get("judge_model", defaults.get("judge_model"))
-                if judge_model:
-                    judge_cmd.extend(["--judge_model", judge_model])
-                if args.pilot:
-                    judge_cmd.extend(["--sample", str(args.pilot)])
+                judge_cmd = [sys.executable, "evaluate.py", "--folder", exp_folder, "--split", split]
+                if should_judge:
+                    judge_cmd.append("--judge")
+                    judge_prompt = r.get("judge_prompt", defaults.get("judge_prompt"))
+                    if judge_prompt:
+                        judge_cmd.extend(["--judge_prompt", str(judge_prompt)])
+                    if args.pilot:
+                        judge_cmd.extend(["--sample", str(args.pilot)])
+                if run_rubric:
+                    judge_cmd.append("--rubric")
+                    rubric_prompt = r.get("rubric_prompt", defaults.get("rubric_prompt"))
+                    if rubric_prompt:
+                        judge_cmd.extend(["--rubric_prompt", str(rubric_prompt)])
+                if run_citation:
+                    judge_cmd.append("--citation")
+                if judge_model and (should_judge or run_rubric):
+                    judge_cmd.extend(["--judge_model", str(judge_model)])
 
-                log_info(f"Running LLM Judge for {exp_folder}...")
-                judge_log = log_dir / f"{idx:02d}_{run_slug}_judge.log"
+                eval_flags = " ".join(f for f in ("--judge" if should_judge else "",
+                                                  "--rubric" if run_rubric else "",
+                                                  "--citation" if run_citation else "") if f)
+                log_info(f"Running post-run evaluation ({eval_flags}) for {exp_folder}...")
+                judge_log = log_dir / f"{idx:02d}_{run_slug}_eval.log"
                 j_code, _, _ = execute_command(judge_cmd, judge_log, env)
                 if j_code == 0:
-                    log_success(f"Judge evaluation completed for {run_name}")
+                    log_success(f"Evaluation completed for {run_name}")
                 else:
-                    log_warn(f"Judge evaluation failed for {run_name} (code: {j_code})")
+                    log_warn(f"Evaluation failed for {run_name} (code: {j_code})")
 
             # Update experiments_data.json
             if r.get("auto_scan", defaults.get("auto_scan", True)):
