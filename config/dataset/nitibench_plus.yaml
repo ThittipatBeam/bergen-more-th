@@ -1,0 +1,22 @@
+# NitiBench+ (Thai legal QA from decided cases) in CCL-style shape.
+# See documentation/nitibench-plus.md for the full design.
+# qrels/sidecar: run scripts/nitibench/build_qrels.py once (or after any
+# change to datasets/nitibench_plus_raw/) before retrieving.
+train:
+    doc: null
+    query: null
+dev:
+    doc:
+      init_args:
+        _target_: modules.processors.nitibench_processor.NitiBenchPlusSections
+        split: train
+        data_dir: datasets/nitibench_plus_raw
+    query:
+      init_args:
+        _target_: modules.processors.nitibench_processor.NitiBenchPlusQA
+        split: train
+        data_dir: datasets/nitibench_plus_raw
+        lang: th
+test:
+    doc: null
+    query: null

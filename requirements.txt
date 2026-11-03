@@ -25,6 +25,7 @@ langdetect
 langcodes
 pythainlp
 python-dotenv
+rapidfuzz  # NitiBench+ Citation F1: fuzzy law-name matching in Parametric mode
 # torch is installed separately by install.sh (CPU vs CUDA wheel depends on your platform).
 # Uncomment for a quick install on CPU-only machines:
 # torch --index-url https://download.pytorch.org/whl/cpu
