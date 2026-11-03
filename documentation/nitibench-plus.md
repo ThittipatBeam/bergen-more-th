@@ -1,7 +1,11 @@
 # NitiBench+ บน Thai RAG Benchmark (BERGEN-TH)
 
-> **สถานะ**: เอกสารแผนงานฉบับอนุมัติ (2026-11-02) — ยังไม่ได้ implement
-> ส่วน "แผน Implementation (Phase A–E)" ด้านล่างคือขั้นตอนที่จะทำต่อ
+> **สถานะ**: **Phase A+B+C+D เสร็จแล้ว 2026-11-03**
+> - **A (data prep)**: processor/คลัง/qrels/sidecar ผ่าน gate (1,228 query rows / 3,253 doc rows / 2,744 qrel pairs)
+> - **B (prompt + retrieval pilot)**: `config/prompt/nitibench_legal.yaml` + pilot QWEN3-EMBED-8B top-100 ผ่าน gate — **version any-hit Recall@100 = 94.2%** (Recall@10 = 71.6%), version/section gap เล็ก (~0.3%) → retriever แยกฉบับเวลาดี; `scripts/nitibench/recall_report.py` พร้อมใช้เทียบ embedder ตัวอื่น
+> - **C (rubric judge + Citation F1)**: `models/evaluators/niti_rubric.py` (official prompt verbatim, 1 call/คดี, checkpoint resume ได้) + `models/evaluators/citation_f1.py` (identifier/fuzzy mode, resolve เวอร์ชัน ณ วันพิพากษา) + flag `--rubric`/`--citation` ใน `evaluate.py` — pilot 75 แถว/31 คดี (RAG: QWEN3-EMBED-8B + DEEPSEEK-V4.1F, judge: KIMI-K3) **ผ่าน gate**: judge parse 100%, model-answer JSON 100% (unparseable=0), tier↔score ครบ 75/75 — ผล pilot: **bar_standard 5.82/10, Citation F1 micro 0.416 / macro 0.455** (hallucinated 41 นับแยก ตามเกณฑ์ทางการ) บทเรียน: judge ชอบตอบ JSON ถูกแต่ครอบหลายแบบ (object เดียว / `{results:[...]}` / `{grades:[...]}`) → parser รองรับ wrapper ครบแล้ว
+> - **D (sweep plumbing + เว็บ)**: `scripts/run_sweep.py` รองรับ `prompt`/`generator_max_new_tokens` override + eval รวม `--rubric --citation` ครั้งเดียวต่อ run; `nitibench_sweep_config.yaml` (RAG/Parametric/Gold-cited/Cohere disabled runs พร้อม Phase E); pilot end-to-end ผ่าน sweep จริง (experiment `e64e73bc8d536231`, 75 แถว/31 คดี, 23 นาทีรวม eval+auto_scan): **bar_standard 6.33/10, Citation F1 0.420, unknown 3/31 คดี (judge nondeterminism ไม่ใช่ parser)** — บทเรียนสำคัญ: รันเดิมซ้ำที่ retrieval เหมือนเป๊ะได้ bar 5.89 vs 6.33 → **judge noise ~0.4–0.5/10** ใส่เป็น caveat บนเว็บแล้ว; เว็บได้ toggle 2 โหมด "Wikipedia V4 | NitiBench+ RAG" (`site/src/lib/nitibench-data.ts` + `NitiBenchTable/Card/Caveats` — จัดอันดับด้วย bar_standard + Citation F1 + Recall@k, **EM/F1 ไม่แสดง** แต่ยังเก็บในข้อมูล), `tsc --noEmit` สะอาด (error ที่เหลือ = package ขาดใน node_modules ของ container นี้ มีมาก่อนแล้ว)
+> Phase E ด้านล่างคือขั้นตอนที่จะทำต่อ
 > ต้นทางข้อมูลอยู่ที่ `datasets/nitibench_plus_raw/` (สำเนาของ [VISAI-AI/nitibench-plus](https://huggingface.co/datasets/VISAI-AI/nitibench-plus))
 
 ## ทำไมต้องมี NitiBench+
@@ -19,7 +23,7 @@ Benchmark ปัจจุบันของเราเป็น Thai Wikipedia 
 
 **หลักคิดของการ integrate: "เครื่องเดิม เปลี่ยน 3 ชิ้น"** — pipeline เดิมทุกขั้น (embed → retrieve → rerank → generate → evaluate → leaderboard) ใช้ได้ทันที เราแค่เปลี่ยน (1) query rows (2) คลังเอกสาร (3) ตัวตรวจคะแนน
 
-สถิติชุดข้อมูล (ตรวจนับจากไฟล์จริงแล้ว): **498 คดี / 1,228 คำถามย่อย / 17 โดเมน** (โดเมนละ 27–30 คดี), drift bands: nodrift 143 / amended 223 / repealed 132 คดี, การอ้างอิงที่ไม่อยู่ในคลัง (out-of-corpus) 194 รายการ (ตรวจด้วย rubric เท่านั้น), คำถามย่อยที่ไม่มี citation ในคลังเลย 5 ข้อ (ต้องใส่ sentinel ตอนแปลงข้อมูล)
+สถิติชุดข้อมูล (ตรวจนับจากไฟล์จริงแล้ว): **498 คดี / 1,228 คำถามย่อย / 17 โดเมน** (โดเมนละ 27–30 คดี), drift bands: nodrift 143 / amended 223 / repealed 132 คดี, การอ้างอิงที่ไม่อยู่ในคลัง (out-of-corpus) 194 รายการ (ตรวจด้วย rubric เท่านั้น) คำถามย่อยที่ไม่มี citation ในคลังเลย 5 ข้อ และ **คำถามย่อยที่ไม่มี citation แบบ load-bearing ในคลัง 13 ข้อ** (8 ข้อส่วนเพิ่มมีเฉพาะ background) — 13 ข้อนี้ต้องใส่ sentinel `<qid> → __out_of_corpus__` ตอนแปลงข้อมูล (sanity check ของ BERGEN ปฏิเสธ list ว่าง) และถูกข้ามออกจาก qrels → ตรวจด้วย rubric เท่านั้น ตรงกับเงื่อนไข "scored on the rubric only" ของ official (สร้างจริงแล้ว: qrels 1,215 ข้อ / 2,744 มาตราเป้าหมาย)
 
 ---
 
@@ -91,7 +95,7 @@ flowchart LR
 
 - `label` = verdict + reasoning ของศาล (ใช้เป็น context ให้ prompt และเป็นข้อมูล lexical ประกอบ — คะแนนหลักไม่ได้มาจาก EM/F1)
 - `doc`/`doc_id` = มาตรา load-bearing **ฉบับที่มีผลในวันพิพากษา** (1978) — โหมด RAG ปกติไม่ใช้คอลัมน์นี้เลย
-- คำถามย่อยที่ไม่มี citation ในคลังเลย (มี 5 ข้อในทั้งชุด) จะได้ sentinel `['__out_of_corpus__']` เพราะ sanity check ของ BERGEN ปฏิเสธ list ว่าง
+- คำถามย่อยที่ไม่มี citation แบบ load-bearing ในคลัง (13 ข้อในทั้งชุด) จะได้ sentinel `['__out_of_corpus__']` เพราะ sanity check ของ BERGEN ปฏิเสธ list ว่าง
 
 ### 2) คลังเอกสาร + qrels
 
