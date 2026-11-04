@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { MetricTable } from "./MetricTable";
 import { MetricsWorkedExample } from "./MetricsWorkedExample";
+import { NitiMetricsWorkedExample } from "./NitiMetricsWorkedExample";
 import { MetricsOverallScore } from "./MetricsOverallScore";
 import { MetricsWhichScore } from "./MetricsWhichScore";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { PAGE_SHELL } from "@/lib/design";
 
 export function MetricsSection() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const isTh = language === "TH";
 
   return (
@@ -33,7 +36,7 @@ export function MetricsSection() {
 
       <MetricTable />
 
-      <MetricsWorkedExample />
+      {isNiti ? <NitiMetricsWorkedExample /> : <MetricsWorkedExample />}
 
       <MetricsOverallScore />
     </div>

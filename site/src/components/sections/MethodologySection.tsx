@@ -1,24 +1,37 @@
 "use client";
 
 import { getMethodologyChapters } from "@/lib/methodology-data";
+import { getNitiChapters } from "@/lib/nitibench-methodology-data";
 import { MethodologyChapter } from "@/components/sections/MethodologyChapter";
 import { PipelineFlow } from "@/components/sections/PipelineFlow";
 import { DatasetStory } from "@/components/sections/DatasetStory";
 import { PageHeader } from "@/components/ui/PageHeader";
 import Link from "next/link";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { PAGE_SHELL } from "@/lib/design";
 
 export function MethodologySection() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const isTh = language === "TH";
-  const chapters = getMethodologyChapters(language);
+  const chapters = isNiti
+    ? getNitiChapters(language)
+    : getMethodologyChapters(language);
   const { systemDesign, questionBank } = chapters;
 
   return (
     <div className={PAGE_SHELL}>
       <PageHeader
-        title={isTh ? "ที่มาของชุดข้อมูลและวิธีให้คะแนน" : "How the benchmark is built and scored"}
+        title={
+          isNiti
+            ? isTh
+              ? "ที่มาของชุดคดีกฎหมายและวิธีให้คะแนน"
+              : "How the legal benchmark is built and scored"
+            : isTh
+              ? "ที่มาของชุดข้อมูลและวิธีให้คะแนน"
+              : "How the benchmark is built and scored"
+        }
         action={
           <Link
             href="/metrics#worked-example"

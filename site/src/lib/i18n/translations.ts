@@ -58,6 +58,8 @@ export const I18N = {
       title: "Thai RAG Benchmark",
       subtitle:
         "Thai RAG Benchmark: tests embedding, reranker, and generator models on question-answer pairs from Thai Wikipedia",
+      subtitleNiti:
+        "Thai RAG Benchmark: tests embedding, reranker, and generator models on Thai legal questions built from real court decisions",
       exploreBtn: "Explore Leaderboard",
       requestBtn: "Request a Benchmark",
       scrollCue: "Scroll to explore models",
@@ -71,6 +73,7 @@ export const I18N = {
       stageReranker: "2. Reranker",
       stageGenerator: "3. Generator",
       noneDirectDense: "None",
+      noRetrieval: "From memory",
       corpusLabel: "Corpus: Thai Wikipedia QA",
       fullResults: "Full results ↓",
     },
@@ -187,6 +190,8 @@ export const I18N = {
       title: "Thai RAG Benchmark",
       subtitle:
         "Thai RAG Benchmark: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์คำถาม-คำตอบจาก Thai Wikipedia",
+      subtitleNiti:
+        "Thai RAG Benchmark: ทดสอบโมเดล embedding, reranker และ generator บนโจทย์กฎหมายไทยที่สร้างจากคำพิพากษาศาลฎีกาจริง",
       exploreBtn: "ดูผลการทดสอบ",
       requestBtn: "ส่งโมเดลเข้าทดสอบ",
       scrollCue: "เลื่อนลงเพื่อดูโมเดลทั้งหมด",
@@ -200,6 +205,7 @@ export const I18N = {
       stageReranker: "2. จัดอันดับซ้ำ (Reranker)",
       stageGenerator: "3. สร้างคำตอบ (Generator)",
       noneDirectDense: "ไม่มี",
+      noRetrieval: "ตอบจากความจำ",
       corpusLabel: "ชุดข้อมูล: Thai Wikipedia QA",
       fullResults: "ดูตารางทั้งหมด ↓",
     },

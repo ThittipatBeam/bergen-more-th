@@ -1,10 +1,15 @@
 "use client";
 
 import { getMetrics } from "@/lib/metrics-data";
+import {
+  NITI_METRIC_ORDER,
+  getNitiMetrics,
+} from "@/lib/nitibench-metrics-data";
 import type { MetricId } from "@/types/metrics";
 import { MetricRow } from "./MetricRow";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { CARD, MEASURE_NOTE, SMALL } from "@/lib/design";
 
 const METRIC_ORDER: MetricId[] = [
@@ -17,11 +22,13 @@ const METRIC_ORDER: MetricId[] = [
   "generation",
 ];
 
-/** All seven metrics side by side; formulas stay behind "Show the math". */
+/** All metrics side by side; formulas stay behind "Show the math". */
 export function MetricTable() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const isTh = language === "TH";
-  const metrics = getMetrics(language);
+  const wiki = getMetrics(language);
+  const niti = getNitiMetrics(language);
 
   const columns = [
     isTh ? "Metric" : "Metric",
@@ -37,11 +44,19 @@ export function MetricTable() {
       <SectionHeading
         id="metric-table-title"
         kicker={isTh ? "ตารางอ้างอิง" : "Reference"}
-        title={isTh ? "7 metric" : "7 metrics"}
+        title={
+          isNiti
+            ? isTh ? "5 metric" : "5 metrics"
+            : isTh ? "7 metric" : "7 metrics"
+        }
         intro={
-          isTh
-            ? "Judge และ Match TH ใช้คิดคะแนนรวม อีก 5 ตัวแสดงไว้ให้ตรวจสอบและไม่เปลี่ยนอันดับ"
-            : "Judge and Match TH decide the overall score. The other five are shown for inspection and never move the rank."
+          isNiti
+            ? isTh
+              ? "Bar rubric เป็นตัวจัดอันดับ Citation F1 ตัดสินคะแนนที่เท่ากัน สามตัวหลังใช้ตรวจสอบ"
+              : "The Bar rubric decides the rank and Citation F1 breaks ties. The other three are shown for inspection."
+            : isTh
+              ? "Judge และ Match TH ใช้คิดคะแนนรวม อีก 5 ตัวแสดงไว้ให้ตรวจสอบและไม่เปลี่ยนอันดับ"
+              : "Judge and Match TH decide the overall score. The other five are shown for inspection and never move the rank."
         }
       />
 
@@ -56,17 +71,27 @@ export function MetricTable() {
       </div>
 
       <ol className="flex flex-col divide-y divide-[var(--border-default)]">
-        {METRIC_ORDER.map((id) => (
-          <li key={id}>
-            <MetricRow metric={metrics[id]} />
-          </li>
-        ))}
+        {isNiti
+          ? NITI_METRIC_ORDER.map((id) => (
+              <li key={id}>
+                <MetricRow metric={niti[id]} />
+              </li>
+            ))
+          : METRIC_ORDER.map((id) => (
+              <li key={id}>
+                <MetricRow metric={wiki[id]} />
+              </li>
+            ))}
       </ol>
 
       <p className={`${SMALL} ${MEASURE_NOTE} text-[var(--text-muted)]`}>
-        {isTh
-          ? "Match TH, Precision, Recall และ F1 ตัดคำไทยด้วย PyThaiNLP ก่อนเทียบคำ ส่วน judge อ่านความหมาย และ exact match เทียบข้อความตรงๆ หลังจัดรูปแบบ"
-          : "Match TH, Precision, Recall and F1 segment Thai words with PyThaiNLP before comparing. The judge reads meaning; exact match compares strings after normalization."}
+        {isNiti
+          ? isTh
+            ? "EM/F1 แบบเทียบคำยังคำนวณอยู่เบื้องหลังแต่ไม่แสดงบนบอร์ดนี้ เพราะคำตอบกฎหมายถูกบันทึกเป็น JSON เชิงโครงสร้าง การเทียบคำไม่ได้บอกความถูกต้องของเนื้อหา"
+            : "Lexical EM/F1 is still computed underneath but never shown on this board: legal answers are structured JSON, so word overlap says little about correctness."
+          : isTh
+            ? "Match TH, Precision, Recall และ F1 ตัดคำไทยด้วย PyThaiNLP ก่อนเทียบคำ ส่วน judge อ่านความหมาย และ exact match เทียบข้อความตรงๆ หลังจัดรูปแบบ"
+            : "Match TH, Precision, Recall and F1 segment Thai words with PyThaiNLP before comparing. The judge reads meaning; exact match compares strings after normalization."}
       </p>
     </section>
   );

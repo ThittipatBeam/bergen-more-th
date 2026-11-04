@@ -6,12 +6,15 @@ import { SmoothScrollLink } from "@/components/ui/SmoothScrollLink";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { TopModelsSwitcher } from "@/components/sections/TopModelsSwitcher";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { I18N } from "@/lib/i18n/translations";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, LEAD, WIDE_SHELL } from "@/lib/design";
 
 export function HeroSection() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const t = I18N[language].hero;
+  const subtitle = isNiti && t.subtitleNiti ? t.subtitleNiti : t.subtitle;
 
   return (
     <section className="relative w-full min-h-[85vh] flex flex-col justify-center overflow-hidden pt-32 sm:pt-36 md:pt-40 pb-16">
@@ -26,7 +29,7 @@ export function HeroSection() {
           />
 
           <p className={`mt-5 sm:mt-6 max-w-xl ${LEAD} text-[var(--text-secondary)] font-normal transition-colors`}>
-            {t.subtitle}
+            {subtitle}
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center lg:justify-start">

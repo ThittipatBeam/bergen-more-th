@@ -211,8 +211,12 @@ export function StackedFolderCard({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            {/* Stage 1: Retrieval */}
-            <StageRow model={row.retriever} label={c.stageRetrieval} />
+            {/* Stage 1: Retrieval — parametric runs answer from memory */}
+            <StageRow
+              model={row.retriever ?? c.noRetrieval}
+              label={c.stageRetrieval}
+              blank={!row.retriever}
+            />
 
             {/* Stage 2: Reranker */}
             <StageRow

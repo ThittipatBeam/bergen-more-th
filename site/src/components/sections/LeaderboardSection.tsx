@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import {
   BENCHMARK_ROWS,
   getLatestRunLabel,
@@ -10,6 +9,7 @@ import { NITI_ROWS } from "@/lib/nitibench-data";
 import { BenchmarkTable } from "@/components/sections/BenchmarkTable";
 import { NitiBenchTable } from "@/components/sections/NitiBenchTable";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { I18N } from "@/lib/i18n/translations";
 import { DATA_SHELL, H2 } from "@/lib/design";
 import type { LeaderboardMode } from "@/types/benchmark";
@@ -23,8 +23,9 @@ export function LeaderboardSection() {
   const { language } = useLanguage();
   const t = I18N[language].leaderboard;
   const latestRun = getLatestRunLabel(language);
-  const [mode, setMode] = useState<LeaderboardMode>("wikipedia");
-  const isNiti = mode === "nitibench";
+  // The in-page switch and the navbar toggle both write the same context:
+  // two controls, one board state.
+  const { dataset: mode, setDataset: setMode, isNiti } = useDataset();
 
   const modeLabel = (key: LeaderboardMode) =>
     key === "nitibench" ? t.modeNitibench : t.modeWikipedia;

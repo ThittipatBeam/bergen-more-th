@@ -1,7 +1,9 @@
 "use client";
 
 import { getPipelineStages } from "@/lib/methodology-data";
+import { getNitiPipelineStages } from "@/lib/nitibench-methodology-data";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 
 interface PipelineFlowProps {
   accent: { fg: string; bg: string };
@@ -10,7 +12,10 @@ interface PipelineFlowProps {
 /** The path one leaderboard row takes, left to right. */
 export function PipelineFlow({ accent }: PipelineFlowProps) {
   const { language } = useLanguage();
-  const stages = getPipelineStages(language);
+  const { isNiti } = useDataset();
+  const stages = isNiti
+    ? getNitiPipelineStages(language)
+    : getPipelineStages(language);
 
   return (
     <ol

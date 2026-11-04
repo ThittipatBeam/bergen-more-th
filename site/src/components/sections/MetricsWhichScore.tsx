@@ -2,15 +2,20 @@
 
 import Link from "next/link";
 import { getWhichScoreRows } from "@/lib/metrics-guide";
+import { getNitiWhichScoreRows } from "@/lib/nitibench-metrics-data";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, MEASURE_NOTE, SMALL } from "@/lib/design";
 
 /** The cheat sheet: match the reader's question to a metric, then the warning. */
 export function MetricsWhichScore() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const isTh = language === "TH";
-  const rows = getWhichScoreRows(language);
+  const rows = isNiti
+    ? getNitiWhichScoreRows(language)
+    : getWhichScoreRows(language);
 
   return (
     <section
@@ -54,9 +59,13 @@ export function MetricsWhichScore() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className={`min-w-0 ${SMALL} ${MEASURE_NOTE} text-[var(--text-muted)]`}>
-          {isTh
-            ? "ทุกตัวเลขบนลีดเดอร์บอร์ดมาจากการทดสอบบนคำถาม Thai Wikipedia 500 ข้อเดียวกัน"
-            : "Every number on the board comes from the same 500 Thai Wikipedia questions."}
+          {isNiti
+            ? isTh
+              ? "ทุกตัวเลขบนลีดเดอร์บอร์ดมาจากการทดสอบบนคดี NitiBench+ ชุดเดียวกัน 498 คดี"
+              : "Every number on the board comes from the same 498 NitiBench+ cases."
+            : isTh
+              ? "ทุกตัวเลขบนลีดเดอร์บอร์ดมาจากการทดสอบบนคำถาม Thai Wikipedia 500 ข้อเดียวกัน"
+              : "Every number on the board comes from the same 500 Thai Wikipedia questions."}
         </p>
         <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
           <Link

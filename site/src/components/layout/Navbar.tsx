@@ -8,6 +8,7 @@ import gsap from "gsap";
 import { RollingLink } from "@/components/ui/RollingLink";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { DatasetToggle } from "@/components/ui/DatasetToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useLanguage } from "@/hooks/use-language";
@@ -149,6 +150,10 @@ export function Navbar() {
 
           {/* Right: Operational Controls & Switches */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Benchmark Switcher with GSAP Animation — too wide beside the
+                logo on phones, so those get it inside the drawer instead */}
+            <DatasetToggle className="hidden md:inline-grid" />
+
             {/* Language Switcher with GSAP Animation */}
             <LanguageToggle />
 

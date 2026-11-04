@@ -9,6 +9,7 @@ import type {
 export const ABOUT_LINKS = {
   code: "https://github.com/ThittipatBeam/bergen-more-th",
   dataset: "https://huggingface.co/datasets/siamaids/thai-wiki-qa-v1",
+  nitibench: "https://huggingface.co/datasets/VISAI-AI/nitibench-plus",
   bergen: "https://github.com/naver/bergen",
   pythainlp: "https://huggingface.co/datasets/pythainlp/thai-wiki-dataset-v4",
   cloud: "https://siam.ai/",
@@ -137,6 +138,16 @@ export function getAboutLinks(lang: Language = "EN"): readonly AboutLink[] {
         ? "คำถามภาษาไทย 5,355 ข้อจาก Thai Wikipedia พร้อมเฉลย ทุกรันวัดด้วย 500 ข้อชุดเดียวกัน"
         : "5,355 verified Thai Wikipedia questions with gold answers. Each run is scored on the same 500 questions.",
       href: ABOUT_LINKS.dataset,
+      cta: isTh ? "ดูชุดข้อมูลบน Hugging Face" : "Open dataset",
+      brand: "huggingface",
+    },
+    {
+      label: isTh ? "ชุดข้อมูลกฎหมาย" : "Legal dataset",
+      name: "VISAI-AI/nitibench-plus",
+      description: isTh
+        ? "สร้างจากคำพิพากษาศาลไทย 498 คดี 1,228 คำถามย่อย พร้อมคลังมาตรา 3,253 ฉบับ ตรวจด้วย rubric สอบทนายและ Citation F1"
+        : "498 Thai court cases distilled into 1,228 sub-questions with a 3,253-row statute pool, scored by the Bar Council rubric and Citation F1.",
+      href: ABOUT_LINKS.nitibench,
       cta: isTh ? "ดูชุดข้อมูลบน Hugging Face" : "Open dataset",
       brand: "huggingface",
     },

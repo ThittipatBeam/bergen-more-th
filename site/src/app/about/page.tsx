@@ -4,7 +4,7 @@ import { AboutSection } from "@/components/sections/AboutSection";
 export const metadata: Metadata = {
   title: "About • SIAM.AI Thai RAG Benchmark",
   description:
-    "Why the Thai RAG benchmark exists, the code and dataset behind every published number, the projects it builds on, and the team that runs it.",
+    "Why the Thai RAG benchmark exists, the code and datasets behind every published number across both boards, the projects it builds on, and the team that runs it.",
 };
 
 export default function AboutPage() {

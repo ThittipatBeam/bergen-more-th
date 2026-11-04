@@ -5,7 +5,7 @@ import { MetricsSection } from "@/components/sections/MetricsSection";
 export const metadata: Metadata = {
   title: "Metrics Explained • SIAM.AI Benchmark",
   description:
-    "How each Thai RAG benchmark score is calculated, including formulas, weighting for the overall score, and a guide to choosing metrics.",
+    "How each benchmark score is calculated: the Wikipedia-board metrics and overall-score weights, or the NitiBench+ Bar rubric and Citation F1, each with formulas and a worked example.",
 };
 
 export default function MetricsPage() {

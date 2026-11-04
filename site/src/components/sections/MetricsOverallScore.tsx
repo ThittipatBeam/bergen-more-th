@@ -4,13 +4,88 @@ import Link from "next/link";
 import { QUALITY_WEIGHTS } from "@/lib/benchmark-data";
 import { FAMILY_COLORS } from "@/lib/metrics-styles";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CARD, MEASURE_BODY, SMALL } from "@/lib/design";
 
 /** The overall score as one stacked bar: weights you can see. */
 export function MetricsOverallScore() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const isTh = language === "TH";
+
+  if (isNiti) {
+    return (
+      <section
+        id="overall-score"
+        aria-labelledby="overall-score-title"
+        className={`flex scroll-mt-28 flex-col gap-6 ${CARD}`}
+      >
+        <SectionHeading
+          id="overall-score-title"
+          kicker={isTh ? "วิธีจัดอันดับ" : "Ranking rule"}
+          title={isTh ? "อันดับบนบอร์ดมาจากอะไร" : "How the rank is decided"}
+          intro={
+            isTh
+              ? "คะแนน rubric สภาทนายเป็นตัวตัดสินคนเดียวของตาราง Citation F1 ใช้แยกกรณีแต้มเท่ากัน ไม่มีน้ำหนักรวมหลาย metric แบบบอร์ดวิกิพีเดีย"
+              : "The Bar rubric decides alone; Citation F1 only breaks displayed ties. There is no multi-metric weighted score on this board."
+          }
+        />
+
+        <p className="rounded-xl border border-[var(--border-default)] bg-[var(--background-subtle)] px-4 py-3 font-mono text-sm leading-relaxed text-[var(--text-primary)]">
+          Rank = Bar (0–10) · ties → Citation F1
+        </p>
+
+        <ul className="grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+          <li className="flex items-baseline gap-2 font-sans text-sm leading-relaxed">
+            <span
+              aria-hidden="true"
+              className="size-2 shrink-0 self-center rounded-full"
+              style={{ backgroundColor: FAMILY_COLORS.quality.fg }}
+            />
+            <span className="font-semibold text-[var(--text-primary)]">
+              Bar rubric
+            </span>
+            <span className="text-[var(--text-secondary)]">
+              {isTh
+                ? "เกรดทางการทีละคดี ถ้า verdict ผิดคะแนนสูงสุดคือ 4"
+                : "official grading per case; a wrong verdict caps the score at 4"}
+            </span>
+          </li>
+          <li className="flex items-baseline gap-2 font-sans text-sm leading-relaxed">
+            <span
+              aria-hidden="true"
+              className="size-2 shrink-0 self-center rounded-full"
+              style={{ backgroundColor: FAMILY_COLORS.containment.fg }}
+            />
+            <span className="font-semibold text-[var(--text-primary)]">
+              Citation F1
+            </span>
+            <span className="text-[var(--text-secondary)]">
+              {isTh
+                ? "ใช้ตัดสินเฉพาะเมื่อแต้ม rubric เท่ากัน"
+                : "breaks ties only; never weighs into the score itself"}
+            </span>
+          </li>
+        </ul>
+
+        <p className={`${SMALL} ${MEASURE_BODY} border-l-2 border-[var(--perf-text)] pl-4 text-[var(--text-secondary)]`}>
+          {isTh
+            ? "EM/F1 แบบเทียบคำยังคำนวณอยู่เบื้องหลังแต่ไม่ขยับอันดับและไม่แสดงในบอร์ดนี้ เวลาสร้างคำตอบเช่นกัน อยู่คอลัมน์ของตัวเองเผื่อเรียงตามความเร็ว"
+            : "Lexical EM/F1 is computed underneath but never shown and never moves the rank. Generation time stays in its own column, for sorting by speed."}
+        </p>
+
+        <Link
+          href="/#leaderboard"
+          className="inline-flex min-h-[44px] w-fit items-center font-sans text-sm font-semibold text-[var(--brand-text)] transition-colors hover:text-[var(--brand-cta-hover)]"
+        >
+          {isTh ? "ดูอันดับบนลีดเดอร์บอร์ด →" : "See the rubric ranking on the leaderboard →"}
+        </Link>
+      </section>
+    );
+  }
+
+
 
   const segments = [
     {

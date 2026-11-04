@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { DatasetToggle } from "@/components/ui/DatasetToggle";
 import { MobileMenuItem } from "@/components/layout/MobileMenuItem";
 import { MobileMenuHeader } from "@/components/layout/MobileMenuHeader";
 import { NavItem } from "@/components/layout/Navbar";
@@ -224,6 +225,7 @@ export function MobileMenu({ isOpen, onClose, items, returnFocusRef }: MobileMen
           </div>
 
           <div className="flex items-center gap-2">
+            <DatasetToggle />
             <LanguageToggle />
             <ThemeToggle />
           </div>

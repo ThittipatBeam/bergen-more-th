@@ -7,6 +7,14 @@ export type MetricId =
   | "f1"
   | "generation";
 
+/** NitiBench+ board metrics — Bar rubric, citation quality, retrieval hit dims. */
+export type NitiMetricId =
+  | "rubric"
+  | "citationF1"
+  | "recallAtK"
+  | "pAt1"
+  | "hallucinated";
+
 /** Accent family — one hue per question the metric answers. */
 export type MetricFamily = "quality" | "containment" | "overlap" | "speed";
 
@@ -66,7 +74,7 @@ export interface MetricTechnicalCopy {
 }
 
 export interface MetricDefinition {
-  id: MetricId;
+  id: MetricId | NitiMetricId;
   /** Short display name, e.g. "Match TH". */
   name: string;
   icon: MetricIconName;
@@ -84,7 +92,7 @@ export interface StoryToken {
 }
 
 export interface StoryScore {
-  id: MetricId;
+  id: MetricId | NitiMetricId;
   label: string;
   value: string;
   /** true = tick, false = cross, null = numeric only. */

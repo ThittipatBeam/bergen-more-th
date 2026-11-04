@@ -7,7 +7,14 @@ import {
   getDatasetResult,
   getDatasetStrip,
 } from "@/lib/methodology-data";
+import {
+  NITI_DATASET_SIZE,
+  NITI_SOURCE,
+  getNitiDatasetResult,
+  getNitiDatasetStrip,
+} from "@/lib/nitibench-methodology-data";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { useStepTracker } from "@/hooks/use-step-tracker";
 import { BODY, H3, MEASURE_BODY, MEASURE_NOTE, SMALL } from "@/lib/design";
 
@@ -16,23 +23,43 @@ const format = (value: number) => value.toLocaleString("en-US");
 /** Question-bank construction as a scrollable vertical timeline with a progress line. */
 export function DatasetStory() {
   const { language } = useLanguage();
+  const { isNiti } = useDataset();
   const isTh = language === "TH";
-  const steps = getDatasetStrip(language);
+  const steps = isNiti ? getNitiDatasetStrip(language) : getDatasetStrip(language);
+  const size = isNiti ? NITI_DATASET_SIZE : DATASET_SIZE;
+  const result = isNiti
+    ? getNitiDatasetResult(language)
+    : getDatasetResult(language);
+  const source = isNiti
+    ? {
+        href: NITI_SOURCE.href,
+        label: isTh ? NITI_SOURCE.labelTh : NITI_SOURCE.labelEn,
+      }
+    : {
+        href: "https://huggingface.co/datasets/pythainlp/thai-wiki-dataset-v4",
+        label: isTh
+          ? "ต้นทาง: thai-wiki-dataset-v4 · CC BY-SA 3.0"
+          : "Source: thai-wiki-dataset-v4 · CC BY-SA 3.0",
+      };
   const trackRef = useRef<HTMLOListElement>(null);
   const { active, fill } = useStepTracker(trackRef);
 
   const stats = [
     {
-      label: isTh ? "คำถามในคลัง" : "In the bank",
-      value: format(DATASET_SIZE.bank),
+      label: isNiti
+        ? isTh ? "คำถามย่อยในคลัง" : "Sub-questions"
+        : isTh ? "คำถามในคลัง" : "In the bank",
+      value: format(size.bank),
     },
     {
       label: isTh ? "ข้อต่อหนึ่งรัน" : "Per run",
-      value: format(DATASET_SIZE.perRun),
+      value: format(size.perRun),
     },
     {
-      label: isTh ? "context ที่ต้องค้น" : "Passages searched",
-      value: format(DATASET_SIZE.passages),
+      label: isNiti
+        ? isTh ? "มาตราที่ต้องค้น" : "Statutes searched"
+        : isTh ? "context ที่ต้องค้น" : "Passages searched",
+      value: format(size.passages),
     },
   ];
 
@@ -129,11 +156,11 @@ export function DatasetStory() {
         </dl>
 
         <p className={`${SMALL} ${MEASURE_NOTE} border-t border-[var(--border-default)] pt-4 text-[var(--text-secondary)]`}>
-          {getDatasetResult(language)}
+          {result}
         </p>
 
         <a
-          href="https://huggingface.co/datasets/pythainlp/thai-wiki-dataset-v4"
+          href={source.href}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex min-h-[44px] w-fit items-center gap-2 font-sans text-sm font-semibold text-[var(--brand-text)] underline-offset-2 transition-colors hover:text-[var(--brand-cta-hover)] hover:underline"
@@ -141,9 +168,7 @@ export function DatasetStory() {
           <span aria-hidden="true" className="inline-flex shrink-0 items-center">
             <HuggingFace.Color size={16} />
           </span>
-          {isTh
-            ? "ต้นทาง: thai-wiki-dataset-v4 · CC BY-SA 3.0"
-            : "Source: thai-wiki-dataset-v4 · CC BY-SA 3.0"}
+          {source.label}
           <span aria-hidden="true">↗</span>
           <span className="sr-only"> (opens in a new tab)</span>
         </a>

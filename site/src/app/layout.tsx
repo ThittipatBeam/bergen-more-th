@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { LanguageProvider } from "@/hooks/use-language";
+import { DatasetProvider } from "@/hooks/use-dataset";
 import {
   PageTransitionProvider,
   PageTransitionView,
@@ -63,13 +64,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[var(--background-canvas)] text-[var(--text-primary)] transition-colors duration-200 selection:bg-[var(--brand-cta)] selection:text-white">
         <LanguageProvider>
-          <PageTransitionProvider>
-            <Navbar />
-            <PageTransitionView>
-              {children}
-              <SiteFooter />
-            </PageTransitionView>
-          </PageTransitionProvider>
+          <DatasetProvider>
+            <PageTransitionProvider>
+              <Navbar />
+              <PageTransitionView>
+                {children}
+                <SiteFooter />
+              </PageTransitionView>
+            </PageTransitionProvider>
+          </DatasetProvider>
         </LanguageProvider>
       </body>
     </html>

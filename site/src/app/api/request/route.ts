@@ -74,6 +74,8 @@ function rateLimited(ip: string): boolean {
 }
 
 interface RequestPayload {
+  /** Which board this run lands on; anything else is scrubbed to the default. */
+  dataset: "wikipedia" | "nitibench";
   generatorName: string;
   generatorLink?: string;
   embeddingName: string;
@@ -99,6 +101,7 @@ function clean(value: unknown, max: number): string {
 function validate(body: unknown): { errors: Record<string, string>; payload: RequestPayload } {
   const raw = (body ?? {}) as Record<string, unknown>;
   const payload: RequestPayload = {
+    dataset: raw.dataset === "nitibench" ? "nitibench" : "wikipedia",
     generatorName: clean(raw.generatorName, 200),
     generatorLink: clean(raw.generatorLink, 500),
     embeddingName: clean(raw.embeddingName, 200),
@@ -121,6 +124,7 @@ function validate(body: unknown): { errors: Record<string, string>; payload: Req
 
 function formatBody(payload: RequestPayload): string {
   return [
+    `Dataset: ${payload.dataset === "nitibench" ? "NitiBench+ (legal)" : "Wikipedia V4 (Thai QA)"}`,
     `Generator: ${payload.generatorName}`,
     payload.generatorLink && `Generator link: ${payload.generatorLink}`,
     `Embedding: ${payload.embeddingName}`,
@@ -136,7 +140,8 @@ function formatBody(payload: RequestPayload): string {
 }
 
 function subjectFor(payload: RequestPayload): string {
-  return `Benchmark run request: ${payload.generatorName} + ${payload.embeddingName}`;
+  const board = payload.dataset === "nitibench" ? "NitiBench+" : "Wikipedia V4";
+  return `Benchmark run request [${board}]: ${payload.generatorName} + ${payload.embeddingName}`;
 }
 
 async function deliverViaWebhook(payload: RequestPayload): Promise<void> {
@@ -210,6 +215,7 @@ async function deliverViaNotion(payload: RequestPayload): Promise<void> {
         Name: {
           title: [{ text: { content: `${payload.generatorName} + ${payload.embeddingName}` } }],
         },
+        ...text("Dataset", payload.dataset === "nitibench" ? "NitiBench+" : "Wikipedia V4"),
         ...text("Contact", payload.contact),
         ...text("Email", payload.email),
         ...text("Generator", payload.generatorName),

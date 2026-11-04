@@ -33,9 +33,14 @@ file at module scope.
 
 - `/` — hero + leaderboard (table on `md+`, stacked cards on phones)
 - `/methodology` — corpus, pipeline, judge protocol, worked scoring example
-- `/metrics` — the seven metrics, formulas, and the overall-score weights
-- `/request` — submit a pipeline for evaluation (see below)
-- `/about` — why the benchmark exists, resources, credits
+- `/metrics` — metric formulas, ranking rule, and worked example for the active board
+- `/request` — submit a pipeline for evaluation on either board (see below)
+- `/about` — why the benchmark exists, resources for both datasets, credits
+
+Two boards live behind one benchmark switch: Wikipedia V4 (Thai QA) and
+NitiBench+ (legal). The toggle in the navbar (and in the mobile drawer) sets a
+global dataset context in `localStorage` — hero champions, leaderboard,
+methodology, metrics, and the request form's board picker all follow it.
 
 ## Request form delivery
 

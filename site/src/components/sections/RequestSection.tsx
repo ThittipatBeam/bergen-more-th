@@ -10,6 +10,7 @@ import { RequestReveal } from "@/components/sections/RequestReveal";
 import { RequestSuccessCard } from "@/components/sections/RequestSuccessCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 import { I18N } from "@/lib/i18n/translations";
 import { BODY, BUTTON_PRIMARY, H2, MEASURE_NOTE, PAGE_SHELL } from "@/lib/design";
 
@@ -18,6 +19,7 @@ export function RequestSection() {
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [invalidDetail, setInvalidDetail] = useState<string | null>(null);
   const { language } = useLanguage();
+  const { dataset } = useDataset();
   const t = I18N[language].request;
   const isTh = language === "TH";
 
@@ -56,7 +58,7 @@ export function RequestSection() {
       const response = await fetch("/api/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, dataset }),
       });
       if (response.ok) {
         setStatus("success");

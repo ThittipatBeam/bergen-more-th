@@ -131,6 +131,14 @@ export interface NitiBenchRow {
 }
 
 /** A category-winning experiment surfaced in the hero stacked card deck. */
+/** The card face of a board row — BenchmarkRow and NitiBenchRow both fit. */
+export interface ChampionRowSource {
+  rank: number;
+  retriever: string | null;
+  reranker: string | null;
+  generator: string;
+}
+
 export interface ChampionPick {
   id: "quality" | "speed" | "match";
   tabLabel: string;
@@ -142,5 +150,5 @@ export interface ChampionPick {
   primaryMetric: ChampionMetric;
   secondaryMetric: ChampionMetric;
   accent: string;
-  row: BenchmarkRow;
+  row: ChampionRowSource;
 }

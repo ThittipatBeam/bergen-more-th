@@ -2,12 +2,18 @@
 
 import { useMemo, useState } from "react";
 import { getChampionPicks } from "@/lib/benchmark-data";
+import { getNitiChampionPicks } from "@/lib/nitibench-champions";
 import { StackedFolderCard } from "@/components/sections/StackedFolderCard";
 import { useLanguage } from "@/hooks/use-language";
+import { useDataset } from "@/hooks/use-dataset";
 
 export function TopModelsSwitcher() {
   const { language } = useLanguage();
-  const picks = useMemo(() => getChampionPicks(language), [language]);
+  const { isNiti } = useDataset();
+  const picks = useMemo(
+    () => (isNiti ? getNitiChampionPicks(language) : getChampionPicks(language)),
+    [language, isNiti]
+  );
 
   // order stores pick indices from back (level 0) to front (level 2 = active).
   // Cards never advance on their own: a deck that swaps while the visitor is
