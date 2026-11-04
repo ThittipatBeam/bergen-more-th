@@ -2,6 +2,9 @@
 
 import type { NitiBenchRow } from "@/types/benchmark";
 import { formatClock } from "@/lib/benchmark-data";
+import { RANK_MEDAL_CLASSES } from "@/lib/rank-styles";
+import { SCORE_BAND_CLASSES, scoreBand } from "@/lib/score-scale";
+import { BrandIcon } from "@/components/ui/BrandIcon";
 
 /** Small shared display pieces for the NitiBench+ board (mobile card +
  *  desktop row both draw from these so the numbers read identically). */
@@ -27,85 +30,93 @@ export function NitiModeChip({ mode }: { mode: NitiBenchRow["mode"] }) {
   );
 }
 
-/** One compact metric tile for the mobile card grid. */
-function MetricTile({
-  label,
-  value,
-  strong = false,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-}) {
+function MobileMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5 rounded-xl border border-[var(--border-default)] px-3 py-2">
-      <span className="text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
+    <div className="flex flex-col gap-1">
+      <dt className="font-mono text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
         {label}
-      </span>
-      <span
-        className={`font-mono ${
-          strong
-            ? "text-lg font-bold text-[var(--brand-text)]"
-            : "text-sm font-semibold text-[var(--text-primary)]"
-        }`}
-      >
+      </dt>
+      <dd className="font-mono text-base font-bold leading-none text-[var(--text-primary)] tracking-tight">
         {value}
-      </span>
+      </dd>
     </div>
   );
 }
 
-/** One NitiBench+ run as a stacked card — the mobile view of the board. */
+/** One NitiBench+ run as a mobile list item — same structure, rank numerals,
+ *  brand tiles, and band-tinted score chip as the Wikipedia board. */
 export function NitiBenchCard({
   row,
   isTh,
+  barMin,
+  barMax,
 }: {
   row: NitiBenchRow;
   isTh: boolean;
+  barMin: number;
+  barMax: number;
 }) {
+  const padRank = `${String(row.rank).padStart(2, "0")}${
+    row.tieCount > 1 ? "=" : ""
+  }`;
+  const rankColor = RANK_MEDAL_CLASSES[row.rank] ?? "text-[var(--text-muted)]";
+  const scoreTint =
+    SCORE_BAND_CLASSES[scoreBand(row.rubricBar, barMin, barMax)];
+
   return (
-    <article className="flex flex-col gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] p-4 shadow-xs">
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-xs font-bold text-[var(--text-muted)]">
-          #{row.rank}
-          {row.tieCount > 1 ? ` (×${row.tieCount})` : ""}
+    <li className="flex flex-col gap-3 p-4">
+      <div className="flex items-start gap-3">
+        <span
+          className={`w-6 shrink-0 pt-1 text-center font-mono text-sm font-extrabold ${rankColor}`}
+        >
+          {padRank}
         </span>
-        <NitiModeChip mode={row.mode} />
-      </div>
-      <div>
-        <h3 className="text-sm font-semibold text-[var(--text-primary)]">
-          {row.generator}
-        </h3>
-        <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
-          {row.retriever ?? (isTh ? "ไม่ได้ค้นเอกสาร" : "no retrieval")}
-          {row.reranker ? ` + ${row.reranker}` : ""} ·{" "}
-          {nitiDate(row.runDate, isTh)}
-        </p>
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <div className="col-span-2">
-          <MetricTile
-            label={isTh ? "คะแนนมาตรฐานสภาทนาย (0–10)" : "Bar-standard (0–10)"}
-            value={row.rubricBar.toFixed(2)}
-            strong
-          />
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="grid size-7 shrink-0 place-items-center rounded-lg border border-[var(--border-default)] bg-[var(--background-primary)] shadow-2xs">
+              <BrandIcon name={row.generator} size={16} />
+            </span>
+            <span className="truncate font-sans text-sm font-bold text-[var(--text-primary)]">
+              {row.generator}
+            </span>
+            {/* RAG is the default for this board; only flag the exceptions. */}
+            {row.mode !== "RAG" && <NitiModeChip mode={row.mode} />}
+          </div>
+          <p className="mt-1 font-mono text-[11px] leading-4 text-[var(--text-secondary)]">
+            {row.retriever ?? (isTh ? "ไม่ได้ค้นเอกสาร" : "no retrieval")}
+            {row.reranker ? ` + ${row.reranker}` : ""}
+            {" · "}
+            {nitiDate(row.runDate, isTh)}
+          </p>
         </div>
-        <MetricTile label="Citation F1" value={nitiPct(row.citationF1)} />
-        <MetricTile label="Recall@k" value={nitiPct(row.recallAtK)} />
-        <MetricTile label="P@1" value={nitiPct(row.pAt1)} />
-        <MetricTile
-          label={isTh ? "อ้างเพี้ยน" : "Hallucinated"}
-          value={row.hallucinated === null ? "—" : String(row.hallucinated)}
-        />
-        <MetricTile
-          label={isTh ? "คดีที่ประเมิน" : "Cases judged"}
-          value={row.nCases === null ? "—" : String(row.nCases)}
-        />
-        <MetricTile
-          label={isTh ? "เวลาสร้างคำตอบ" : "Gen time"}
-          value={formatClock(row.genSeconds)}
-        />
+
+        <div
+          className={`flex shrink-0 flex-col items-end rounded-lg px-2.5 py-1.5 ${scoreTint}`}
+        >
+          <span className="font-mono text-xl font-bold leading-none tracking-tight text-[var(--text-primary)]">
+            {row.rubricBar.toFixed(2)}
+          </span>
+          <span className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[var(--text-secondary)]">
+            Bar
+          </span>
+        </div>
       </div>
-    </article>
+
+      <dl className="grid grid-cols-3 gap-2 border-t border-[var(--border-default)]/60 pt-3">
+        <MobileMetric label="Citation F1" value={nitiPct(row.citationF1)} />
+        <MobileMetric label="Recall@k" value={nitiPct(row.recallAtK)} />
+        <MobileMetric label="P@1" value={nitiPct(row.pAt1)} />
+      </dl>
+
+      <p className="font-mono text-[11px] text-[var(--text-muted)]">
+        {formatClock(row.genSeconds)}
+        {" · "}
+        {isTh ? "อ้างเพี้ยน" : "halluc."}{" "}
+        {row.hallucinated === null ? "—" : String(row.hallucinated)}
+        {" · "}
+        {isTh ? "คดี" : "cases"} {row.nCases === null ? "—" : String(row.nCases)}
+      </p>
+    </li>
   );
 }

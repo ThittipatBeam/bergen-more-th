@@ -2,14 +2,9 @@
 
 import type { NitiBenchRow } from "@/types/benchmark";
 import { useLanguage } from "@/hooks/use-language";
-import { formatClock } from "@/lib/benchmark-data";
 import { NitiBenchCaveats } from "@/components/sections/NitiBenchCaveats";
-import {
-  NitiBenchCard,
-  NitiModeChip,
-  nitiDate,
-  nitiPct,
-} from "@/components/sections/NitiBenchCard";
+import { NitiBenchTableRow } from "@/components/sections/NitiBenchTableRow";
+import { NitiBenchCard } from "@/components/sections/NitiBenchCard";
 
 /**
  * NitiBench+ (Thai legal) board. Ranked by the official Bar-Council rubric
@@ -37,6 +32,10 @@ export function NitiBenchTable({ rows }: { rows: NitiBenchRow[] }) {
   }
 
   const judgeModel = rows.find((r) => r.judgeModel)?.judgeModel ?? null;
+  // Board-wide rubric range; drives the sequential tint on the headline score.
+  const barValues = rows.map((r) => r.rubricBar);
+  const barMin = Math.min(...barValues);
+  const barMax = Math.max(...barValues);
 
   return (
     <div className="flex flex-col gap-4">
@@ -46,14 +45,22 @@ export function NitiBenchTable({ rows }: { rows: NitiBenchRow[] }) {
           : "Ranked by the official Bar-Council rubric score (0–10); Citation F1 breaks ties. Recall@k is version-exact (the statute version in force on the decision date)."}
       </p>
 
-      {/* Mobile: one card per run */}
+      {/* Mobile: one item per run, same list shell as the Wikipedia board */}
       <div className="flex flex-col gap-3 md:hidden">
-        {rows.map((row) => (
-          <NitiBenchCard key={row.id} row={row} isTh={isTh} />
-        ))}
+        <ol className="divide-y divide-[var(--border-default)] overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs">
+          {rows.map((row) => (
+            <NitiBenchCard
+              key={row.id}
+              row={row}
+              isTh={isTh}
+              barMin={barMin}
+              barMax={barMax}
+            />
+          ))}
+        </ol>
       </div>
 
-      {/* Tablet/desktop: full table */}
+      {/* Tablet/desktop: full table, same chrome as the Wikipedia board */}
       <div className="hidden overflow-x-auto rounded-2xl border border-[var(--border-default)] bg-[var(--background-primary)] shadow-xs transition-colors md:block">
         <table className="w-full min-w-[1000px] border-collapse text-left">
           <caption className="sr-only">
@@ -62,63 +69,63 @@ export function NitiBenchTable({ rows }: { rows: NitiBenchRow[] }) {
               : "NitiBench+ leaderboard ranked by the Bar-Council rubric score."}
           </caption>
           <thead>
-            <tr className="border-b border-[var(--border-default)] text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
-              <th scope="col" className="px-3 py-3 font-medium">#</th>
-              <th scope="col" className="px-3 py-3 font-medium">{isTh ? "โมเดล" : "Model"}</th>
-              <th scope="col" className="px-3 py-3 font-medium">{isTh ? "โหมด" : "Mode"}</th>
-              <th scope="col" className="px-3 py-3 font-medium">Embedding</th>
-              <th scope="col" className="px-3 py-3 font-medium">Bar (0–10)</th>
-              <th scope="col" className="px-3 py-3 font-medium">Citation F1</th>
-              <th scope="col" className="px-3 py-3 font-medium">Recall@k</th>
-              <th scope="col" className="px-3 py-3 font-medium">P@1</th>
-              <th scope="col" className="px-3 py-3 font-medium">{isTh ? "อ้างเพี้ยน" : "Halluc."}</th>
-              <th scope="col" className="px-3 py-3 font-medium">{isTh ? "คดี" : "Cases"}</th>
-              <th scope="col" className="px-3 py-3 font-medium">{isTh ? "เวลาสร้าง" : "Gen time"}</th>
-              <th scope="col" className="px-3 py-3 font-medium">{isTh ? "วันที่" : "Date"}</th>
+            <tr className="bg-[var(--background-subtle)] border-b border-[var(--border-default)] text-xs font-sans font-semibold uppercase tracking-wider text-[var(--text-secondary)] transition-colors select-none">
+              <th
+                scope="col"
+                className="sticky left-0 z-20 w-10 bg-[var(--background-subtle)] py-3.5 px-1.5 text-center"
+              >
+                #
+              </th>
+              <th
+                scope="col"
+                className="sticky left-14 z-20 bg-[var(--background-subtle)] py-3.5 px-2 text-left sm:px-3"
+              >
+                {isTh ? "โมเดล" : "Model"}
+              </th>
+              <th scope="col" className="py-3.5 px-3 text-left">
+                Embedding
+              </th>
+              <th scope="col" className="py-3.5 px-3 text-left">
+                Reranker
+              </th>
+              <th
+                scope="col"
+                className="py-3.5 px-2 sm:px-3 text-right bg-[var(--surface-brand)] text-[var(--brand-text)]"
+              >
+                Bar (0–10)
+              </th>
+              <th scope="col" className="py-3.5 px-2 text-center">
+                Citation F1
+              </th>
+              <th scope="col" className="py-3.5 px-2 text-center">
+                Recall@k
+              </th>
+              <th scope="col" className="py-3.5 px-2 text-center">
+                P@1
+              </th>
+              <th scope="col" className="py-3.5 px-2 text-center">
+                {isTh ? "อ้างเพี้ยน" : "Halluc."}
+              </th>
+              <th scope="col" className="py-3.5 px-2 text-center">
+                {isTh ? "คดี" : "Cases"}
+              </th>
+              <th scope="col" className="py-3.5 px-2 text-right">
+                {isTh ? "เวลาสร้าง" : "Gen time"}
+              </th>
+              <th scope="col" className="py-3.5 px-3 text-right">
+                {isTh ? "วันที่" : "Date"}
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr
+              <NitiBenchTableRow
                 key={row.id}
-                className="border-b border-[var(--border-default)] last:border-0 transition-colors"
-              >
-                <td className="px-3 py-3 font-mono text-xs font-bold text-[var(--text-muted)]">
-                  {row.rank}
-                  {row.tieCount > 1 ? ` ×${row.tieCount}` : ""}
-                </td>
-                <td className="px-3 py-3 text-sm font-semibold text-[var(--text-primary)]">
-                  {row.generator}
-                </td>
-                <td className="px-3 py-3"><NitiModeChip mode={row.mode} /></td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-secondary)]">
-                  {row.retriever ?? (isTh ? "ไม่ได้ค้น" : "none")}
-                </td>
-                <td className="px-3 py-3 font-mono text-sm font-bold text-[var(--brand-text)]">
-                  {row.rubricBar.toFixed(2)}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-primary)]">
-                  {nitiPct(row.citationF1)}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-primary)]">
-                  {nitiPct(row.recallAtK)}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-primary)]">
-                  {nitiPct(row.pAt1)}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-primary)]">
-                  {row.hallucinated ?? "—"}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-primary)]">
-                  {row.nCases ?? "—"}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-primary)]">
-                  {formatClock(row.genSeconds)}
-                </td>
-                <td className="px-3 py-3 font-mono text-xs text-[var(--text-muted)]">
-                  {nitiDate(row.runDate, isTh)}
-                </td>
-              </tr>
+                row={row}
+                isTh={isTh}
+                barMin={barMin}
+                barMax={barMax}
+              />
             ))}
           </tbody>
         </table>
