@@ -125,10 +125,25 @@ export interface NitiBenchRow {
   /** Version-exact Recall@k and P@1 from ranking_metrics, 0-100; null when absent. */
   recallAtK: number | null;
   pAt1: number | null;
-  /** Cases judged — full benchmark is 498; pilots show fewer. */
+  /** Cases judged; the published board keeps complete 498-case runs only. */
   nCases: number | null;
   genSeconds: number | null;
 }
+
+export type NitiMetricColumnKey =
+  | "retriever"
+  | "reranker"
+  | "rubricBar"
+  | "citationF1"
+  | "recallAtK"
+  | "pAt1"
+  | "hallucinated"
+  | "nCases"
+  | "genSeconds"
+  | "runDate";
+
+export type NitiColumnVisibility = Record<NitiMetricColumnKey, boolean>;
+export type NitiSortKey = NitiMetricColumnKey | "rank";
 
 /** A category-winning experiment surfaced in the hero stacked card deck. */
 /** The card face of a board row — BenchmarkRow and NitiBenchRow both fit. */

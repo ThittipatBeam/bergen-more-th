@@ -22,10 +22,13 @@ const MODES: { key: LeaderboardMode }[] = [
 export function LeaderboardSection() {
   const { language } = useLanguage();
   const t = I18N[language].leaderboard;
-  const latestRun = getLatestRunLabel(language);
   // The in-page switch and the navbar toggle both write the same context:
   // two controls, one board state.
   const { dataset: mode, setDataset: setMode, isNiti } = useDataset();
+  const latestRun = getLatestRunLabel(
+    language,
+    isNiti ? NITI_ROWS : BENCHMARK_ROWS
+  );
 
   const modeLabel = (key: LeaderboardMode) =>
     key === "nitibench" ? t.modeNitibench : t.modeWikipedia;

@@ -271,8 +271,11 @@ export function getChampionPicks(lang: Language = "EN"): ChampionPick[] {
 
 export const CHAMPION_PICKS: ChampionPick[] = getChampionPicks("EN");
 
-export function getLatestRunLabel(lang: Language = "EN"): string {
-  const latest = BENCHMARK_ROWS.map((row) => row.runDate)
+export function getLatestRunLabel(
+  lang: Language = "EN",
+  rows: readonly { runDate: string }[] = BENCHMARK_ROWS
+): string {
+  const latest = rows.map((row) => row.runDate)
     .filter(Boolean)
     .sort()
     .pop();

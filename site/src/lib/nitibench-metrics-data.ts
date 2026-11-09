@@ -87,8 +87,8 @@ export function getNitiMetrics(
           ? "retrieval เจอมาตราของศาลกี่มาตรา?"
           : "How many of the court's statutes did retrieval surface?",
         explanation: isTh
-          ? "เทียบชุดมาตราจาก top 100 กับมาตราที่ศาลอ้องจริงในแต่ละคำถาม"
-          : "The top-100 retrieval set is compared against the statutes the court actually cited.",
+          ? "เทียบชุดมาตราจาก top k กับมาตราที่ศาลอ้างจริงในแต่ละคำถาม"
+          : "The top-k retrieval set is compared against the statutes the court actually cited.",
         example: isTh
           ? "ศาลอ้างสามมาตรา ค้นเจอสอง: Recall = 66.7%"
           : "The court cited three statutes; retrieval found two, so recall is 66.7%.",

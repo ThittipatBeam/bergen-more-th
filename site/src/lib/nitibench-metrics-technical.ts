@@ -44,7 +44,7 @@ export const NITI_TECHNICAL_EN: Record<NitiMetricId, MetricTechnicalCopy> = {
       ],
     },
     notes: [
-      "Counting is any-hit: finding the right section in any version scores, and section-exact counting is nearly identical on this corpus.",
+      "Counting is version-exact: both the statute section and version must match the qrels for that decision date.",
       "The pool holds only the 3,253 gold statute rows; the full corpus is roughly 105k sections, so these numbers are easier than the official setup.",
     ],
   },
@@ -115,7 +115,7 @@ export const NITI_TECHNICAL_TH: Record<
       { symbol: "D_top", meaning: "มาตราที่ retrieval คืนมาใน top k" },
     ],
     notes: [
-      "นับแบบ any-hit คือเจอมาตราที่ถูกสักฉบับก็ได้คะแนน แบบ section-exact ต่างกันนิดเดียวบนคลังนี้",
+      "นับแบบตรงฉบับ (version-exact): ต้องตรงทั้งเลขมาตราและฉบับที่ใช้ ณ วันพิพากษา การเจอถูกมาตราแต่ผิดฉบับไม่นับ",
       "คลังมีเฉพาะมาตราที่เป็นเฉลย 3,253 แถว ส่วนคลังเต็มต้นทางหมื่นแสนแถวยังไม่เปิดเผย ตัวเลขที่นี่จึงง่ายกว่าเงื่อนไขทางการ",
     ],
   },

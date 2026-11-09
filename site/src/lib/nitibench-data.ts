@@ -12,6 +12,7 @@ import type {
  */
 
 const NITI_QUERY_SUFFIX = "NitiBenchPlusQA";
+const FULL_NITI_CASE_COUNT = 498;
 
 export const isNitiExperiment = (exp: ExperimentRecord): boolean =>
   (exp.dataset?.query?.target ?? "").endsWith(NITI_QUERY_SUFFIX);
@@ -93,10 +94,15 @@ const toNitiRow = (exp: ExperimentRecord): NitiBenchRow | null => {
   };
 };
 
-/** Ranked by the official Bar-standard rubric score; citation F1 breaks ties. */
+/** Ranked by the official Bar-standard rubric score; citation F1 breaks ties.
+ *  Only complete runs are published: filtering here also keeps hero champions
+ *  on the same 498-case workload. Pilot runs remain in the raw JSON. */
 const sortedRows = (rawExperiments as unknown as ExperimentRecord[])
   .map(toNitiRow)
-  .filter((row): row is NitiBenchRow => row !== null)
+  .filter(
+    (row): row is NitiBenchRow =>
+      row !== null && row.nCases === FULL_NITI_CASE_COUNT
+  )
   .sort(
     (a, b) =>
       b.rubricBar - a.rubricBar ||
